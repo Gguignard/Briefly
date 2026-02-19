@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Briefly - Design Directions Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            color: #1a1a1a;
+        }
+
+        /* Navigation Controls */
+        .nav-controls {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-bottom: 1px solid #d4d4d4;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .nav-controls h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .direction-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .direction-btn {
+            padding: 8px 16px;
+            border: 1px solid #d4d4d4;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .direction-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .direction-btn.active {
+            background: #0066cc;
+            color: white;
+            border-color: #0066cc;
+        }
+
+        /* Main Container */
+        .container {
+            margin-top: 72px;
+            padding: 24px;
+            max-width: 1400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .direction-view {
+            display: none;
+        }
+
+        .direction-view.active {
+            display: block;
+        }
+
+        .direction-header {
+            margin-bottom: 24px;
+        }
+
+        .direction-header h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .direction-header p {
+            color: #6b6b6b;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        /* Mobile Frame */
+        .mobile-frame {
+            max-width: 375px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+        }
+
+        /* Direction 1: Spacious & Airy */
+        .dir1 .top-bar {
+            padding: 16px;
+            background: white;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dir1 .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .dir1 .feed {
+            padding: 24px 16px 80px;
+            background: #fafafa;
+            min-height: 600px;
+        }
+
+        .dir1 .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+
+        .dir1 .card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+        }
+
+        .dir1 .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .dir1 .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            line-height: 1.4;
+        }
+
+        .dir1 .card-title.read {
+            font-weight: 400;
+            color: #6b6b6b;
+            opacity: 0.7;
+        }
+
+        .dir1 .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .dir1 .badge.premium {
+            background: #e8d4a0;
+            color: #7a6020;
+        }
+
+        .dir1 .badge.basic {
+            background: #f5f5f5;
+            color: #6b6b6b;
+        }
+
+        .dir1 .card-meta {
+            font-size: 14px;
+            color: #6b6b6b;
+            margin-bottom: 12px;
+        }
+
+        .dir1 .card-preview {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .dir1 .card-bullets {
+            list-style: none;
+            margin-bottom: 16px;
+        }
+
+        .dir1 .card-bullets li {
+            display: flex;
+            gap: 8px;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .dir1 .bullet-icon {
+            color: #0066cc;
+            flex-shrink: 0;
+        }
+
+        .dir1 .card-action {
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            color: #0066cc;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            transition: background 0.2s;
+            border-radius: 6px;
+        }
+
+        .dir1 .card-action:hover {
+            background: #f5f5f5;
+        }
+
+        .dir1 .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #d4d4d4;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+        }
+
+        .dir1 .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #6b6b6b;
+            font-size: 12px;
+            min-width: 64px;
+            cursor: pointer;
+        }
+
+        .dir1 .nav-item.active {
+            color: #0066cc;
+        }
+
+        .dir1 .nav-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Direction 2: Dense & Efficient */
+        .dir2 .top-bar {
+            padding: 12px 16px;
+            background: #1a1a1a;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dir2 .logo {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .dir2 .feed {
+            padding: 16px 12px 80px;
+            background: white;
+            min-height: 600px;
+        }
+
+        .dir2 .card {
+            background: white;
+            border: 1px solid #d4d4d4;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .dir2 .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .dir2 .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .dir2 .card-title.read {
+            font-weight: 400;
+            color: #6b6b6b;
+        }
+
+        .dir2 .badge {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .dir2 .badge.premium {
+            background: #d4af37;
+            color: white;
+        }
+
+        .dir2 .badge.basic {
+            background: #d4d4d4;
+            color: #6b6b6b;
+        }
+
+        .dir2 .card-meta {
+            font-size: 13px;
+            color: #6b6b6b;
+            margin-bottom: 8px;
+        }
+
+        .dir2 .card-preview {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .dir2 .card-bullets {
+            list-style: none;
+            margin-bottom: 12px;
+        }
+
+        .dir2 .card-bullets li {
+            display: flex;
+            gap: 6px;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .dir2 .bullet-icon {
+            color: #0066cc;
+            flex-shrink: 0;
+            font-size: 12px;
+        }
+
+        .dir2 .card-action {
+            padding: 8px 12px;
+            background: #0066cc;
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 6px;
+            font-weight: 500;
+        }
+
+        .dir2 .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #d4d4d4;
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+        }
+
+        .dir2 .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            color: #6b6b6b;
+            font-size: 11px;
+            min-width: 60px;
+            cursor: pointer;
+        }
+
+        .dir2 .nav-item.active {
+            color: #0066cc;
+        }
+
+        /* Direction 3: Minimal & Clean */
+        .dir3 .top-bar {
+            padding: 20px 16px;
+            background: white;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .dir3 .logo {
+            font-size: 24px;
+            font-weight: 300;
+            color: #1a1a1a;
+            letter-spacing: -0.5px;
+        }
+
+        .dir3 .feed {
+            padding: 32px 20px 80px;
+            background: white;
+            min-height: 600px;
+        }
+
+        .dir3 .card {
+            background: white;
+            border-bottom: 1px solid #f5f5f5;
+            padding: 24px 0;
+        }
+
+        .dir3 .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .dir3 .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+            line-height: 1.3;
+        }
+
+        .dir3 .card-title.read {
+            font-weight: 400;
+            color: #6b6b6b;
+        }
+
+        .dir3 .badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .dir3 .badge.premium {
+            background: #1a1a1a;
+            color: #d4af37;
+        }
+
+        .dir3 .badge.basic {
+            background: #f5f5f5;
+            color: #6b6b6b;
+        }
+
+        .dir3 .card-meta {
+            font-size: 14px;
+            color: #6b6b6b;
+            margin-bottom: 12px;
+        }
+
+        .dir3 .card-preview {
+            font-size: 16px;
+            line-height: 1.7;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .dir3 .card-bullets {
+            list-style: none;
+            margin-bottom: 16px;
+        }
+
+        .dir3 .card-bullets li {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #2d2d2d;
+            margin-bottom: 10px;
+            padding-left: 16px;
+            position: relative;
+        }
+
+        .dir3 .card-bullets li:before {
+            content: "—";
+            position: absolute;
+            left: 0;
+            color: #d4d4d4;
+        }
+
+        .dir3 .card-action {
+            color: #0066cc;
+            font-size: 16px;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .dir3 .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #f5f5f5;
+            display: flex;
+            justify-content: space-around;
+            padding: 16px 0;
+        }
+
+        .dir3 .nav-item {
+            color: #6b6b6b;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .dir3 .nav-item.active {
+            color: #1a1a1a;
+            border-bottom: 2px solid #1a1a1a;
+        }
+
+        /* Direction 4: Bold & Confident */
+        .dir4 .top-bar {
+            padding: 20px 16px;
+            background: #0066cc;
+            color: white;
+        }
+
+        .dir4 .logo {
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .dir4 .feed {
+            padding: 20px 16px 80px;
+            background: #f5f5f5;
+            min-height: 600px;
+        }
+
+        .dir4 .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .dir4 .card:hover {
+            border-color: #0066cc;
+        }
+
+        .dir4 .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .dir4 .card-title {
+            font-size: 19px;
+            font-weight: 700;
+            color: #1a1a1a;
+            line-height: 1.3;
+        }
+
+        .dir4 .card-title.read {
+            font-weight: 600;
+            color: #6b6b6b;
+        }
+
+        .dir4 .badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .dir4 .badge.premium {
+            background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
+            color: #1a1a1a;
+        }
+
+        .dir4 .badge.basic {
+            background: #d4d4d4;
+            color: #6b6b6b;
+        }
+
+        .dir4 .card-meta {
+            font-size: 14px;
+            color: #6b6b6b;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .dir4 .card-preview {
+            font-size: 17px;
+            line-height: 1.6;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .dir4 .card-bullets {
+            list-style: none;
+            margin-bottom: 16px;
+        }
+
+        .dir4 .card-bullets li {
+            display: flex;
+            gap: 10px;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .dir4 .bullet-icon {
+            color: #0066cc;
+            flex-shrink: 0;
+            font-weight: 700;
+        }
+
+        .dir4 .card-action {
+            padding: 12px 16px;
+            background: #0066cc;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+
+        .dir4 .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 2px solid #0066cc;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+        }
+
+        .dir4 .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #6b6b6b;
+            font-size: 13px;
+            font-weight: 600;
+            min-width: 64px;
+            cursor: pointer;
+        }
+
+        .dir4 .nav-item.active {
+            color: #0066cc;
+        }
+
+        /* All Caught Up Message */
+        .caught-up {
+            text-align: center;
+            padding: 32px 16px;
+            color: #6b6b6b;
+        }
+
+        .caught-up-emoji {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .caught-up-text {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        /* Direction 5: Refined Balance (Blend 1+4) */
+        .dir5 .top-bar {
+            padding: 16px;
+            background: white;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dir5 .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a1a;
+            letter-spacing: -0.3px;
+        }
+
+        .dir5 .feed {
+            padding: 24px 16px 96px;
+            background: #fafafa;
+            min-height: 600px;
+        }
+
+        .dir5 .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            border: 1.5px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .dir5 .card:hover {
+            box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+            border-color: #daeaff;
+        }
+
+        .dir5 .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .dir5 .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            line-height: 1.4;
+        }
+
+        .dir5 .card-title.read {
+            font-weight: 400;
+            color: #6b6b6b;
+            opacity: 0.7;
+        }
+
+        .dir5 .badge {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .dir5 .badge.premium {
+            background: linear-gradient(135deg, #e8d4a0 0%, #f4e4b4 100%);
+            color: #6b4e10;
+        }
+
+        .dir5 .badge.basic {
+            background: #f0f0f0;
+            color: #6b6b6b;
+        }
+
+        .dir5 .card-meta {
+            font-size: 13px;
+            color: #9b9b9b;
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .dir5 .card-preview {
+            font-size: 16px;
+            line-height: 1.65;
+            color: #2d2d2d;
+            margin-bottom: 14px;
+        }
+
+        .dir5 .card-bullets {
+            list-style: none;
+            margin-bottom: 18px;
+        }
+
+        .dir5 .card-bullets li {
+            display: flex;
+            gap: 8px;
+            font-size: 15px;
+            line-height: 1.55;
+            color: #2d2d2d;
+            margin-bottom: 10px;
+        }
+
+        .dir5 .bullet-icon {
+            color: #4a8fd4;
+            flex-shrink: 0;
+            font-weight: 700;
+        }
+
+        .dir5 .card-action {
+            padding: 11px 16px;
+            background: #f0f7ff;
+            border: 1.5px solid #c8dff5;
+            color: #0055b3;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.18s;
+        }
+
+        .dir5 .card-action:hover {
+            background: #daeaff;
+            border-color: #aacef0;
+        }
+
+        .dir5 .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #ebebeb;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+        }
+
+        .dir5 .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #9b9b9b;
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 64px;
+            cursor: pointer;
+        }
+
+        .dir5 .nav-item.active {
+            color: #0066cc;
+        }
+
+        .dir5 .nav-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (min-width: 768px) {
+            .mobile-frame {
+                max-width: 480px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-controls">
+        <h1>Briefly - Exploration Directions Design</h1>
+        <div class="direction-buttons">
+            <button class="direction-btn active" onclick="showDirection(1)">Dir 1: Spacious</button>
+            <button class="direction-btn" onclick="showDirection(2)">Dir 2: Dense</button>
+            <button class="direction-btn" onclick="showDirection(3)">Dir 3: Minimal</button>
+            <button class="direction-btn" onclick="showDirection(4)">Dir 4: Bold</button>
+            <button class="direction-btn" onclick="showDirection(5)" style="background:#e8f3ff; border-color:#0066cc; color:#0055b3; font-weight:600;">Dir 5: Blend ✨</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Direction 1: Spacious & Airy -->
+        <div class="direction-view dir1 active" id="direction-1">
+            <div class="direction-header">
+                <h2>Direction 1: Spacious & Airy (Recommandé)</h2>
+                <p><strong>Style:</strong> Espacement généreux (24px entre cards), ombres douces, typographie Substack (16-18px), palette sobre Notion. Aligné 100% avec nos principes "calme émotionnel" et "respiration visuelle".</p>
+                <p><strong>Avantages:</strong> Lisibilité maximale, scan rapide facilité, esthétique professionnelle rassurante, confiance immédiate.</p>
+            </div>
+
+            <div class="mobile-frame">
+                <div class="top-bar">
+                    <div class="logo">Briefly</div>
+                    <div style="color: #6b6b6b;">⚙</div>
+                </div>
+
+                <div class="feed">
+                    <!-- Card 1: Non-lu, Premium -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">The Pragmatic Engineer</div>
+                            <span class="badge premium">Premium</span>
+                        </div>
+                        <div class="card-meta">Il y a 2h</div>
+                        <div class="card-preview">
+                            Meta announces major layoffs affecting remote work policies and IC career advancement...
+                        </div>
+                        <ul class="card-bullets">
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span><strong>Meta: 12% reduction</strong> (3,000 employees affected)</span>
+                            </li>
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Remote work policy changes effective Q2 2026</span>
+                            </li>
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>IC vs manager career paths discussion</span>
+                            </li>
+                        </ul>
+                        <button class="card-action">Lire newsletter complète →</button>
+                    </div>
+
+                    <!-- Card 2: Lu, Basique -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title read">Stratechery</div>
+                            <span class="badge basic">Basique</span>
+                        </div>
+                        <div class="card-meta">Hier</div>
+                        <div class="card-preview">
+                            Apple Vision Pro sales analysis shows slower adoption than anticipated in consumer markets...
+                        </div>
+                        <ul class="card-bullets">
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Q1 sales: 250K units (vs 500K target)</span>
+                            </li>
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Enterprise adoption stronger (35% of sales)</span>
+                            </li>
+                        </ul>
+                        <button class="card-action">Lire newsletter complète →</button>
+                    </div>
+
+                    <!-- Card 3: Non-lu, Basique -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">TLDR Newsletter</div>
+                            <span class="badge basic">Basique</span>
+                        </div>
+                        <div class="card-meta">Il y a 5h</div>
+                        <div class="card-preview">
+                            GitHub Copilot update brings multi-file editing and improved context awareness...
+                        </div>
+                        <ul class="card-bullets">
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Multi-file refactoring now supported</span>
+                            </li>
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Context window expanded to 12K tokens</span>
+                            </li>
+                        </ul>
+                        <button class="card-action">Lire newsletter complète →</button>
+                    </div>
+
+                    <!-- All Caught Up -->
+                    <div class="caught-up">
+                        <div class="caught-up-emoji">🎉</div>
+                        <div class="caught-up-text">
+                            <strong>Tu es à jour!</strong><br>
+                            Tous tes résumés sont lus.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-nav">
+                    <div class="nav-item active">
+                        <div class="nav-icon">📰</div>
+                        <span>Feed</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">📬</div>
+                        <span>Newsletters</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">⚙</div>
+                        <span>Réglages</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction 2: Dense & Efficient -->
+        <div class="direction-view dir2" id="direction-2">
+            <div class="direction-header">
+                <h2>Direction 2: Dense & Efficient</h2>
+                <p><strong>Style:</strong> Espacement compact (16px entre cards), borders clairs, CTA buttons solides, top bar foncée. Plus d'info visible à l'écran simultanément.</p>
+                <p><strong>Avantages:</strong> Efficacité maximale pour power users, scroll réduit. <strong>Risques:</strong> Peut sembler oppressant (anti-calme), fatigue oculaire si sessions longues.</p>
+            </div>
+
+            <div class="mobile-frame">
+                <div class="top-bar">
+                    <div class="logo">Briefly</div>
+                    <div>⚙</div>
+                </div>
+
+                <div class="feed">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">The Pragmatic Engineer</div>
+                            <span class="badge premium">Premium</span>
+                        </div>
+                        <div class="card-meta">Il y a 2h</div>
+                        <div class="card-preview">
+                            Meta announces major layoffs affecting remote work policies...
+                        </div>
+                        <ul class="card-bullets">
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span><strong>Meta: 12% reduction</strong> (3,000 employees)</span>
+                            </li>
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Remote work policy changes Q2 2026</span>
+                            </li>
+                        </ul>
+                        <button class="card-action">Lire complète</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title read">Stratechery</div>
+                            <span class="badge basic">Basique</span>
+                        </div>
+                        <div class="card-meta">Hier</div>
+                        <div class="card-preview">
+                            Apple Vision Pro sales analysis shows slower adoption...
+                        </div>
+                        <ul class="card-bullets">
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Q1 sales: 250K units (vs 500K target)</span>
+                            </li>
+                        </ul>
+                        <button class="card-action">Lire complète</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">TLDR Newsletter</div>
+                            <span class="badge basic">Basique</span>
+                        </div>
+                        <div class="card-meta">Il y a 5h</div>
+                        <div class="card-preview">
+                            GitHub Copilot update brings multi-file editing...
+                        </div>
+                        <ul class="card-bullets">
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Multi-file refactoring supported</span>
+                            </li>
+                        </ul>
+                        <button class="card-action">Lire complète</button>
+                    </div>
+
+                    <div class="caught-up">
+                        <div class="caught-up-emoji">🎉</div>
+                        <div class="caught-up-text">
+                            Tu es à jour!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-nav">
+                    <div class="nav-item active">
+                        <div class="nav-icon">📰</div>
+                        <span>Feed</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">📬</div>
+                        <span>Newsletters</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">⚙</div>
+                        <span>Réglages</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction 3: Minimal & Clean -->
+        <div class="direction-view dir3" id="direction-3">
+            <div class="direction-header">
+                <h2>Direction 3: Minimal & Clean</h2>
+                <p><strong>Style:</strong> Ultra-minimal, pas de cards (borders bottom seulement), typographie fine, badge discrets. Background blanc pur, navigation textuelle.</p>
+                <p><strong>Avantages:</strong> Élégance maximale, focus contenu. <strong>Risques:</strong> Peut sembler trop austère, manque différenciation visuelle entre résumés.</p>
+            </div>
+
+            <div class="mobile-frame">
+                <div class="top-bar">
+                    <div class="logo">Briefly</div>
+                </div>
+
+                <div class="feed">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">The Pragmatic Engineer</div>
+                            <span class="badge premium">PRO</span>
+                        </div>
+                        <div class="card-meta">Il y a 2h</div>
+                        <div class="card-preview">
+                            Meta announces major layoffs affecting remote work policies and IC career advancement opportunities...
+                        </div>
+                        <ul class="card-bullets">
+                            <li>Meta: 12% reduction (3,000 employees affected)</li>
+                            <li>Remote work policy changes effective Q2 2026</li>
+                            <li>IC vs manager career paths under review</li>
+                        </ul>
+                        <button class="card-action">Lire la newsletter complète</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title read">Stratechery</div>
+                            <span class="badge basic">STD</span>
+                        </div>
+                        <div class="card-meta">Hier</div>
+                        <div class="card-preview">
+                            Apple Vision Pro sales analysis shows slower than anticipated adoption in consumer markets...
+                        </div>
+                        <ul class="card-bullets">
+                            <li>Q1 sales: 250K units (vs 500K initial target)</li>
+                            <li>Enterprise adoption stronger at 35% of total sales</li>
+                        </ul>
+                        <button class="card-action">Lire la newsletter complète</button>
+                    </div>
+
+                    <div class="caught-up">
+                        <div class="caught-up-emoji">✓</div>
+                        <div class="caught-up-text">
+                            Tous tes résumés sont lus.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-nav">
+                    <div class="nav-item active">Feed</div>
+                    <div class="nav-item">Newsletters</div>
+                    <div class="nav-item">Réglages</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Direction 4: Bold & Confident -->
+        <div class="direction-view dir4" id="direction-4">
+            <div class="direction-header">
+                <h2>Direction 4: Bold & Confident</h2>
+                <p><strong>Style:</strong> Couleur bleu dominante (top bar), cards border-radius large (16px), badge premium gradient doré, CTA buttons solides bleu. Typographie plus bold.</p>
+                <p><strong>Avantages:</strong> Personnalité forte, mémorable, différenciation maximale. <strong>Risques:</strong> Peut sembler moins professionnel/sobre (risque confiance), visuellement fatigant long-terme.</p>
+            </div>
+
+            <div class="mobile-frame">
+                <div class="top-bar">
+                    <div class="logo">Briefly</div>
+                </div>
+
+                <div class="feed">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">The Pragmatic Engineer</div>
+                            <span class="badge premium">Premium</span>
+                        </div>
+                        <div class="card-meta">Il y a 2h</div>
+                        <div class="card-preview">
+                            Meta announces major layoffs affecting remote work policies and IC career advancement...
+                        </div>
+                        <ul class="card-bullets">
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span><strong>Meta: 12% reduction</strong> (3,000 employees)</span>
+                            </li>
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Remote work policy changes Q2 2026</span>
+                            </li>
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>IC vs manager career paths discussion</span>
+                            </li>
+                        </ul>
+                        <button class="card-action">Lire newsletter complète</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title read">Stratechery</div>
+                            <span class="badge basic">Basique</span>
+                        </div>
+                        <div class="card-meta">Hier</div>
+                        <div class="card-preview">
+                            Apple Vision Pro sales analysis shows slower adoption than anticipated...
+                        </div>
+                        <ul class="card-bullets">
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Q1 sales: 250K units (vs 500K target)</span>
+                            </li>
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Enterprise adoption at 35% of sales</span>
+                            </li>
+                        </ul>
+                        <button class="card-action">Lire newsletter complète</button>
+                    </div>
+
+                    <div class="caught-up">
+                        <div class="caught-up-emoji">🎉</div>
+                        <div class="caught-up-text">
+                            <strong>Tu es à jour!</strong><br>
+                            Tous tes résumés sont lus.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-nav">
+                    <div class="nav-item active">
+                        <div class="nav-icon">📰</div>
+                        <span>Feed</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">📬</div>
+                        <span>Newsletters</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">⚙</div>
+                        <span>Réglages</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Direction 5: Refined Balance (Blend 1+4) -->
+        <div class="direction-view dir5" id="direction-5">
+            <div class="direction-header">
+                <h2>Direction 5: Refined Balance — Blend 1 + 4 ✨</h2>
+                <p><strong>Style:</strong> Espacement généreux du Dir 1 (24px entre cards, border-radius 16px), shadows douces. CTAs visibles sans agressivité : fond bleu très pâle + border subtile (pas de bouton solide). Badge premium gradient doré discret du Dir 4. Top bar blanc épuré.</p>
+                <p><strong>Équilibre :</strong> Calme et lisibilité du Dir 1 · CTAs clairs et cliquables · Bleu adouci (#0055b3) · Hover cards avec bordure bleu pâle.</p>
+            </div>
+
+            <div class="mobile-frame">
+                <div class="top-bar">
+                    <div class="logo">Briefly</div>
+                    <div style="color: #9b9b9b; font-size: 20px;">⚙</div>
+                </div>
+
+                <div class="feed">
+                    <!-- Card 1: Non-lu, Premium -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">The Pragmatic Engineer</div>
+                            <span class="badge premium">Premium</span>
+                        </div>
+                        <div class="card-meta">Il y a 2h</div>
+                        <div class="card-preview">
+                            Meta announces major layoffs affecting remote work policies and IC career advancement opportunities...
+                        </div>
+                        <ul class="card-bullets">
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span><strong>Meta: 12% reduction</strong> (3,000 employees affected)</span>
+                            </li>
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Remote work policy changes effective Q2 2026</span>
+                            </li>
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>IC vs manager career paths under review</span>
+                            </li>
+                        </ul>
+                        <button class="card-action">Lire la newsletter complète →</button>
+                    </div>
+
+                    <!-- Card 2: Lu, Basique -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title read">Stratechery</div>
+                            <span class="badge basic">Basique</span>
+                        </div>
+                        <div class="card-meta">Hier</div>
+                        <div class="card-preview">
+                            Apple Vision Pro sales analysis shows slower than anticipated adoption in consumer markets...
+                        </div>
+                        <ul class="card-bullets">
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Q1 sales: 250K units (vs 500K initial target)</span>
+                            </li>
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Enterprise adoption stronger at 35% of total sales</span>
+                            </li>
+                        </ul>
+                        <button class="card-action">Lire la newsletter complète →</button>
+                    </div>
+
+                    <!-- Card 3: Non-lu, Basique -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">TLDR Newsletter</div>
+                            <span class="badge basic">Basique</span>
+                        </div>
+                        <div class="card-meta">Il y a 5h</div>
+                        <div class="card-preview">
+                            GitHub Copilot update brings multi-file editing and autonomous refactoring capabilities to all plans...
+                        </div>
+                        <ul class="card-bullets">
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>Multi-file refactoring now supported in all tiers</span>
+                            </li>
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span><strong>Autonomous PR generation</strong> in beta (invite-only)</span>
+                            </li>
+                            <li>
+                                <span class="bullet-icon">•</span>
+                                <span>VS Code extension updated with inline diff view</span>
+                            </li>
+                        </ul>
+                        <button class="card-action">Lire la newsletter complète →</button>
+                    </div>
+
+                    <div class="caught-up">
+                        <div class="caught-up-emoji">🎉</div>
+                        <div class="caught-up-text">
+                            Tu es à jour !<br>
+                            <span style="font-size:14px; color:#b0b0b0;">Tous tes résumés sont lus.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-nav">
+                    <div class="nav-item active">
+                        <div class="nav-icon">📰</div>
+                        <span>Feed</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">📬</div>
+                        <span>Newsletters</span>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">⚙</div>
+                        <span>Réglages</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showDirection(num) {
+            // Hide all directions
+            document.querySelectorAll('.direction-view').forEach(view => {
+                view.classList.remove('active');
+            });
+
+            // Remove active from all buttons
+            document.querySelectorAll('.direction-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected direction
+            document.getElementById(`direction-${num}`).classList.add('active');
+
+            // Activate button
+            event.target.classList.add('active');
+
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
