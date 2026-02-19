@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\grego\\\\Documents\\\\Briefly\\\\_bmad-output\\\\planning-artifacts\\\\product-brief-Briefly-2026-02-15.md'' -Raw\")",
+      "Bash(powershell -Command \"\\(Get-Content ''C:\\\\Users\\\\grego\\\\Documents\\\\Briefly\\\\_bmad-output\\\\planning-artifacts\\\\product-brief-Briefly-2026-02-15.md''\\).Count\")",
+      "Bash(powershell -Command \"\\(Get-Content ''C:\\\\Users\\\\grego\\\\Documents\\\\Briefly\\\\_bmad-output\\\\planning-artifacts\\\\prd.md''\\).Count\")",
+      "Bash(powershell -Command \"\\(Get-Content ''C:\\\\Users\\\\grego\\\\Documents\\\\Briefly\\\\_bmad-output\\\\planning-artifacts\\\\prd-validation-report.md''\\).Count\")",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\grego\\\\Documents\\\\Briefly\\\\_bmad-output\\\\planning-artifacts\\\\product-brief-Briefly-2026-02-15.md'' | Select-Object -First 350 | Out-String -Width 10000\")",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\grego\\\\Documents\\\\Briefly\\\\_bmad-output\\\\planning-artifacts\\\\prd-validation-report.md'' | Select-Object -First 350 | Out-String -Width 10000\")",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\grego\\\\Documents\\\\Briefly\\\\_bmad-output\\\\planning-artifacts\\\\product-brief-Briefly-2026-02-15.md'' | Select-Object -Skip 350 | Out-String -Width 10000\")",
+      "Bash(powershell -Command \"Get-Content ''C:\\\\Users\\\\grego\\\\Documents\\\\Briefly\\\\_bmad-output\\\\planning-artifacts\\\\prd-validation-report.md'' | Select-Object -Skip 350 | Out-String -Width 10000\")",
+      "Bash(powershell -Command:*)",
+      "Bash(npx create-next-app:*)",
+      "Bash(npx shadcn@latest init --defaults)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(rtk npm run lint:*)"
+    ]
+  }
+}
