@@ -17,7 +17,22 @@
       "Bash(rtk npm run lint:*)",
       "Bash(npm run lint)",
       "Bash(npm run build:*)",
-      "Bash(git status:*)"
+      "Bash(git status:*)",
+      "Bash(rtk ls:*)",
+      "Bash(npm install:*)",
+      "Bash(supabase --version:*)",
+      "Bash(npx supabase init)",
+      "Bash(docker:*)",
+      "Bash(npx supabase start)",
+      "Bash(npx supabase status)",
+      "Bash(npx supabase:*)",
+      "Bash(curl:*)",
+      "Bash(PGPASSWORD=postgres psql:*)",
+      "Bash(ls:*)",
+      "Bash(npm test:*)",
+      "Bash(rtk git status)",
+      "Bash(rtk git status:*)",
+      "Bash(rtk git add .)"
     ]
   }
 }
