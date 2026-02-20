@@ -14,7 +14,10 @@
       "Bash(npx create-next-app:*)",
       "Bash(npx shadcn@latest init --defaults)",
       "Bash(npx shadcn@latest add:*)",
-      "Bash(rtk npm run lint:*)"
+      "Bash(rtk npm run lint:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run build:*)",
+      "Bash(git status:*)"
     ]
   }
 }
