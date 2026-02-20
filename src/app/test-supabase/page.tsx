@@ -23,7 +23,7 @@ export default async function TestSupabasePage() {
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">Test Supabase - Connexion réussie!</h1>
-      <p className="mb-4">Nombre d'utilisateurs: {users?.length || 0}</p>
+      <p className="mb-4">Nombre d&apos;utilisateurs: {users?.length || 0}</p>
 
       <div className="bg-green-100 p-4 rounded">
         <h2 className="font-bold mb-2">Utilisateurs (depuis le seed):</h2>
