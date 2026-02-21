@@ -6,8 +6,10 @@
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit",
     "test": "vitest run",
+    "test:ci": "vitest run --reporter=verbose",
     "test:watch": "vitest"
   },
   "dependencies": {
