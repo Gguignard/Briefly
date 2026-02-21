@@ -1,0 +1,63 @@
+# config/deploy.yml
+#
+# Configuration Kamal pour déploiement Briefly
+#
+# AVANT PREMIER DÉPLOIEMENT:
+#   1. Remplacer IP_VPS_OVH par l'IP publique du VPS (ex: 51.91.xxx.xxx)
+#   2. Remplacer GITHUB_USERNAME par votre username GitHub
+#   3. Remplacer briefly.yourdomain.com par le domaine de production
+#   4. Configurer les secrets GitHub Actions (voir README section Secrets)
+#   5. Sur le VPS: kamal env push (pour pousser les secrets)
+#
+service: briefly
+image: ghcr.io/GITHUB_USERNAME/briefly
+
+servers:
+  web:
+    - IP_VPS_OVH  # TODO: Remplacer par l'IP du VPS OVH
+
+registry:
+  server: ghcr.io
+  username:
+    - KAMAL_REGISTRY_USERNAME
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+builder:
+  dockerfile: docker/Dockerfile
+  context: .
+  multiarch: false  # Build pour arch cible uniquement (plus rapide)
+
+env:
+  clear:
+    NODE_ENV: production
+    PORT: "3000"
+  secret:
+    # Supabase
+    - NEXT_PUBLIC_SUPABASE_URL
+    - NEXT_PUBLIC_SUPABASE_ANON_KEY
+    - SUPABASE_SERVICE_ROLE_KEY
+    # Clerk Auth
+    - CLERK_SECRET_KEY
+    - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+    # Redis
+    - REDIS_URL
+    # Monitoring
+    - SENTRY_DSN
+    # Stripe (billing)
+    - STRIPE_SECRET_KEY
+    - STRIPE_WEBHOOK_SECRET
+    # LLM APIs
+    - OPENAI_API_KEY
+    - ANTHROPIC_API_KEY
+
+proxy:
+  ssl: true
+  host: briefly.yourdomain.com  # TODO: Remplacer par le domaine de production
+
+# Health check pour rolling deploys
+healthcheck:
+  path: /api/health
+  port: 3000
+  interval: 10
+  max_attempts: 30
