@@ -1,0 +1,37 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "confirm": "Confirmer"
+  },
+  "nav": {
+    "summaries": "Résumés",
+    "newsletters": "Newsletters",
+    "categories": "Catégories",
+    "settings": "Paramètres",
+    "billing": "Facturation",
+    "signOut": "Se déconnecter"
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "signUpCta": "Essayer gratuitement",
+    "securityMessage": "Connexion sécurisée OAuth 2.0 — Briefly n'accède jamais à vos emails personnels"
+  },
+  "summaries": {
+    "empty": "Vos premiers résumés arriveront demain matin !",
+    "newCount": "{count} nouveau(x) résumé(s) disponible(s)",
+    "readMore": "Lire la newsletter complète",
+    "badgePremium": "Premium",
+    "badgeBasic": "Basique"
+  },
+  "newsletters": {
+    "empty": "Ajoutez votre première newsletter",
+    "addButton": "Ajouter une newsletter",
+    "limitReached": "{count}/5 newsletters (tier gratuit)"
+  }
+}
