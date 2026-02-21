@@ -1,0 +1,37 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm"
+  },
+  "nav": {
+    "summaries": "Summaries",
+    "newsletters": "Newsletters",
+    "categories": "Categories",
+    "settings": "Settings",
+    "billing": "Billing",
+    "signOut": "Sign Out"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signUpCta": "Try for Free",
+    "securityMessage": "Secure OAuth 2.0 login — Briefly never accesses your personal emails"
+  },
+  "summaries": {
+    "empty": "Your first summaries will arrive tomorrow morning!",
+    "newCount": "{count} new summar{count, plural, one {y} other {ies}} available",
+    "readMore": "Read full newsletter",
+    "badgePremium": "Premium",
+    "badgeBasic": "Basic"
+  },
+  "newsletters": {
+    "empty": "Add your first newsletter",
+    "addButton": "Add Newsletter",
+    "limitReached": "{count}/5 newsletters (free tier)"
+  }
+}
