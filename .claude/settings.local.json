@@ -32,7 +32,23 @@
       "Bash(npm test:*)",
       "Bash(rtk git status)",
       "Bash(rtk git status:*)",
-      "Bash(rtk git add .)"
+      "Bash(rtk git add .)",
+      "Bash(rtk git commit -m \"$\\(cat <<''EOF''\nfeat\\(supabase\\): implement Supabase setup with initial schema \\(Story 1.2\\)\n\n- Add @supabase/ssr client for browser and server\n- Create database migration with users and llm_costs tables\n- Enable RLS with Clerk-based policies\n- Generate TypeScript types from schema\n- Add Vitest tests \\(9/9 passing\\)\n- Create admin client for RLS bypass\n- Add test page to verify connection\n- Configure Supabase CLI with Docker\n\nAll acceptance criteria met and tests passing.\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(rtk git diff:*)",
+      "Bash(rtk npm test)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(rtk docker build:*)",
+      "Bash(rtk docker run:*)",
+      "Bash(rtk docker stop:*)",
+      "Bash(rtk docker rm:*)",
+      "Bash(copy \"C:\\\\Users\\\\grego\\\\Documents\\\\Briefly\\\\.env.production.example\" \"C:\\\\Users\\\\grego\\\\Documents\\\\Briefly\\\\.env.production\")",
+      "Bash(rtk docker compose:*)",
+      "Bash(rtk docker ps --filter \"name=briefly\")",
+      "Bash(rtk git log:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(npm run test:ci:*)",
+      "Bash(git rm:*)"
     ]
   }
 }
