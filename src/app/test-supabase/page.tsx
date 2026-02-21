@@ -1,5 +1,8 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 
+// Force dynamic rendering - cette page nécessite des vars d'env runtime
+export const dynamic = 'force-dynamic'
+
 export default async function TestSupabasePage() {
   // Utilise le client admin pour bypasser le RLS lors des tests
   const supabase = createAdminClient()

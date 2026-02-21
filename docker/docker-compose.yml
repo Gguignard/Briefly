@@ -1,0 +1,56 @@
+# docker/docker-compose.yml
+#
+# PRÉREQUIS: Créer .env.production à la racine du projet
+#   cp .env.production.example .env.production
+#   Puis remplir les valeurs
+#
+
+networks:
+  briefly-net:
+    driver: bridge
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: briefly-app
+    restart: unless-stopped
+    env_file:
+      - ../.env.production
+    networks:
+      - briefly-net
+    depends_on:
+      - redis
+    expose:
+      - "3000"
+
+  redis:
+    image: redis:7-alpine
+    container_name: briefly-redis
+    restart: unless-stopped
+    networks:
+      - briefly-net
+    # Port 6379 NON exposé publiquement — réseau interne uniquement
+    # Pas de persistence au MVP
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: briefly-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - briefly-net
+    depends_on:
+      - app
+
+volumes:
+  caddy_data:
+  caddy_config:

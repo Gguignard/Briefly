@@ -1,0 +1,22 @@
+# docker/Caddyfile
+#
+# AVANT DÉPLOIEMENT: Remplacer briefly.yourdomain.com par le domaine de production
+# Caddy génèrera automatiquement un certificat TLS via Let's Encrypt
+#
+briefly.yourdomain.com {
+    reverse_proxy app:3000
+
+    encode gzip
+
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        X-XSS-Protection "1; mode=block"
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    }
+
+    log {
+        output stdout
+        format json
+    }
+}
