@@ -44,5 +44,72 @@
     "empty": "Add your first newsletter",
     "addButton": "Add Newsletter",
     "limitReached": "{count}/5 newsletters (free tier)"
+  },
+  "marketing": {
+    "meta": {
+      "title": "Briefly — AI Newsletter Summaries | Free",
+      "description": "Briefly transforms your newsletters into concise AI summaries. Save 5h/week. Free for 5 newsletters.",
+      "og_title": "Briefly — AI Newsletter Summaries",
+      "og_description": "Transform your newsletters into AI summaries in 30 seconds. Free, no credit card required.",
+      "og_image_alt": "Briefly dashboard preview"
+    },
+    "header": {
+      "pricing": "Pricing",
+      "signIn": "Sign In",
+      "signUp": "Try for Free"
+    },
+    "footer": {
+      "tagline": "Summarize your newsletters with AI",
+      "product": "Product",
+      "features": "Features",
+      "pricing": "Pricing",
+      "legal": "Legal",
+      "privacy": "Privacy",
+      "terms": "Terms of Service",
+      "support": "Support",
+      "help": "Help",
+      "contact": "Contact",
+      "copyright": "© 2026 Briefly. All rights reserved."
+    },
+    "hero": {
+      "badge": "Free for 5 newsletters",
+      "headline": "Transform your newsletters into AI summaries in 30 seconds",
+      "subheadline": "Save 5h/week. Briefly reads, summarizes and categorizes your newsletters for you.",
+      "cta_primary": "Try for Free",
+      "cta_secondary": "See Pricing",
+      "no_credit_card": "No credit card required",
+      "image_alt": "Briefly summaries feed preview"
+    },
+    "features": {
+      "title": "Everything you need",
+      "subtitle": "Smart summaries, real organization, zero effort.",
+      "dual_llm": {
+        "title": "Dual LLM AI",
+        "description": "GPT-5 Nano for fast summaries, Claude Haiku for in-depth analysis. The best of both worlds."
+      },
+      "auto_summary": {
+        "title": "Automatic summaries",
+        "description": "As soon as a newsletter arrives, Briefly summarizes it. Get the essentials in 30 seconds."
+      },
+      "categories": {
+        "title": "Smart categorization",
+        "description": "Organize your newsletters by custom themes. Tech, Finance, Culture — you choose."
+      }
+    },
+    "social_proof": {
+      "title": "Used by thousands of professionals",
+      "user_count": "{count}+ active users",
+      "testimonial": {
+        "quote": "Briefly saved me 5 hours a week. I never miss important information anymore.",
+        "author": "Sarah M.",
+        "role": "Product Manager"
+      }
+    },
+    "cta": {
+      "title": "Ready to take control of your newsletters?",
+      "subtitle": "Join thousands of users who save time every day.",
+      "button": "Get Started for Free",
+      "no_credit_card": "No credit card required"
+    }
   }
 }
