@@ -213,10 +213,44 @@ export function SummaryCard() {
 
 ---
 
+## Senior Developer Review (AI)
+
+### Review Date
+2026-02-22
+
+### Review Outcome
+✅ **Approved** (after fixes applied)
+
+### Issues Found & Resolved
+| Severity | Issue | Status |
+|----------|-------|--------|
+| 🔴 HIGH | Strings hardcodées dans `page.tsx` - AC #8 violé | ✅ Fixed |
+| 🔴 HIGH | Pluriel FR sans syntaxe ICU dans `fr.json` | ✅ Fixed |
+| 🔴 HIGH | Tests incomplets - ne vérifient pas tous les namespaces | ✅ Fixed |
+| 🟡 MED | Type assertion `as any` - type safety compromis | ✅ Fixed |
+| 🟡 MED | Pas de type `Locale` exporté réutilisable | ✅ Fixed |
+| 🟡 MED | Pas de navigation helpers (`Link`, `useRouter`) | ✅ Fixed |
+| 🟢 LOW | Commentaires en anglais (convention acceptée) | N/A |
+| 🟢 LOW | Metadata non internationalisées | ✅ Fixed |
+
+### Fixes Applied
+1. **page.tsx** - Utilise maintenant `getTranslations('home')` pour tous les textes
+2. **fr.json** - Ajout namespaces `home`, `metadata` + syntaxe ICU pour pluriels
+3. **en.json** - Ajout namespaces `home`, `metadata`
+4. **routing.ts** - Export `locales` const et type `Locale`
+5. **layout.tsx** - Type guard `isValidLocale()` + `generateMetadata()` internationalisé
+6. **navigation.ts** - Nouveau fichier avec helpers `Link`, `redirect`, `usePathname`, etc.
+7. **i18n.test.tsx** - Tests étendus pour tous les namespaces + validation ICU plurals
+
+### Convention établie
+- **Commentaires dans le code : EN anglais** (convention universelle)
+
+---
+
 ## Dev Agent Record
 
 ### Status
-Review
+Done
 
 ### Agent Model Used
 Claude Sonnet 4.5 (claude-sonnet-4-5-20250929)
@@ -231,31 +265,36 @@ Claude Sonnet 4.5 (claude-sonnet-4-5-20250929)
 
 ### Completion Notes
 **Implémentation complétée avec succès (2026-02-21)**
+**Code review passée avec corrections (2026-02-22)**
 
 Internationalisation configurée avec next-intl pour français et anglais :
-- Configuration i18n complète avec routing et request handlers
+- Configuration i18n complète avec routing, request handlers, et navigation helpers
 - Structure App Router restructurée avec pattern `[locale]/`
-- Fichiers de traduction créés avec toutes les clés spécifiées
+- Fichiers de traduction avec 7 namespaces et syntaxe ICU pour pluriels
 - Middleware configuré pour détection automatique de locale
-- Tests unitaires créés pour valider la configuration i18n
+- Tests unitaires complets (9 tests) validant tous les namespaces
+- Type `Locale` exporté pour type safety
+- Metadata internationalisées via `generateMetadata()`
 
 **Note importante** : Clerk n'est pas encore installé dans le projet. Le middleware a été configuré pour next-intl uniquement. L'intégration Clerk pourra être ajoutée ultérieurement quand Clerk sera installé (probablement dans Story 3.1 - OAuth Signup).
 
-**Tests** : 17 tests passent (11 existants + 6 nouveaux tests i18n)
+**Tests** : 20 tests (14 passent, 4 Supabase échouent - DB locale non démarrée, non lié à i18n)
+**Tests i18n** : 9/9 passent
 **Build** : Production build réussit sans erreur
 **TypeScript** : Aucune erreur de type
 
 ### File List
 - `package.json` - Ajout de next-intl dependency
 - `next.config.ts` - Configuration du plugin next-intl
-- `src/i18n/routing.ts` - Configuration des locales (fr, en)
+- `src/i18n/routing.ts` - Configuration des locales + export type Locale
 - `src/i18n/request.ts` - Configuration getRequestConfig
-- `src/i18n/__tests__/i18n.test.tsx` - Tests unitaires pour i18n
+- `src/i18n/navigation.ts` - **[NEW]** Helpers navigation (Link, redirect, useRouter, etc.)
+- `src/i18n/__tests__/i18n.test.tsx` - Tests unitaires complets (9 tests, tous namespaces)
 - `src/middleware.ts` - Middleware next-intl pour détection locale
-- `src/app/[locale]/layout.tsx` - Root layout avec NextIntlClientProvider
-- `messages/fr.json` - Traductions françaises
-- `messages/en.json` - Traductions anglaises
-- Déplacé : `src/app/page.tsx` → `src/app/[locale]/page.tsx`
+- `src/app/[locale]/layout.tsx` - Root layout avec NextIntlClientProvider + generateMetadata
+- `src/app/[locale]/page.tsx` - Page d'accueil avec traductions
+- `messages/fr.json` - Traductions françaises (7 namespaces, syntaxe ICU)
+- `messages/en.json` - Traductions anglaises (7 namespaces, syntaxe ICU)
 - Déplacé : `src/app/(marketing)/` → `src/app/[locale]/(marketing)/`
 - Déplacé : `src/app/(auth)/` → `src/app/[locale]/(auth)/`
 - Déplacé : `src/app/(dashboard)/` → `src/app/[locale]/(dashboard)/`
@@ -263,4 +302,6 @@ Internationalisation configurée avec next-intl pour français et anglais :
 - Supprimé : `src/app/layout.tsx` (remplacé par [locale]/layout.tsx)
 
 ### Debug Log
-Aucun problème majeur rencontré. Configuration effectuée selon les spécifications de la story avec adaptation pour l'absence de Clerk.
+- Implémentation initiale sans problème majeur
+- **Code Review (2026-02-22)** : 6 issues corrigées (3 HIGH, 3 MEDIUM, 1 LOW)
+- Convention établie : commentaires EN anglais dans le code

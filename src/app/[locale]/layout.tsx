@@ -1,10 +1,14 @@
 import { NextIntlClientProvider } from 'next-intl'
-import { getMessages } from 'next-intl/server'
+import { getMessages, getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-import { routing } from '@/i18n/routing'
+import { routing, locales, type Locale } from '@/i18n/routing'
 import '../globals.css'
+
+function isValidLocale(locale: string): locale is Locale {
+  return locales.includes(locale as Locale)
+}
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -16,13 +20,22 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
-export const metadata: Metadata = {
-  title: 'Briefly',
-  description: 'Summarize newsletters with AI',
-}
-
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }))
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: 'metadata' })
+
+  return {
+    title: t('title'),
+    description: t('description'),
+  }
 }
 
 export default async function LocaleLayout({
@@ -35,7 +48,7 @@ export default async function LocaleLayout({
   const { locale } = await params
 
   // Ensure that the incoming `locale` is valid
-  if (!routing.locales.includes(locale as any)) {
+  if (!isValidLocale(locale)) {
     notFound()
   }
 

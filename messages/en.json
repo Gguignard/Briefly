@@ -8,6 +8,17 @@
     "edit": "Edit",
     "confirm": "Confirm"
   },
+  "home": {
+    "tagline": "Summarize your newsletters with AI",
+    "componentsTitle": "shadcn/ui Components",
+    "componentsDescription": "Button, Card and Badge working",
+    "stackTitle": "Tech Stack",
+    "stackDescription": "Story 1.1 — Foundations"
+  },
+  "metadata": {
+    "title": "Briefly",
+    "description": "Summarize your newsletters with AI"
+  },
   "nav": {
     "summaries": "Summaries",
     "newsletters": "Newsletters",

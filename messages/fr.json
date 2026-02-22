@@ -8,6 +8,17 @@
     "edit": "Modifier",
     "confirm": "Confirmer"
   },
+  "home": {
+    "tagline": "Résumez vos newsletters avec l'IA",
+    "componentsTitle": "Composants shadcn/ui",
+    "componentsDescription": "Button, Card et Badge fonctionnels",
+    "stackTitle": "Stack technique",
+    "stackDescription": "Story 1.1 — Fondations"
+  },
+  "metadata": {
+    "title": "Briefly",
+    "description": "Résumez vos newsletters avec l'IA"
+  },
   "nav": {
     "summaries": "Résumés",
     "newsletters": "Newsletters",
@@ -24,7 +35,7 @@
   },
   "summaries": {
     "empty": "Vos premiers résumés arriveront demain matin !",
-    "newCount": "{count} nouveau(x) résumé(s) disponible(s)",
+    "newCount": "{count, plural, one {# nouveau résumé disponible} other {# nouveaux résumés disponibles}}",
     "readMore": "Lire la newsletter complète",
     "badgePremium": "Premium",
     "badgeBasic": "Basique"
