@@ -1,0 +1,5 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#0f172a"/>
+  <text x="50%" y="40%" font-family="Arial, sans-serif" font-size="64" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle">Briefly</text>
+  <text x="50%" y="60%" font-family="Arial, sans-serif" font-size="32" fill="#94a3b8" text-anchor="middle" dominant-baseline="middle">AI Newsletter Summaries</text>
+</svg>
