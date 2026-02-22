@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react'
 import { Button } from '@/components/ui/button'
+import * as Sentry from '@sentry/nextjs'
 
 export default function Error({
   error,
@@ -11,7 +12,10 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    // En production, on utilisera Pino (Story 1.6) à la place de console.error
+    // Capturer l'erreur avec Sentry (Story 1.6)
+    Sentry.captureException(error)
+
+    // Log en développement pour debugging
     if (process.env.NODE_ENV === 'development') {
       console.error(error)
     }
