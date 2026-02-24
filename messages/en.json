@@ -33,6 +33,10 @@
     "signUpCta": "Try for Free",
     "securityMessage": "🔒 Secure OAuth 2.0 login — Briefly never accesses your personal emails"
   },
+  "jsonLd": {
+    "websiteDescription": "AI summaries of your newsletters in 2 minutes a day",
+    "offerDescription": "Free tier — 5 newsletters max"
+  },
   "summaries": {
     "empty": "Your first summaries will arrive tomorrow morning!",
     "newCount": "{count} new summar{count, plural, one {y} other {ies}} available",

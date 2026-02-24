@@ -34,9 +34,26 @@ export async function generateMetadata({
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: 'metadata' })
 
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://briefly.app'
+
   return {
+    metadataBase: new URL(baseUrl),
     title: t('title'),
     description: t('description'),
+    alternates: {
+      canonical: `${baseUrl}/${locale}`,
+      languages: {
+        fr: `${baseUrl}/fr`,
+        en: `${baseUrl}/en`,
+        'x-default': `${baseUrl}/fr`,
+      },
+    },
+    openGraph: {
+      type: 'website',
+      siteName: 'Briefly',
+      locale: locale === 'fr' ? 'fr_FR' : 'en_US',
+      alternateLocale: locale === 'fr' ? 'en_US' : 'fr_FR',
+    },
   }
 }
 
