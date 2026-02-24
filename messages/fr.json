@@ -138,6 +138,57 @@
         "unlimited_categories": "Catégorisation personnalisée illimitée",
         "priority_support": "Support prioritaire"
       }
+    },
+    "legal": {
+      "privacy": {
+        "meta_title": "Politique de Confidentialité — Briefly",
+        "title": "Politique de Confidentialité",
+        "last_updated": "Dernière mise à jour : février 2026",
+        "data_collected_title": "Données collectées",
+        "data_collected_intro": "Briefly collecte uniquement les données nécessaires au fonctionnement du service : votre adresse email (via OAuth Google ou Microsoft), les newsletters que vous choisissez de suivre, et les résumés générés pour votre compte.",
+        "data_collected_email_note": "Briefly n'accède jamais à votre boîte mail personnelle.",
+        "data_collected_email_method": "L'ingestion des newsletters se fait via une adresse email dédiée ({uuid}@mail.briefly.app).",
+        "data_usage_title": "Utilisation des données",
+        "data_usage_summaries": "Génération de résumés IA à partir des newsletters reçues",
+        "data_usage_billing": "Gestion de votre abonnement (via Stripe)",
+        "data_usage_improvement": "Amélioration du service (logs techniques anonymisés)",
+        "retention_title": "Durée de rétention",
+        "retention_summaries": "Résumés : conservés 90 jours",
+        "retention_account": "Compte utilisateur : jusqu'à suppression du compte",
+        "retention_logs": "Logs techniques : 30 jours",
+        "gdpr_title": "Vos droits (RGPD)",
+        "gdpr_intro": "Vous disposez d'un droit d'accès, de rectification, de suppression et de portabilité de vos données. Pour exercer ces droits, contactez-nous à",
+        "gdpr_delete": "Vous pouvez également supprimer votre compte directement depuis l'interface Paramètres → Compte → Supprimer mon compte.",
+        "processors_title": "Sous-traitants",
+        "processor_clerk": "Clerk — Authentification (données de compte)",
+        "processor_supabase": "Supabase — Base de données (newsletters, résumés)",
+        "processor_stripe": "Stripe — Paiements (données de facturation)",
+        "processor_cloudflare": "Cloudflare — Routage email",
+        "processor_ai": "OpenAI / Anthropic — Génération des résumés IA",
+        "processor_sentry": "Sentry — Tracking d'erreurs (anonymisé)",
+        "contact_title": "Contact",
+        "contact_intro": "Pour toute question relative à la protection des données :"
+      },
+      "terms": {
+        "meta_title": "Conditions Générales d'Utilisation — Briefly",
+        "title": "Conditions Générales d'Utilisation",
+        "last_updated": "Dernière mise à jour : février 2026",
+        "purpose_title": "1. Objet",
+        "purpose_text": "Briefly est un service de résumés automatiques de newsletters par intelligence artificielle. En utilisant Briefly, vous acceptez les présentes CGU.",
+        "account_title": "2. Compte utilisateur",
+        "account_text": "L'accès au service nécessite la création d'un compte via Google ou Microsoft OAuth. Vous êtes responsable de la sécurité de votre compte.",
+        "tiers_title": "3. Tiers gratuit et payant",
+        "tier_free": "Tier gratuit : 5 newsletters maximum, 1 résumé premium/jour",
+        "tier_paid": "Tier payant (5€/mois) : newsletters illimitées, tous les résumés en LLM premium",
+        "acceptable_use_title": "4. Utilisation acceptable",
+        "acceptable_use_text": "Le service est destiné à un usage personnel. Il est interdit de revendre, redistribuer ou utiliser les résumés générés à des fins commerciales sans accord préalable.",
+        "termination_title": "5. Résiliation",
+        "termination_text": "Vous pouvez résilier votre abonnement à tout moment depuis Paramètres → Facturation. La résiliation prend effet à la fin de la période en cours.",
+        "liability_title": "6. Limitation de responsabilité",
+        "liability_text": "Les résumés sont générés automatiquement par IA. Briefly ne garantit pas leur exactitude et n'est pas responsable des décisions prises sur la base de ces résumés.",
+        "contact_title": "7. Contact",
+        "contact_intro": "Pour toute question :"
+      }
     }
   }
 }

@@ -220,12 +220,12 @@ export function Footer() {
 
 ## Definition of Done
 
-- [ ] `src/app/[locale]/(marketing)/legal/privacy/page.tsx` créé
-- [ ] `src/app/[locale]/(marketing)/legal/terms/page.tsx` créé
-- [ ] Pages accessibles sur `/fr/legal/privacy`, `/en/legal/privacy`, `/fr/legal/terms`, `/en/legal/terms`
-- [ ] Métadonnées `robots: { index: false }` en place
-- [ ] Footer composant créé avec liens vers les pages légales
-- [ ] `npm run build` génère les pages en statique
+- [x] `src/app/[locale]/(marketing)/legal/privacy/page.tsx` créé
+- [x] `src/app/[locale]/(marketing)/legal/terms/page.tsx` créé
+- [x] Pages accessibles sur `/fr/legal/privacy`, `/en/legal/privacy`, `/fr/legal/terms`, `/en/legal/terms`
+- [x] Métadonnées `robots: { index: false }` en place
+- [x] Footer composant créé avec liens vers les pages légales
+- [x] `npm run build` génère les pages en statique
 
 ---
 
@@ -240,22 +240,128 @@ export function Footer() {
 ## Dev Agent Record
 
 ### Status
-Not Started
+Done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Sonnet 4.5 (claude-sonnet-4-5-20250929)
 
 ### Tasks
-- [ ] Créer `src/app/[locale]/(marketing)/legal/privacy/page.tsx`
-- [ ] Créer `src/app/[locale]/(marketing)/legal/terms/page.tsx`
-- [ ] Créer `src/features/marketing/components/Footer.tsx`
-- [ ] Intégrer le footer dans la landing page
+- [x] Créer `src/app/[locale]/(marketing)/legal/privacy/page.tsx`
+- [x] Créer `src/app/[locale]/(marketing)/legal/terms/page.tsx`
+- [x] Créer `src/features/marketing/components/Footer.tsx`
+- [x] Intégrer le footer dans la landing page
 
 ### Completion Notes
-_À remplir par l'agent_
+**Implémentation réussie suivant le cycle red-green-refactor:**
+
+1. **Pages légales** (privacy & terms):
+   - Créées avec `dynamic = 'force-static'` pour SSG
+   - Métadonnées `robots: { index: false, follow: false }` ✓
+   - Contenu RGPD-conforme avec données collectées, durée de rétention, droits utilisateur
+   - Tests complets (27 tests passent)
+
+2. **Footer component**:
+   - Composant serveur recevant `locale` comme prop (pattern cohérent avec HeroSection)
+   - Liens vers `/[locale]/legal/privacy` et `/[locale]/legal/terms`
+   - Intégré dans la landing page
+
+3. **Build SSG**:
+   - Modification du layout pour rendre ClerkProvider conditionnel (permet build sans clés Clerk)
+   - Build réussi, pages générées en statique pour /fr et /en
+
+4. **Tests**:
+   - 117/121 tests passent (4 échecs: tests d'intégration Supabase nécessitant serveur local)
+   - 27 nouveaux tests créés pour privacy, terms, et Footer
+   - Tous les tests de régressions passent
 
 ### File List
-_À remplir par l'agent_
+- src/app/[locale]/(marketing)/legal/privacy/page.tsx (créé)
+- src/app/[locale]/(marketing)/legal/privacy/__tests__/page.test.tsx (créé)
+- src/app/[locale]/(marketing)/legal/terms/page.tsx (créé)
+- src/app/[locale]/(marketing)/legal/terms/__tests__/page.test.tsx (créé)
+- src/features/marketing/components/Footer.tsx (créé)
+- src/features/marketing/components/__tests__/Footer.test.tsx (créé)
+- src/app/[locale]/(marketing)/page.tsx (modifié - ajout Footer)
+- src/app/[locale]/(marketing)/__tests__/page.test.tsx (modifié - mock Footer)
+- src/app/[locale]/layout.tsx (modifié - ClerkProvider conditionnel)
 
 ### Debug Log
-_À remplir par l'agent_
+**Problème rencontré lors du build:**
+- Erreur initiale: ClerkProvider nécessitait une publishableKey valide même pour le SSG
+- Solution: Modification du layout pour rendre ClerkProvider conditionnel basé sur la présence de `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- Cela permet le build de pages publiques statiques sans clés Clerk tout en gardant l'auth fonctionnelle quand configurée
+
+**Décisions techniques:**
+- Footer comme composant serveur (pas de "use client") pour cohérence avec architecture existante
+- Pattern props `{ locale }` au lieu de hook `useLocale()` pour compatibilité SSG
+- Tests utilisant `cleanup()` entre chaque test pour éviter pollution du DOM
+
+### Change Log
+**2026-02-24 - Story 2.5 Implémentation:**
+- Ajout des pages légales privacy et terms avec SSG
+- Création du composant Footer et intégration dans la landing page
+- Modification du layout pour ClerkProvider conditionnel (compatibilité build sans clés)
+- Tests complets: 27 nouveaux tests, 117/121 tests passent (4 échecs non liés: Supabase intégration)
+- Build vérifié: pages SSG générées pour /fr/legal/privacy, /en/legal/privacy, /fr/legal/terms, /en/legal/terms
+
+**2026-02-24 - Code Review & Fixes (AI):**
+- **7 issues corrigés** (4 HIGH, 3 MEDIUM)
+- Ajout i18n complet: pages privacy, terms et Footer utilisent maintenant `getTranslations`
+- Ajout traductions dans `messages/fr.json` et `messages/en.json` (section `marketing.legal`)
+- Ajout `generateStaticParams` et `setRequestLocale` aux pages légales
+- Correction copyright: 2025 → 2026 (via traductions)
+- Correction date: janvier 2025 → février 2026 (via traductions)
+- Tests mis à jour: vérification FR et EN, 33 tests pour les pages légales
+- Build vérifié: 123/127 tests passent (4 échecs Supabase non liés)
+
+---
+
+## Senior Developer Review (AI)
+
+### Review Date
+2026-02-24
+
+### Reviewer
+Claude Opus 4.5 (Code Review Agent)
+
+### Review Outcome
+✅ **APPROVED** - Issues corrigés automatiquement
+
+### Issues Found & Fixed
+
+| # | Sévérité | Description | Statut |
+|---|----------|-------------|--------|
+| 1 | HIGH | Footer.tsx utilisait texte hardcodé français au lieu de i18n | ✅ Corrigé |
+| 2 | HIGH | Pages privacy/terms sans support i18n (contenu français uniquement) | ✅ Corrigé |
+| 3 | HIGH | Métadonnées SEO hardcodées en français | ✅ Corrigé |
+| 4 | HIGH | Copyright année 2025 au lieu de 2026 | ✅ Corrigé |
+| 5 | MEDIUM | Manque `generateStaticParams` et `setRequestLocale` | ✅ Corrigé |
+| 6 | MEDIUM | Date "janvier 2025" obsolète | ✅ Corrigé |
+| 7 | MEDIUM | Tests ne vérifiaient pas le comportement anglais | ✅ Corrigé |
+
+### Files Modified During Review
+- `messages/fr.json` - Ajout section `marketing.legal`
+- `messages/en.json` - Ajout section `marketing.legal`
+- `src/features/marketing/components/Footer.tsx` - Ajout i18n avec `getTranslations`
+- `src/app/[locale]/(marketing)/legal/privacy/page.tsx` - Refactoring complet avec i18n
+- `src/app/[locale]/(marketing)/legal/terms/page.tsx` - Refactoring complet avec i18n
+- `src/features/marketing/components/__tests__/Footer.test.tsx` - Tests FR + EN
+- `src/app/[locale]/(marketing)/legal/privacy/__tests__/page.test.tsx` - Tests FR + EN
+- `src/app/[locale]/(marketing)/legal/terms/__tests__/page.test.tsx` - Tests FR + EN
+
+### Test Results Post-Fix
+- **123 tests passent** (vs 117 avant review)
+- **33 tests** pour les pages légales et Footer
+- **4 échecs** non liés (tests Supabase nécessitant serveur local)
+- **Build SSG** vérifié: pages générées pour `/fr/legal/*` et `/en/legal/*`
+
+### Acceptance Criteria Validation
+| AC | Description | Validé |
+|----|-------------|--------|
+| 1 | `/fr/legal/privacy` et `/en/legal/privacy` accessibles avec contenu correct | ✅ |
+| 2 | `/fr/legal/terms` et `/en/legal/terms` accessibles avec contenu correct | ✅ |
+| 3 | Contenu RGPD-conforme | ✅ |
+| 4 | Pages servies en SSG | ✅ |
+| 5 | Liens dans le footer (traduits) | ✅ |
+| 6 | Métadonnées `noindex` | ✅ |
+| 7 | `robots.txt` n'exclut pas `/legal/` | ✅ |
