@@ -110,6 +110,30 @@
       "subtitle": "Rejoignez des milliers d'utilisateurs qui économisent du temps chaque jour.",
       "button": "Commencer gratuitement",
       "no_credit_card": "Aucune carte bancaire requise"
+    },
+    "pricing": {
+      "meta_title": "Tarifs — Briefly",
+      "meta_description": "Gratuit ou Premium, choisissez la formule qui vous convient. Économisez 5h/semaine avec Briefly.",
+      "title": "Choisissez votre formule",
+      "subtitle": "Commencez gratuitement, upgradez quand vous êtes prêt",
+      "free_tier": "Gratuit",
+      "paid_tier": "Premium",
+      "free_price": "0€/mois",
+      "paid_price": "5€/mois",
+      "roi_note": "💡 5h économisées par semaine >> 5€ par mois",
+      "cta_free": "Commencer gratuitement",
+      "cta_paid": "Passer au Premium",
+      "popular": "Le plus populaire",
+      "features": {
+        "ai_summaries": "Résumés IA quotidiens",
+        "five_newsletters": "5 newsletters maximum",
+        "one_premium_day": "1 résumé premium/jour (teaser)",
+        "unlimited_newsletters": "Newsletters illimitées",
+        "all_premium_llm": "Tous les résumés en LLM premium",
+        "custom_categories": "Catégorisation personnalisée",
+        "unlimited_categories": "Catégorisation personnalisée illimitée",
+        "priority_support": "Support prioritaire"
+      }
     }
   }
 }
