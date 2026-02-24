@@ -22,17 +22,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: t('title'),
     description: t('description'),
     alternates: {
-      canonical: `${baseUrl}/${locale}/`,
+      canonical: `${baseUrl}/${locale}`,
       languages: {
-        fr: `${baseUrl}/fr/`,
-        en: `${baseUrl}/en/`,
-        'x-default': `${baseUrl}/fr/`,
+        fr: `${baseUrl}/fr`,
+        en: `${baseUrl}/en`,
+        'x-default': `${baseUrl}/fr`,
       },
     },
     openGraph: {
       title: t('og_title'),
       description: t('og_description'),
-      url: `${baseUrl}/${locale}/`,
+      url: `${baseUrl}/${locale}`,
       siteName: 'Briefly',
       locale: locale === 'fr' ? 'fr_FR' : 'en_US',
       type: 'website',
@@ -58,8 +58,45 @@ export default async function LandingPage({ params }: Props) {
   const { locale } = await params
   setRequestLocale(locale)
 
+  const t = await getTranslations({ locale, namespace: 'jsonLd' })
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://briefly.app'
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebSite',
+        '@id': `${baseUrl}/#website`,
+        url: baseUrl,
+        name: 'Briefly',
+        description: t('websiteDescription'),
+      },
+      {
+        '@type': 'Organization',
+        '@id': `${baseUrl}/#organization`,
+        name: 'Briefly',
+        url: baseUrl,
+      },
+      {
+        '@type': 'SoftwareApplication',
+        name: 'Briefly',
+        applicationCategory: 'ProductivityApplication',
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'EUR',
+          description: t('offerDescription'),
+        },
+      },
+    ],
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <HeroSection locale={locale} />
       <FeaturesSection />
       <SocialProofSection />

@@ -33,6 +33,10 @@
     "signUpCta": "Essayer gratuitement",
     "securityMessage": "🔒 Connexion sécurisée OAuth 2.0 — Briefly n'accède jamais à vos emails personnels"
   },
+  "jsonLd": {
+    "websiteDescription": "Résumés IA de vos newsletters en 2 minutes par jour",
+    "offerDescription": "Tier gratuit — 5 newsletters max"
+  },
   "summaries": {
     "empty": "Vos premiers résumés arriveront demain matin !",
     "newCount": "{count, plural, one {# nouveau résumé disponible} other {# nouveaux résumés disponibles}}",
