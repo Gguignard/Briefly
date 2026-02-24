@@ -110,6 +110,30 @@
       "subtitle": "Join thousands of users who save time every day.",
       "button": "Get Started for Free",
       "no_credit_card": "No credit card required"
+    },
+    "pricing": {
+      "meta_title": "Pricing — Briefly",
+      "meta_description": "Free or Premium, choose the plan that works for you. Save 5h/week with Briefly.",
+      "title": "Choose your plan",
+      "subtitle": "Start free, upgrade when you're ready",
+      "free_tier": "Free",
+      "paid_tier": "Premium",
+      "free_price": "$0/month",
+      "paid_price": "$5/month",
+      "roi_note": "💡 5h saved per week >> $5 per month",
+      "cta_free": "Get Started for Free",
+      "cta_paid": "Upgrade to Premium",
+      "popular": "Most popular",
+      "features": {
+        "ai_summaries": "Daily AI summaries",
+        "five_newsletters": "5 newsletters maximum",
+        "one_premium_day": "1 premium summary/day (teaser)",
+        "unlimited_newsletters": "Unlimited newsletters",
+        "all_premium_llm": "All summaries with premium LLM",
+        "custom_categories": "Custom categorization",
+        "unlimited_categories": "Unlimited custom categorization",
+        "priority_support": "Priority support"
+      }
     }
   }
 }

@@ -113,13 +113,13 @@ const PAID_FEATURES = [
 
 ## Definition of Done
 
-- [ ] Page `/fr/pricing` et `/en/pricing` s'affichent sans erreur
-- [ ] Layout responsive (2 colonnes desktop, empilé mobile)
-- [ ] Features avec icônes ✅ et 🔒 correctement affichées
-- [ ] CTAs redirigent vers `/sign-up` (Clerk)
-- [ ] `export const dynamic = 'force-static'` en place
-- [ ] Metadata SEO générée dynamiquement selon locale
-- [ ] `npm run build` génère la page en statique
+- [x] Page `/fr/pricing` et `/en/pricing` s'affichent sans erreur
+- [x] Layout responsive (2 colonnes desktop, empilé mobile)
+- [x] Features avec icônes ✅ et 🔒 correctement affichées
+- [x] CTAs redirigent vers `/sign-up` (Clerk)
+- [x] `export const dynamic = 'force-static'` en place
+- [x] Metadata SEO générée dynamiquement selon locale
+- [x] `npm run build` génère la page en statique
 
 ---
 
@@ -134,23 +134,56 @@ const PAID_FEATURES = [
 ## Dev Agent Record
 
 ### Status
-Not Started
+Done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.5
 
 ### Tasks
-- [ ] Créer `src/app/[locale]/(marketing)/pricing/page.tsx`
-- [ ] Créer `src/features/marketing/components/PricingCard.tsx`
-- [ ] Ajouter les clés i18n dans `messages/fr.json` et `messages/en.json`
-- [ ] Vérifier SSG (`force-static`)
-- [ ] Vérifier responsive mobile
+- [x] Créer `src/app/[locale]/(marketing)/pricing/page.tsx`
+- [x] Créer `src/components/marketing/PricingCard.tsx` (adapté au pattern existant du projet)
+- [x] Ajouter les clés i18n dans `messages/fr.json` et `messages/en.json`
+- [x] Vérifier SSG (`force-static`)
+- [x] Vérifier responsive mobile
+- [x] Écrire les tests unitaires
 
 ### Completion Notes
-_À remplir par l'agent_
+- Page pricing implémentée avec SSG (`force-static`) pour `/fr/pricing` et `/en/pricing`
+- Composant PricingCard créé dans `src/components/marketing/` (suivant le pattern existant du projet au lieu de `src/features/marketing/`)
+- Layout responsive: 2 colonnes desktop (md:grid-cols-2), empilé mobile
+- Features avec icônes Check (✓) et Lock (🔒) via lucide-react
+- CTAs redirigent vers `/{locale}/sign-up`
+- Badge "Le plus populaire" sur le tier Premium avec aria-label pour accessibilité
+- ROI note affiché sous les cards: "💡 5h économisées par semaine >> 5€ par mois"
+- Metadata SEO générée dynamiquement selon la locale (utilise NEXT_PUBLIC_APP_URL depuis .env.example)
+- Stratégie de devise documentée: € pour FR, $ pour EN (optimisation conversion selon marché cible)
+- 17 tests unitaires ajoutés: 10 tests de types/traductions + 7 tests de rendu complet (happy-dom + @testing-library/react)
+- Configuration vitest améliorée pour supporter les tests de composants React
 
 ### File List
-_À remplir par l'agent_
+- `src/app/[locale]/(marketing)/pricing/page.tsx` (nouveau)
+- `src/components/marketing/PricingCard.tsx` (nouveau)
+- `src/components/marketing/__tests__/PricingCard.test.tsx` (nouveau)
+- `src/test/setup.ts` (nouveau - config testing-library pour vitest)
+- `messages/fr.json` (modifié - ajout section marketing.pricing)
+- `messages/en.json` (modifié - ajout section marketing.pricing)
+- `vitest.config.mts` (modifié - ajout environnement happy-dom + setup)
+- `package.json` (modifié - ajout @testing-library/react, @testing-library/jest-dom, happy-dom)
 
 ### Debug Log
-_À remplir par l'agent_
+- Build SSG vérifié: pages `/fr/pricing` et `/en/pricing` générées en statique
+- Lint passé sans erreur
+- 17/17 tests pricing passent avec happy-dom + @testing-library/react
+
+### Change Log
+**2026-02-24 - Code Review (Claude Sonnet 4.5)**
+- Review adversariale complète effectuée
+- Corrections appliquées:
+  - ✅ Corrigé variable d'environnement: utilise NEXT_PUBLIC_APP_URL au lieu de NEXT_PUBLIC_BASE_URL non-existante
+  - ✅ Amélioré accessibilité: ajout aria-label au badge "Le plus populaire"
+  - ✅ Ajouté 7 tests de rendu complets avec @testing-library/react (total 17 tests)
+  - ✅ Configuré vitest avec happy-dom pour tests de composants React
+  - ✅ Documenté stratégie de devise FR/EN dans le code
+  - ✅ Mis à jour File List et Completion Notes
+- Résultat: 0 HIGH issues, 0 MEDIUM issues, tous les ACs implémentés, 17/17 tests passent
+- Statut changé: Review → Done
