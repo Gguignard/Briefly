@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { routing, locales, type Locale } from '@/i18n/routing'
+import { ClerkProvider } from '@clerk/nextjs'
+import { frFR, enUS } from '@clerk/localizations'
 import '../globals.css'
 
 function isValidLocale(locale: string): locale is Locale {
@@ -56,14 +58,19 @@ export default async function LocaleLayout({
   // side is the easiest way to get started
   const messages = await getMessages()
 
+  // Clerk localization based on current locale
+  const clerkLocalization = locale === 'fr' ? frFR : enUS
+
   return (
     <html lang={locale}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
+        <ClerkProvider localization={clerkLocalization}>
+          <NextIntlClientProvider messages={messages}>
+            {children}
+          </NextIntlClientProvider>
+        </ClerkProvider>
       </body>
     </html>
   )
