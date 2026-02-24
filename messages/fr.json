@@ -31,7 +31,7 @@
     "signIn": "Se connecter",
     "signUp": "S'inscrire",
     "signUpCta": "Essayer gratuitement",
-    "securityMessage": "Connexion sécurisée OAuth 2.0 — Briefly n'accède jamais à vos emails personnels"
+    "securityMessage": "🔒 Connexion sécurisée OAuth 2.0 — Briefly n'accède jamais à vos emails personnels"
   },
   "summaries": {
     "empty": "Vos premiers résumés arriveront demain matin !",

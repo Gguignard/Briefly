@@ -31,7 +31,7 @@
     "signIn": "Sign In",
     "signUp": "Sign Up",
     "signUpCta": "Try for Free",
-    "securityMessage": "Secure OAuth 2.0 login — Briefly never accesses your personal emails"
+    "securityMessage": "🔒 Secure OAuth 2.0 login — Briefly never accesses your personal emails"
   },
   "summaries": {
     "empty": "Your first summaries will arrive tomorrow morning!",
