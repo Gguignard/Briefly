@@ -17,7 +17,7 @@ export default async function SettingsPage() {
     .from('user_settings')
     .select('daily_summary_enabled')
     .eq('user_id', userId)
-    .single()
+    .maybeSingle()
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-8">
