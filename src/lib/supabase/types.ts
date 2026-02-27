@@ -34,6 +34,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      user_settings: {
+        Row: {
+          user_id: string
+          daily_summary_enabled: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          daily_summary_enabled?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          daily_summary_enabled?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       llm_costs: {
         Row: {
           cost_usd: number
