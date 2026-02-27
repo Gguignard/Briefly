@@ -15,11 +15,16 @@ export function NotificationSection({ initialEnabled = true }: Props) {
 
   const handleToggle = async (value: boolean) => {
     setEnabled(value)
-    await fetch('/api/settings/notifications', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ dailySummaryEnabled: value }),
-    })
+    try {
+      const res = await fetch('/api/settings/notifications', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dailySummaryEnabled: value }),
+      })
+      if (!res.ok) setEnabled(!value)
+    } catch {
+      setEnabled(!value)
+    }
   }
 
   return (

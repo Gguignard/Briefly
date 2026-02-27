@@ -22,11 +22,11 @@ vi.mock('@/lib/supabase/admin', () => ({
   })),
 }))
 
-function createRequest(body: unknown): Request {
+function createRequest(body: unknown, contentType = 'application/json'): Request {
   return new Request('http://localhost:3000/api/settings/notifications', {
     method: 'PATCH',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    headers: { 'Content-Type': contentType },
+    body: typeof body === 'string' ? body : JSON.stringify(body),
   })
 }
 
@@ -47,6 +47,17 @@ describe('PATCH /api/settings/notifications', () => {
     expect(data.error.code).toBe('UNAUTHORIZED')
   })
 
+  it('returns 400 when request body is invalid JSON', async () => {
+    mockAuth.mockResolvedValue({ userId: 'user_123' })
+
+    const req = createRequest('not valid json')
+    const response = await PATCH(req)
+    const data = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(data.error.code).toBe('VALIDATION_ERROR')
+  })
+
   it('returns 400 when dailySummaryEnabled is not a boolean', async () => {
     mockAuth.mockResolvedValue({ userId: 'user_123' })
 
@@ -58,7 +69,7 @@ describe('PATCH /api/settings/notifications', () => {
     expect(data.error.code).toBe('VALIDATION_ERROR')
   })
 
-  it('upserts and returns success when enabling notifications', async () => {
+  it('upserts with onConflict and returns success when enabling notifications', async () => {
     mockAuth.mockResolvedValue({ userId: 'user_123' })
 
     const req = createRequest({ dailySummaryEnabled: true })
@@ -67,13 +78,13 @@ describe('PATCH /api/settings/notifications', () => {
 
     expect(response.status).toBe(200)
     expect(data.data.updated).toBe(true)
-    expect(mockUpsert).toHaveBeenCalledWith({
-      user_id: 'user_123',
-      daily_summary_enabled: true,
-    })
+    expect(mockUpsert).toHaveBeenCalledWith(
+      { user_id: 'user_123', daily_summary_enabled: true },
+      { onConflict: 'user_id' }
+    )
   })
 
-  it('upserts and returns success when disabling notifications', async () => {
+  it('upserts with onConflict and returns success when disabling notifications', async () => {
     mockAuth.mockResolvedValue({ userId: 'user_123' })
 
     const req = createRequest({ dailySummaryEnabled: false })
@@ -82,10 +93,10 @@ describe('PATCH /api/settings/notifications', () => {
 
     expect(response.status).toBe(200)
     expect(data.data.updated).toBe(true)
-    expect(mockUpsert).toHaveBeenCalledWith({
-      user_id: 'user_123',
-      daily_summary_enabled: false,
-    })
+    expect(mockUpsert).toHaveBeenCalledWith(
+      { user_id: 'user_123', daily_summary_enabled: false },
+      { onConflict: 'user_id' }
+    )
   })
 
   it('returns 500 when Supabase upsert fails', async () => {
@@ -97,6 +108,6 @@ describe('PATCH /api/settings/notifications', () => {
     const data = await response.json()
 
     expect(response.status).toBe(500)
-    expect(data.error.code).toBe('DB_ERROR')
+    expect(data.error.code).toBe('INTERNAL_ERROR')
   })
 })

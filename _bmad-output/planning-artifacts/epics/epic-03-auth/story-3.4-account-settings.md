@@ -209,7 +209,7 @@ CREATE POLICY "Users can manage own settings"
 ## Dev Agent Record
 
 ### Status
-Completed ✅
+Done ✅
 
 ### Agent Model Used
 claude-sonnet-4-6
@@ -219,6 +219,13 @@ claude-sonnet-4-6
 - [x] Créer `AccountSection`, `NotificationSection`, `BillingSection`
 - [x] Créer `PATCH /api/settings/notifications`
 - [x] Créer migration `user_settings`
+- [x] [AI-Review] Corriger race condition + rollback UI dans `NotificationSection.handleToggle`
+- [x] [AI-Review] Protéger `req.json()` contre les corps JSON invalides dans l'API route
+- [x] [AI-Review] Remplacer `.single()` par `.maybeSingle()` dans la settings page
+- [x] [AI-Review] Renforcer les tests de la page (assertions sur props `initialEnabled`)
+- [x] [AI-Review] Ajouter protection auth dans le `(dashboard)` layout
+- [x] [AI-Review] Ajouter `{ onConflict: 'user_id' }` explicite dans l'upsert
+- [x] [AI-Review] Mettre à jour les tests API route (JSON invalide + assertions onConflict)
 
 ### Completion Notes
 - Utilisation de `createAdminClient()` dans la page et l'API route (le client SSR Supabase n'a pas de JWT Clerk pour le RLS)
@@ -226,18 +233,24 @@ claude-sonnet-4-6
 - Composants UI `Switch` et `Label` créés via `radix-ui` (umbrella package)
 - i18n ajouté pour les namespaces `settings.account`, `settings.notifications`, `settings.billing` (fr + en)
 - `userId` retiré des props de `NotificationSection` (l'auth est vérifiée dans l'API route)
-- 156 tests passent (5 nouveaux pour l'API route, 3 pour la page)
+- **[Code Review]** `NotificationSection.handleToggle` : ajout try/catch avec rollback optimiste si la réponse n'est pas `ok`
+- **[Code Review]** API route : `req.json()` enveloppé dans try/catch (400 si JSON invalide)
+- **[Code Review]** Settings page : `.single()` → `.maybeSingle()` pour éviter PGRST116 sur nouvel utilisateur
+- **[Code Review]** Tests page : assertions sur `initialEnabled` via mock trackable de `NotificationSection`
+- **[Code Review]** Dashboard layout : protection auth ajoutée au niveau layout (défense en profondeur)
+- **[Code Review]** API upsert : `{ onConflict: 'user_id' }` explicite ; code d'erreur `DB_ERROR` → `INTERNAL_ERROR`
 
 ### File List
 - `src/components/ui/switch.tsx` (nouveau)
 - `src/components/ui/label.tsx` (nouveau)
 - `src/features/settings/components/AccountSection.tsx` (nouveau)
-- `src/features/settings/components/NotificationSection.tsx` (nouveau)
+- `src/features/settings/components/NotificationSection.tsx` (modifié — rollback handleToggle)
 - `src/features/settings/components/BillingSection.tsx` (nouveau)
-- `src/app/[locale]/(dashboard)/settings/page.tsx` (nouveau)
-- `src/app/api/settings/notifications/route.ts` (nouveau)
-- `src/app/api/settings/notifications/__tests__/route.test.ts` (nouveau)
-- `src/app/[locale]/(dashboard)/settings/__tests__/page.test.ts` (nouveau)
+- `src/app/[locale]/(dashboard)/settings/page.tsx` (modifié — maybeSingle)
+- `src/app/[locale]/(dashboard)/layout.tsx` (modifié — auth protection)
+- `src/app/api/settings/notifications/route.ts` (modifié — try/catch JSON, onConflict, INTERNAL_ERROR)
+- `src/app/api/settings/notifications/__tests__/route.test.ts` (modifié — nouveau test JSON invalide, assertions onConflict)
+- `src/app/[locale]/(dashboard)/settings/__tests__/page.test.ts` (modifié — assertions initialEnabled, maybeSingle mock)
 - `supabase/migrations/002_user_settings.sql` (nouveau)
 - `src/lib/supabase/types.ts` (modifié — ajout `user_settings`)
 - `messages/fr.json` (modifié — ajout namespace `settings`)

@@ -6,7 +6,13 @@ export async function PATCH(req: Request) {
   const { userId } = await auth()
   if (!userId) return apiError('UNAUTHORIZED', 'Non autorisé', 401)
 
-  const body = await req.json()
+  let body: Record<string, unknown>
+  try {
+    body = await req.json()
+  } catch {
+    return apiError('VALIDATION_ERROR', 'Corps de requête JSON invalide', 400)
+  }
+
   const { dailySummaryEnabled } = body
 
   if (typeof dailySummaryEnabled !== 'boolean') {
@@ -17,9 +23,9 @@ export async function PATCH(req: Request) {
 
   const { error } = await supabase
     .from('user_settings')
-    .upsert({ user_id: userId, daily_summary_enabled: dailySummaryEnabled })
+    .upsert({ user_id: userId, daily_summary_enabled: dailySummaryEnabled }, { onConflict: 'user_id' })
 
-  if (error) return apiError('DB_ERROR', 'Erreur de sauvegarde', 500)
+  if (error) return apiError('INTERNAL_ERROR', 'Erreur de sauvegarde', 500)
 
   return apiResponse({ updated: true })
 }

@@ -18,8 +18,8 @@ vi.mock('next-intl/server', () => ({
 }))
 
 // Mock Supabase admin client
-const mockSingle = vi.fn()
-const mockEq = vi.fn(() => ({ single: mockSingle }))
+const mockMaybeSingle = vi.fn()
+const mockEq = vi.fn(() => ({ maybeSingle: mockMaybeSingle }))
 const mockSelect = vi.fn(() => ({ eq: mockEq }))
 
 vi.mock('@/lib/supabase/admin', () => ({
@@ -30,12 +30,13 @@ vi.mock('@/lib/supabase/admin', () => ({
   })),
 }))
 
-// Mock feature components
+// Mock feature components with trackable fns
+const mockNotificationSection = vi.fn().mockReturnValue(null)
 vi.mock('@/features/settings/components/AccountSection', () => ({
   AccountSection: () => null,
 }))
 vi.mock('@/features/settings/components/NotificationSection', () => ({
-  NotificationSection: () => null,
+  NotificationSection: (props: unknown) => mockNotificationSection(props),
 }))
 vi.mock('@/features/settings/components/BillingSection', () => ({
   BillingSection: () => null,
@@ -44,7 +45,7 @@ vi.mock('@/features/settings/components/BillingSection', () => ({
 describe('SettingsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockSingle.mockResolvedValue({ data: null, error: null })
+    mockMaybeSingle.mockResolvedValue({ data: null, error: null })
   })
 
   it('redirects to sign-in when user is not authenticated', async () => {
@@ -56,28 +57,46 @@ describe('SettingsPage', () => {
     expect(mockRedirect).toHaveBeenCalledWith('/sign-in')
   })
 
-  it('renders settings page when user is authenticated', async () => {
+  it('passes initialEnabled=true to NotificationSection when no settings row exists', async () => {
     mockAuth.mockResolvedValue({ userId: 'user_123' })
-    mockSingle.mockResolvedValue({
+    mockMaybeSingle.mockResolvedValue({ data: null, error: null })
+
+    const { default: SettingsPage } = await import('../page')
+    await SettingsPage()
+
+    expect(mockRedirect).not.toHaveBeenCalled()
+    expect(mockNotificationSection).toHaveBeenCalledWith(
+      expect.objectContaining({ initialEnabled: true })
+    )
+  })
+
+  it('passes initialEnabled=true when daily_summary_enabled is true in DB', async () => {
+    mockAuth.mockResolvedValue({ userId: 'user_123' })
+    mockMaybeSingle.mockResolvedValue({
       data: { daily_summary_enabled: true },
       error: null,
     })
 
     const { default: SettingsPage } = await import('../page')
-    const result = await SettingsPage()
+    await SettingsPage()
 
-    expect(mockRedirect).not.toHaveBeenCalled()
-    expect(result).toBeDefined()
+    expect(mockNotificationSection).toHaveBeenCalledWith(
+      expect.objectContaining({ initialEnabled: true })
+    )
   })
 
-  it('defaults notification to enabled when no settings exist', async () => {
+  it('passes initialEnabled=false when daily_summary_enabled is false in DB', async () => {
     mockAuth.mockResolvedValue({ userId: 'user_123' })
-    mockSingle.mockResolvedValue({ data: null, error: null })
+    mockMaybeSingle.mockResolvedValue({
+      data: { daily_summary_enabled: false },
+      error: null,
+    })
 
     const { default: SettingsPage } = await import('../page')
-    const result = await SettingsPage()
+    await SettingsPage()
 
-    expect(result).toBeDefined()
-    expect(mockRedirect).not.toHaveBeenCalled()
+    expect(mockNotificationSection).toHaveBeenCalledWith(
+      expect.objectContaining({ initialEnabled: false })
+    )
   })
 })
