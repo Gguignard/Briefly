@@ -49,6 +49,25 @@
     "addButton": "Ajouter une newsletter",
     "limitReached": "{count}/5 newsletters (tier gratuit)"
   },
+  "settings": {
+    "title": "Paramètres",
+    "account": {
+      "title": "Compte",
+      "edit_hint": "Pour modifier votre email ou avatar, cliquez sur votre avatar ci-dessus."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "daily_summary": "Résumé quotidien par email"
+    },
+    "billing": {
+      "title": "Abonnement",
+      "current_tier": "Votre abonnement actuel",
+      "manage": "Gérer mon abonnement",
+      "free": "Gratuit",
+      "starter": "Starter",
+      "pro": "Pro"
+    }
+  },
   "marketing": {
     "meta": {
       "title": "Briefly — Résumés IA de vos newsletters | Gratuit",

@@ -49,6 +49,25 @@
     "addButton": "Add Newsletter",
     "limitReached": "{count}/5 newsletters (free tier)"
   },
+  "settings": {
+    "title": "Settings",
+    "account": {
+      "title": "Account",
+      "edit_hint": "To update your email or avatar, click on your avatar above."
+    },
+    "notifications": {
+      "title": "Notifications",
+      "daily_summary": "Daily email digest"
+    },
+    "billing": {
+      "title": "Subscription",
+      "current_tier": "Your current plan",
+      "manage": "Manage subscription",
+      "free": "Free",
+      "starter": "Starter",
+      "pro": "Pro"
+    }
+  },
   "marketing": {
     "meta": {
       "title": "Briefly — AI Newsletter Summaries | Free",

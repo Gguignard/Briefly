@@ -209,22 +209,39 @@ CREATE POLICY "Users can manage own settings"
 ## Dev Agent Record
 
 ### Status
-Not Started
+Completed ✅
 
 ### Agent Model Used
-_À remplir par l'agent_
+claude-sonnet-4-6
 
 ### Tasks
-- [ ] Créer `src/app/[locale]/(dashboard)/settings/page.tsx`
-- [ ] Créer `AccountSection`, `NotificationSection`, `BillingSection`
-- [ ] Créer `PATCH /api/settings/notifications`
-- [ ] Créer migration `user_settings`
+- [x] Créer `src/app/[locale]/(dashboard)/settings/page.tsx`
+- [x] Créer `AccountSection`, `NotificationSection`, `BillingSection`
+- [x] Créer `PATCH /api/settings/notifications`
+- [x] Créer migration `user_settings`
 
 ### Completion Notes
-_À remplir par l'agent_
+- Utilisation de `createAdminClient()` dans la page et l'API route (le client SSR Supabase n'a pas de JWT Clerk pour le RLS)
+- Fetch de la valeur initiale `daily_summary_enabled` dans le Server Component (settings page) pour initialiser le toggle correctement
+- Composants UI `Switch` et `Label` créés via `radix-ui` (umbrella package)
+- i18n ajouté pour les namespaces `settings.account`, `settings.notifications`, `settings.billing` (fr + en)
+- `userId` retiré des props de `NotificationSection` (l'auth est vérifiée dans l'API route)
+- 156 tests passent (5 nouveaux pour l'API route, 3 pour la page)
 
 ### File List
-_À remplir par l'agent_
+- `src/components/ui/switch.tsx` (nouveau)
+- `src/components/ui/label.tsx` (nouveau)
+- `src/features/settings/components/AccountSection.tsx` (nouveau)
+- `src/features/settings/components/NotificationSection.tsx` (nouveau)
+- `src/features/settings/components/BillingSection.tsx` (nouveau)
+- `src/app/[locale]/(dashboard)/settings/page.tsx` (nouveau)
+- `src/app/api/settings/notifications/route.ts` (nouveau)
+- `src/app/api/settings/notifications/__tests__/route.test.ts` (nouveau)
+- `src/app/[locale]/(dashboard)/settings/__tests__/page.test.ts` (nouveau)
+- `supabase/migrations/002_user_settings.sql` (nouveau)
+- `src/lib/supabase/types.ts` (modifié — ajout `user_settings`)
+- `messages/fr.json` (modifié — ajout namespace `settings`)
+- `messages/en.json` (modifié — ajout namespace `settings`)
 
 ### Debug Log
-_À remplir par l'agent_
+Aucun.
