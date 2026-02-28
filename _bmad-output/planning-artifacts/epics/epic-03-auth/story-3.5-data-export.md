@@ -169,21 +169,50 @@ import { DataExportButton } from './DataExportButton'
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+claude-sonnet-4-6
 
 ### Tasks
-- [ ] Créer `GET /api/account/export`
-- [ ] Créer `DataExportButton` component
-- [ ] Intégrer dans `AccountSection`
+- [x] Créer `GET /api/account/export`
+- [x] Créer `DataExportButton` component
+- [x] Intégrer dans `AccountSection`
+
+### Review Follow-ups (AI) — Résolus (Revue 1)
+- [x] [AI-Review][HIGH] Utiliser `createAdminClient()` au lieu de `createClient()` [route.ts:9]
+- [x] [AI-Review][HIGH] AC #3 : ajouter le profil utilisateur (table `users`) dans l'export [route.ts:28]
+- [x] [AI-Review][HIGH] Ajouter `catch` + feedback d'erreur dans `DataExportButton` [DataExportButton.tsx:12]
+- [x] [AI-Review][HIGH] Vérifier `newsletters.error` / `summaries.error` [route.ts:31]
+- [x] [AI-Review][MEDIUM] Corriger `a.click()` avec `appendChild/removeChild` (Firefox) [DataExportButton.tsx:21]
+- [x] [AI-Review][MEDIUM] Ajouter tests automatisés pour la route export [export/__tests__/route.test.ts]
+
+### Review Follow-ups (AI) — Résolus (Revue 2)
+- [x] [AI-Review][CRITIQUE] Stager les fichiers non committés : `route.ts`, `route.test.ts`, `types.ts` étaient UNTRACKED/unstaged
+- [x] [AI-Review][CRITIQUE] Vérifier `profile.error` et `settings.error` (incohérence avec newsletters/summaries) [route.ts:33]
+- [x] [AI-Review][MOYEN] Ajouter `export const dynamic = 'force-dynamic'` pour éviter le cache Next.js [route.ts:5]
+- [x] [AI-Review][MOYEN] Documenter `BillingSection.tsx` et `NotificationSection.tsx` dans le File List (harmonisation CSS)
+- [x] [AI-Review][MOYEN] Ajouter tests pour `settings.error` (vrai erreur DB vs PGRST116) [route.test.ts:130-150]
 
 ### Completion Notes
-_À remplir par l'agent_
+- Route `GET /api/account/export` protégée par Clerk auth, retourne JSON avec headers `Content-Disposition`
+- Utilise `createAdminClient()` (service role) conformément au pattern du projet
+- Export inclut le profil utilisateur (email, tier) depuis la table `users`
+- `DataExportButton` gère les erreurs avec état visuel + clé i18n `export_error`
+- Types Supabase mis à jour pour inclure les tables `newsletters` et `summaries` (stubs pour les stories futures)
+- Clés i18n ajoutées dans `fr.json` et `en.json` sous `settings.account.gdpr` (dont `export_error`)
+- 6 tests unitaires couvrant 401, 200, erreurs BD, profil manquant, données vides
 
 ### File List
-_À remplir par l'agent_
+- `src/app/api/account/export/route.ts` (créé)
+- `src/app/api/account/export/__tests__/route.test.ts` (créé)
+- `src/features/settings/components/DataExportButton.tsx` (créé)
+- `src/features/settings/components/AccountSection.tsx` (modifié)
+- `src/features/settings/components/BillingSection.tsx` (modifié — harmonisation style CSS `bg-card border-border rounded-xl shadow-sm`)
+- `src/features/settings/components/NotificationSection.tsx` (modifié — harmonisation style CSS `bg-card border-border rounded-xl shadow-sm`)
+- `src/lib/supabase/types.ts` (modifié — ajout types `newsletters` et `summaries`)
+- `messages/fr.json` (modifié — clés RGPD dont `export_error`)
+- `messages/en.json` (modifié — clés RGPD dont `export_error`)
 
 ### Debug Log
-_À remplir par l'agent_
+- Tables `newsletters` et `summaries` absentes des types Supabase → ajout de stubs typés pour permettre la compilation sans erreur
