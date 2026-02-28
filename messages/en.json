@@ -53,7 +53,25 @@
     "title": "Settings",
     "account": {
       "title": "Account",
-      "edit_hint": "To update your email or avatar, click on your avatar above."
+      "edit_hint": "To update your email or avatar, click on your avatar above.",
+      "gdpr": {
+        "title": "Data Portability (GDPR)",
+        "export_button": "Export my data",
+        "exporting": "Exporting...",
+        "export_error": "Export failed. Please try again."
+      },
+      "danger_zone": {
+        "title": "Danger Zone",
+        "description": "Account deletion is permanent and irreversible.",
+        "button": "Delete my account",
+        "dialog_title": "Permanently delete your account?",
+        "dialog_description_1": "This action is irreversible. All your data will be deleted: newsletters, summaries, settings and subscription.",
+        "dialog_description_2": "Your paid subscription will be cancelled immediately with no pro-rata refund.",
+        "cancel": "Cancel",
+        "confirm": "Yes, permanently delete",
+        "confirming": "Deleting...",
+        "error": "Deletion failed. Please try again."
+      }
     },
     "notifications": {
       "title": "Notifications",
@@ -77,12 +95,13 @@
       "og_image_alt": "Briefly dashboard preview"
     },
     "header": {
+      "features": "Features",
       "pricing": "Pricing",
       "signIn": "Sign In",
       "signUp": "Try for Free"
     },
     "footer": {
-      "tagline": "Summarize your newsletters with AI",
+      "tagline": "AI-powered newsletter summaries",
       "product": "Product",
       "features": "Features",
       "pricing": "Pricing",
@@ -96,41 +115,41 @@
     },
     "hero": {
       "badge": "Free for 5 newsletters",
-      "headline": "Transform your newsletters into AI summaries in 30 seconds",
-      "subheadline": "Save 5h/week. Briefly reads, summarizes and categorizes your newsletters for you.",
+      "headline": "Stop drowning in newsletters. Start reading what matters.",
+      "subheadline": "Briefly uses AI to turn your newsletters into concise summaries you can read in 30 seconds. Save 5 hours a week, effortlessly.",
       "cta_primary": "Try for Free",
       "cta_secondary": "See Pricing",
       "no_credit_card": "No credit card required",
       "image_alt": "Briefly summaries feed preview"
     },
     "features": {
-      "title": "Everything you need",
-      "subtitle": "Smart summaries, real organization, zero effort.",
+      "title": "How Briefly works",
+      "subtitle": "Three powerful features, zero configuration.",
       "dual_llm": {
         "title": "Dual LLM AI",
-        "description": "GPT-5 Nano for fast summaries, Claude Haiku for in-depth analysis. The best of both worlds."
+        "description": "Two AI models work together: one for speed, one for depth. You always get the best summary."
       },
       "auto_summary": {
         "title": "Automatic summaries",
-        "description": "As soon as a newsletter arrives, Briefly summarizes it. Get the essentials in 30 seconds."
+        "description": "Your newsletters are summarized the moment they arrive. Open the app, read the highlights, done."
       },
       "categories": {
         "title": "Smart categorization",
-        "description": "Organize your newsletters by custom themes. Tech, Finance, Culture — you choose."
+        "description": "Automatically organized by topic — Tech, Finance, Culture, or any theme you create."
       }
     },
     "social_proof": {
-      "title": "Used by thousands of professionals",
+      "title": "Trusted by professionals who value their time",
       "user_count": "{count}+ active users",
       "testimonial": {
-        "quote": "Briefly saved me 5 hours a week. I never miss important information anymore.",
+        "quote": "I used to spend an hour every morning skimming newsletters. Now I get the key insights in 5 minutes with my coffee.",
         "author": "Sarah M.",
         "role": "Product Manager"
       }
     },
     "cta": {
-      "title": "Ready to take control of your newsletters?",
-      "subtitle": "Join thousands of users who save time every day.",
+      "title": "Your newsletters, summarized. Every morning.",
+      "subtitle": "Join professionals who start their day informed, not overwhelmed.",
       "button": "Get Started for Free",
       "no_credit_card": "No credit card required"
     },

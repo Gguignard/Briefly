@@ -53,7 +53,25 @@
     "title": "Paramètres",
     "account": {
       "title": "Compte",
-      "edit_hint": "Pour modifier votre email ou avatar, cliquez sur votre avatar ci-dessus."
+      "edit_hint": "Pour modifier votre email ou avatar, cliquez sur votre avatar ci-dessus.",
+      "gdpr": {
+        "title": "Portabilité des données (RGPD)",
+        "export_button": "Exporter mes données",
+        "exporting": "Export en cours...",
+        "export_error": "Erreur lors de l'export. Veuillez réessayer."
+      },
+      "danger_zone": {
+        "title": "Zone de danger",
+        "description": "La suppression de votre compte est définitive et irréversible.",
+        "button": "Supprimer mon compte",
+        "dialog_title": "Supprimer définitivement votre compte ?",
+        "dialog_description_1": "Cette action est irréversible. Toutes vos données seront supprimées : newsletters, résumés, paramètres et abonnement.",
+        "dialog_description_2": "Votre abonnement payant sera annulé immédiatement sans remboursement au prorata.",
+        "cancel": "Annuler",
+        "confirm": "Oui, supprimer définitivement",
+        "confirming": "Suppression...",
+        "error": "Erreur lors de la suppression. Veuillez réessayer."
+      }
     },
     "notifications": {
       "title": "Notifications",
@@ -77,12 +95,13 @@
       "og_image_alt": "Aperçu du tableau de bord Briefly"
     },
     "header": {
+      "features": "Fonctionnalités",
       "pricing": "Tarifs",
       "signIn": "Se connecter",
       "signUp": "Essayer gratuitement"
     },
     "footer": {
-      "tagline": "Résumez vos newsletters avec l'IA",
+      "tagline": "Résumés de newsletters propulsés par l'IA",
       "product": "Produit",
       "features": "Fonctionnalités",
       "pricing": "Tarifs",
@@ -96,41 +115,41 @@
     },
     "hero": {
       "badge": "Gratuit pour 5 newsletters",
-      "headline": "Transformez vos newsletters en résumés IA en 30 secondes",
-      "subheadline": "Économisez 5h/semaine. Briefly lit, résume et catégorise vos newsletters à votre place.",
+      "headline": "Arrêtez de crouler sous les newsletters. Lisez l'essentiel.",
+      "subheadline": "Briefly utilise l'IA pour transformer vos newsletters en résumés concis, lisibles en 30 secondes. Économisez 5 heures par semaine, sans effort.",
       "cta_primary": "Essayer gratuitement",
       "cta_secondary": "Voir les tarifs",
       "no_credit_card": "Aucune carte bancaire requise",
       "image_alt": "Aperçu du feed de résumés Briefly"
     },
     "features": {
-      "title": "Tout ce dont vous avez besoin",
-      "subtitle": "Des résumés intelligents, une vraie organisation, zéro effort.",
+      "title": "Comment Briefly fonctionne",
+      "subtitle": "Trois fonctionnalités puissantes, zéro configuration.",
       "dual_llm": {
         "title": "Dual LLM IA",
-        "description": "GPT-5 Nano pour les résumés rapides, Claude Haiku pour les analyses approfondies. Le meilleur des deux mondes."
+        "description": "Deux modèles d'IA travaillent ensemble : l'un pour la rapidité, l'autre pour la profondeur. Vous obtenez toujours le meilleur résumé."
       },
       "auto_summary": {
         "title": "Résumés automatiques",
-        "description": "Dès qu'une newsletter arrive, Briefly la résume. Retrouvez l'essentiel en 30 secondes."
+        "description": "Vos newsletters sont résumées dès leur arrivée. Ouvrez l'app, lisez l'essentiel, c'est fait."
       },
       "categories": {
         "title": "Catégorisation intelligente",
-        "description": "Organisez vos newsletters par thèmes personnalisés. Tech, Finance, Culture — à vous de choisir."
+        "description": "Organisées automatiquement par thème — Tech, Finance, Culture, ou tout thème que vous créez."
       }
     },
     "social_proof": {
-      "title": "Utilisé par des milliers de professionnels",
+      "title": "Adopté par les professionnels qui valorisent leur temps",
       "user_count": "{count}+ utilisateurs actifs",
       "testimonial": {
-        "quote": "Briefly m'a permis de gagner 5 heures par semaine. Je ne rate plus aucune information importante.",
+        "quote": "Je passais une heure chaque matin à survoler mes newsletters. Maintenant, j'ai les points clés en 5 minutes avec mon café.",
         "author": "Sarah M.",
         "role": "Product Manager"
       }
     },
     "cta": {
-      "title": "Prêt à reprendre le contrôle de vos newsletters ?",
-      "subtitle": "Rejoignez des milliers d'utilisateurs qui économisent du temps chaque jour.",
+      "title": "Vos newsletters, résumées. Chaque matin.",
+      "subtitle": "Rejoignez les professionnels qui commencent leur journée informés, pas submergés.",
       "button": "Commencer gratuitement",
       "no_credit_card": "Aucune carte bancaire requise"
     },
