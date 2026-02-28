@@ -78,7 +78,7 @@ export default async function LocaleLayout({
   // Clerk localization based on current locale
   const clerkLocalization = locale === 'fr' ? frFR : enUS
 
-  // Check if Clerk is configured (allows static build of public pages without Clerk keys)
+  // Guard: allow static builds in CI environments without Clerk keys configured
   const hasClerkKey = !!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 
   return (

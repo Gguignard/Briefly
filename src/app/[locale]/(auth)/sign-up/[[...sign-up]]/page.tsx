@@ -1,5 +1,5 @@
 import { SignUp } from '@clerk/nextjs'
-import { getTranslations } from 'next-intl/server'
+import { clerkAppearance } from '@/features/auth/clerk-appearance'
 
 interface SignUpPageProps {
   params: Promise<{ locale: string }>
@@ -7,18 +7,15 @@ interface SignUpPageProps {
 
 export default async function SignUpPage({ params }: SignUpPageProps) {
   const { locale } = await params
-  const t = await getTranslations('auth')
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4">
-      <p className="text-sm text-muted-foreground text-center max-w-sm">
-        {t('securityMessage')}
-      </p>
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-background via-secondary to-muted px-4">
       <SignUp
         routing="path"
         path={`/${locale}/sign-up`}
         signInUrl={`/${locale}/sign-in`}
-        forceRedirectUrl={`/${locale}/summaries`}
+        forceRedirectUrl={`/${locale}/settings`}
+        appearance={clerkAppearance}
       />
     </div>
   )

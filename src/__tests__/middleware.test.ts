@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextFetchEvent } from 'next/server'
 
 // Mock next-intl middleware
 const mockIntlMiddleware = vi.fn(() => new Response(null, { status: 200 }))
@@ -7,26 +7,33 @@ vi.mock('next-intl/middleware', () => ({
   default: vi.fn(() => mockIntlMiddleware),
 }))
 
+// Mock i18n routing config
+vi.mock('../i18n/routing', () => ({
+  routing: {},
+  locales: ['fr', 'en'],
+}))
+
 // Mock Clerk
 const mockProtect = vi.fn()
-const mockClerkMiddlewareHandler = vi.fn()
-
 vi.mock('@clerk/nextjs/server', () => ({
   clerkMiddleware: vi.fn((handler) => {
-    mockClerkMiddlewareHandler.mockImplementation((req: NextRequest) => {
+    return vi.fn((req: NextRequest, _event: unknown) => {
       const auth = { protect: mockProtect }
       return handler(auth, req)
     })
-    return mockClerkMiddlewareHandler
   }),
   createRouteMatcher: vi.fn((patterns: string[]) => {
     return (req: NextRequest) => {
       const pathname = req.nextUrl.pathname
       return patterns.some((pattern) => {
-        // Convert route matcher pattern to regex
-        const regexStr = '^' + pattern
-          .replace(/\(\.?\*\)/g, '.*')
-          .replace(/\.\.\./g, '.*') + '$'
+        const regexStr =
+          '^' +
+          pattern
+            .replace(/\/:[a-zA-Z]+/g, '/[^/]+') // /:locale, /:param → /[^/]+
+            .replace(/\(fr\|en\)/g, '(?:fr|en)')
+            .replace(/\(\.?\*\)/g, '.*')
+            .replace(/\.\.\./g, '.*') +
+          '$'
         return new RegExp(regexStr).test(pathname)
       })
     }
@@ -37,165 +44,168 @@ function createRequest(pathname: string): NextRequest {
   return new NextRequest(new URL(pathname, 'http://localhost:3000'))
 }
 
+const fakeEvent = {} as NextFetchEvent
+
 describe('middleware', () => {
-  beforeEach(() => {
+  let middleware: (req: NextRequest, event: NextFetchEvent) => Promise<Response>
+
+  beforeEach(async () => {
     vi.clearAllMocks()
+    vi.resetModules()
     mockProtect.mockResolvedValue({ sessionClaims: {} })
+    const mod = await import('../middleware')
+    middleware = mod.default
   })
 
-  describe('public routes', () => {
-    it('allows root without authentication', async () => {
-      // Dynamic import to get the middleware after mocks are set up
-      const mod = await import('../middleware')
-      const middleware = mockClerkMiddlewareHandler
-
+  describe('public routes — skip Clerk, go straight to i18n', () => {
+    it('allows / without authentication', async () => {
       const req = createRequest('/')
-      await middleware(req)
+      await middleware(req, fakeEvent)
 
       expect(mockProtect).not.toHaveBeenCalled()
       expect(mockIntlMiddleware).toHaveBeenCalledWith(req)
     })
 
     it('allows /fr without authentication', async () => {
-      const middleware = mockClerkMiddlewareHandler
       const req = createRequest('/fr')
-      await middleware(req)
+      await middleware(req, fakeEvent)
 
       expect(mockProtect).not.toHaveBeenCalled()
       expect(mockIntlMiddleware).toHaveBeenCalledWith(req)
     })
 
     it('allows /en without authentication', async () => {
-      const middleware = mockClerkMiddlewareHandler
       const req = createRequest('/en')
-      await middleware(req)
+      await middleware(req, fakeEvent)
 
       expect(mockProtect).not.toHaveBeenCalled()
       expect(mockIntlMiddleware).toHaveBeenCalledWith(req)
     })
 
     it('allows /fr/pricing without authentication', async () => {
-      const middleware = mockClerkMiddlewareHandler
       const req = createRequest('/fr/pricing')
-      await middleware(req)
+      await middleware(req, fakeEvent)
 
       expect(mockProtect).not.toHaveBeenCalled()
     })
 
     it('allows /en/pricing without authentication', async () => {
-      const middleware = mockClerkMiddlewareHandler
       const req = createRequest('/en/pricing')
-      await middleware(req)
+      await middleware(req, fakeEvent)
 
       expect(mockProtect).not.toHaveBeenCalled()
     })
 
     it('allows /fr/legal/privacy without authentication', async () => {
-      const middleware = mockClerkMiddlewareHandler
       const req = createRequest('/fr/legal/privacy')
-      await middleware(req)
+      await middleware(req, fakeEvent)
 
       expect(mockProtect).not.toHaveBeenCalled()
     })
 
     it('allows /fr/sign-in without authentication', async () => {
-      const middleware = mockClerkMiddlewareHandler
       const req = createRequest('/fr/sign-in')
-      await middleware(req)
+      await middleware(req, fakeEvent)
 
       expect(mockProtect).not.toHaveBeenCalled()
     })
 
     it('allows /fr/sign-up without authentication', async () => {
-      const middleware = mockClerkMiddlewareHandler
       const req = createRequest('/fr/sign-up')
-      await middleware(req)
+      await middleware(req, fakeEvent)
 
       expect(mockProtect).not.toHaveBeenCalled()
     })
 
     it('allows /api/webhooks/clerk without authentication', async () => {
-      const middleware = mockClerkMiddlewareHandler
       const req = createRequest('/api/webhooks/clerk')
-      await middleware(req)
+      await middleware(req, fakeEvent)
 
       expect(mockProtect).not.toHaveBeenCalled()
       expect(mockIntlMiddleware).toHaveBeenCalledWith(req)
     })
   })
 
-  describe('protected routes', () => {
-    it('calls auth.protect() for /fr/summaries', async () => {
-      const middleware = mockClerkMiddlewareHandler
-      const req = createRequest('/fr/summaries')
-      await middleware(req)
-
-      expect(mockProtect).toHaveBeenCalled()
-    })
-
-    it('calls auth.protect() for /en/newsletters', async () => {
-      const middleware = mockClerkMiddlewareHandler
-      const req = createRequest('/en/newsletters')
-      await middleware(req)
-
-      expect(mockProtect).toHaveBeenCalled()
-    })
-
-    it('calls auth.protect() for /fr/categories', async () => {
-      const middleware = mockClerkMiddlewareHandler
-      const req = createRequest('/fr/categories')
-      await middleware(req)
+  describe('protected routes — Clerk auth required', () => {
+    it('calls auth.protect() for /fr/dashboard', async () => {
+      const req = createRequest('/fr/dashboard')
+      await middleware(req, fakeEvent)
 
       expect(mockProtect).toHaveBeenCalled()
     })
 
     it('calls auth.protect() for /fr/settings', async () => {
-      const middleware = mockClerkMiddlewareHandler
       const req = createRequest('/fr/settings')
-      await middleware(req)
+      await middleware(req, fakeEvent)
+
+      expect(mockProtect).toHaveBeenCalled()
+    })
+
+    it('calls auth.protect() for /fr/newsletters', async () => {
+      const req = createRequest('/fr/newsletters')
+      await middleware(req, fakeEvent)
+
+      expect(mockProtect).toHaveBeenCalled()
+    })
+
+    it('calls auth.protect() for /fr/categories', async () => {
+      const req = createRequest('/fr/categories')
+      await middleware(req, fakeEvent)
 
       expect(mockProtect).toHaveBeenCalled()
     })
 
     it('calls auth.protect() for /fr/billing', async () => {
-      const middleware = mockClerkMiddlewareHandler
       const req = createRequest('/fr/billing')
-      await middleware(req)
+      await middleware(req, fakeEvent)
 
       expect(mockProtect).toHaveBeenCalled()
     })
 
-    it('returns intl middleware response after auth for protected routes', async () => {
-      const middleware = mockClerkMiddlewareHandler
+    it('calls auth.protect() for /fr/summaries', async () => {
       const req = createRequest('/fr/summaries')
-      await middleware(req)
+      await middleware(req, fakeEvent)
+
+      expect(mockProtect).toHaveBeenCalled()
+    })
+
+    it('passes i18n middleware after successful auth', async () => {
+      const req = createRequest('/fr/settings')
+      await middleware(req, fakeEvent)
 
       expect(mockIntlMiddleware).toHaveBeenCalledWith(req)
     })
 
-    it('delegates unauthenticated redirect to auth.protect() for protected routes', async () => {
-      // When unauthenticated, Clerk's auth.protect() triggers a NEXT_REDIRECT to /sign-in?redirect_url=...
-      // This test verifies our middleware calls protect() and propagates Clerk's redirect mechanism
+    it('redirects to /fr/sign-in when unauthenticated on /fr/settings', async () => {
       const nextRedirectError = Object.assign(new Error('NEXT_REDIRECT'), {
-        digest: 'NEXT_REDIRECT;replace;/sign-in?redirect_url=%2Ffr%2Fsummaries;307;',
+        digest: 'NEXT_REDIRECT;replace;/fr/sign-in?redirect_url=%2Ffr%2Fsettings;307;',
       })
       mockProtect.mockRejectedValue(nextRedirectError)
 
-      const middleware = mockClerkMiddlewareHandler
-      const req = createRequest('/fr/summaries')
+      const req = createRequest('/fr/settings')
 
-      await expect(middleware(req)).rejects.toMatchObject({
+      await expect(middleware(req, fakeEvent)).rejects.toMatchObject({
         digest: expect.stringContaining('NEXT_REDIRECT'),
       })
-      expect(mockProtect).toHaveBeenCalled()
+      expect(mockProtect).toHaveBeenCalledWith(
+        expect.objectContaining({ unauthenticatedUrl: expect.stringContaining('/fr/sign-in') }),
+      )
     })
 
-    it('calls auth.protect() for /summaries without locale prefix', async () => {
-      const middleware = mockClerkMiddlewareHandler
-      const req = createRequest('/summaries')
-      await middleware(req)
+    it('redirects to /en/sign-in when unauthenticated on /en/newsletters', async () => {
+      const nextRedirectError = Object.assign(new Error('NEXT_REDIRECT'), {
+        digest: 'NEXT_REDIRECT;replace;/en/sign-in;307;',
+      })
+      mockProtect.mockRejectedValue(nextRedirectError)
 
-      expect(mockProtect).toHaveBeenCalled()
+      const req = createRequest('/en/newsletters')
+
+      await expect(middleware(req, fakeEvent)).rejects.toMatchObject({
+        digest: expect.stringContaining('NEXT_REDIRECT'),
+      })
+      expect(mockProtect).toHaveBeenCalledWith(
+        expect.objectContaining({ unauthenticatedUrl: expect.stringContaining('/en/sign-in') }),
+      )
     })
   })
 
@@ -205,9 +215,8 @@ describe('middleware', () => {
         sessionClaims: { metadata: { role: 'user' } },
       })
 
-      const middleware = mockClerkMiddlewareHandler
       const req = createRequest('/fr/admin')
-      const response = await middleware(req)
+      const response = await middleware(req, fakeEvent)
 
       expect(response.status).toBe(403)
       const body = await response.json()
@@ -219,9 +228,8 @@ describe('middleware', () => {
         sessionClaims: { metadata: {} },
       })
 
-      const middleware = mockClerkMiddlewareHandler
       const req = createRequest('/en/admin')
-      const response = await middleware(req)
+      const response = await middleware(req, fakeEvent)
 
       expect(response.status).toBe(403)
     })
@@ -231,9 +239,8 @@ describe('middleware', () => {
         sessionClaims: { metadata: { role: 'admin' } },
       })
 
-      const middleware = mockClerkMiddlewareHandler
       const req = createRequest('/fr/admin')
-      await middleware(req)
+      await middleware(req, fakeEvent)
 
       expect(mockIntlMiddleware).toHaveBeenCalledWith(req)
     })
@@ -243,9 +250,8 @@ describe('middleware', () => {
         sessionClaims: { metadata: { role: 'admin' } },
       })
 
-      const middleware = mockClerkMiddlewareHandler
       const req = createRequest('/en/admin/dashboard')
-      await middleware(req)
+      await middleware(req, fakeEvent)
 
       expect(mockIntlMiddleware).toHaveBeenCalledWith(req)
     })
