@@ -10,6 +10,13 @@ export async function DELETE() {
   const supabase = createAdminClient()
 
   try {
+    // 0. Récupérer l'UUID interne (FK pour llm_costs.user_id → users.id)
+    const { data: userRecord } = await supabase
+      .from('users')
+      .select('id')
+      .eq('clerk_id', userId)
+      .maybeSingle()
+
     // 1. Supprimer toutes les données Supabase (ordre pour respecter les FK)
     const r1 = await supabase.from('user_settings').delete().eq('user_id', userId)
     if (r1.error) throw new Error(`user_settings: ${r1.error.message}`)
@@ -20,8 +27,11 @@ export async function DELETE() {
     const r3 = await supabase.from('newsletters').delete().eq('user_id', userId)
     if (r3.error) throw new Error(`newsletters: ${r3.error.message}`)
 
-    const r4 = await supabase.from('llm_costs').delete().eq('user_id', userId)
-    if (r4.error) throw new Error(`llm_costs: ${r4.error.message}`)
+    // llm_costs.user_id est une FK vers users.id (UUID) — utilise l'UUID interne
+    if (userRecord?.id) {
+      const r4 = await supabase.from('llm_costs').delete().eq('user_id', userRecord.id)
+      if (r4.error) throw new Error(`llm_costs: ${r4.error.message}`)
+    }
 
     const r5 = await supabase.from('users').delete().eq('clerk_id', userId)
     if (r5.error) throw new Error(`users: ${r5.error.message}`)

@@ -204,7 +204,7 @@ import { DeleteAccountDialog } from '@/features/settings/components/DeleteAccoun
 ## Dev Agent Record
 
 ### Status
-Done
+Done (code review v2 — 2026-02-28)
 
 ### Agent Model Used
 claude-sonnet-4-6
@@ -218,16 +218,20 @@ claude-sonnet-4-6
 ### Completion Notes
 - Stripe ignoré : table `subscriptions` absente du schéma DB (Story 7.1 non implémentée)
 - `createAdminClient` utilisé (pattern cohérent avec export route)
-- `user_id` = Clerk userId pour `newsletters`, `summaries`, `user_settings`, `llm_costs` ; `clerk_id` pour table `users`
+- `user_id` = Clerk userId pour `newsletters`, `summaries`, `user_settings` ; `clerk_id` pour table `users`
+- `llm_costs.user_id` = FK vers `users.id` (UUID) — suppression via UUID interne récupéré au préalable
 - AlertDialog créé avec `radix-ui` (monorepo, cohérent avec `switch.tsx`)
-- Code review : H1 (erreurs Supabase vérifiées), H2 (signOut Clerk client-side), M1 (INTERNAL_ERROR), M2 (Clerk 404 idempotent), M3 (DangerZoneSection extrait)
+- `DataExportButton` UI intégrée ici pour cohérence UX Settings (dépend de Story 3.5 pour l'API `/api/account/export`)
+- Code review (v2) : H1 (UUID pour llm_costs), H2 (DataExportButton documentée + a.download fixé), M3 (tests DeleteAccountDialog ajoutés)
 
 ### File List
 - `src/components/ui/alert-dialog.tsx` (nouveau)
 - `src/app/api/account/delete/route.ts` (nouveau)
 - `src/app/api/account/delete/__tests__/route.test.ts` (nouveau)
 - `src/features/settings/components/DeleteAccountDialog.tsx` (nouveau)
+- `src/features/settings/components/__tests__/DeleteAccountDialog.test.tsx` (nouveau — code review)
 - `src/features/settings/components/DangerZoneSection.tsx` (nouveau)
+- `src/features/settings/components/DataExportButton.tsx` (nouveau — UI Story 3.5, API dépend de story-3.5)
 - `src/features/settings/components/AccountSection.tsx` (modifié)
 - `src/app/[locale]/(dashboard)/settings/page.tsx` (modifié)
 - `src/app/[locale]/(dashboard)/settings/__tests__/page.test.ts` (modifié)
