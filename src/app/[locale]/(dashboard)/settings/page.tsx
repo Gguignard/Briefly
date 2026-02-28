@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server'
 import { AccountSection } from '@/features/settings/components/AccountSection'
 import { NotificationSection } from '@/features/settings/components/NotificationSection'
 import { BillingSection } from '@/features/settings/components/BillingSection'
+import { DangerZoneSection } from '@/features/settings/components/DangerZoneSection'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export default async function SettingsPage() {
@@ -20,11 +21,12 @@ export default async function SettingsPage() {
     .maybeSingle()
 
   return (
-    <div className="max-w-2xl mx-auto py-8 px-4 space-y-8">
+    <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">
       <h1 className="text-2xl font-semibold">{t('title')}</h1>
       <AccountSection />
       <NotificationSection initialEnabled={settings?.daily_summary_enabled ?? true} />
       <BillingSection />
+      <DangerZoneSection />
     </div>
   )
 }

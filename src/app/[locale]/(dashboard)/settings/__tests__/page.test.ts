@@ -41,6 +41,9 @@ vi.mock('@/features/settings/components/NotificationSection', () => ({
 vi.mock('@/features/settings/components/BillingSection', () => ({
   BillingSection: () => null,
 }))
+vi.mock('@/features/settings/components/DangerZoneSection', () => ({
+  DangerZoneSection: () => null,
+}))
 
 describe('SettingsPage', () => {
   beforeEach(() => {
