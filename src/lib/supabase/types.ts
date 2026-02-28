@@ -34,6 +34,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      newsletters: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          email_address: string
+          category_id: string | null
+          active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          email_address: string
+          category_id?: string | null
+          active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          email_address?: string
+          category_id?: string | null
+          active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      summaries: {
+        Row: {
+          id: string
+          user_id: string
+          newsletter_id: string
+          title: string
+          content: string
+          llm_tier: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          newsletter_id: string
+          title: string
+          content: string
+          llm_tier: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          newsletter_id?: string
+          title?: string
+          content?: string
+          llm_tier?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       user_settings: {
         Row: {
           user_id: string

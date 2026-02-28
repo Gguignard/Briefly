@@ -14,7 +14,7 @@ export function BillingSection() {
   const tierLabel = t(tier as 'free' | 'starter' | 'pro', { defaultValue: tier })
 
   return (
-    <section className="border rounded-lg p-6 space-y-4">
+    <section className="bg-card border border-border rounded-xl p-6 space-y-4 shadow-sm">
       <h2 className="text-lg font-medium">{t('title')}</h2>
       <div className="flex items-center justify-between">
         <div>
