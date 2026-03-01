@@ -47,7 +47,12 @@
   "newsletters": {
     "empty": "Add your first newsletter",
     "addButton": "Add Newsletter",
-    "limitReached": "{count}/5 newsletters (free tier)"
+    "limitReached": "{count}/5 newsletters (free tier)",
+    "inbox": {
+      "title": "Your forwarding address",
+      "copy": "Copy address",
+      "description": "Forward your newsletters to this address to receive them in Briefly."
+    }
   },
   "settings": {
     "title": "Settings",

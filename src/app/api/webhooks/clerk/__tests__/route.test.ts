@@ -17,8 +17,8 @@ const mockInsert = vi.fn()
 const mockDelete = vi.fn()
 const mockEq = vi.fn()
 
-vi.mock('@supabase/supabase-js', () => ({
-  createClient: vi.fn(() => ({
+vi.mock('@/lib/supabase/admin', () => ({
+  createAdminClient: vi.fn(() => ({
     from: vi.fn((table: string) => {
       if (table === 'users') {
         return {
@@ -151,12 +151,15 @@ describe('POST /api/webhooks/clerk', () => {
 
     expect(response.status).toBe(200)
     expect(data.data.received).toBe(true)
-    expect(mockInsert).toHaveBeenCalledWith({
-      clerk_id: 'user_test123',
-      email: 'test@example.com',
-      tier: 'free',
-      created_at: new Date(1234567890000).toISOString(),
-    })
+    expect(mockInsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        clerk_id: 'user_test123',
+        email: 'test@example.com',
+        inbox_address: expect.stringMatching(/^[0-9a-f-]+@mail\.briefly\.app$/),
+        tier: 'free',
+        created_at: new Date(1234567890000).toISOString(),
+      }),
+    )
   })
 
   it('returns 500 when Supabase insert fails', async () => {
@@ -256,5 +259,37 @@ describe('POST /api/webhooks/clerk', () => {
     expect(data.data.received).toBe(true)
     expect(mockDelete).toHaveBeenCalled()
     expect(mockEq).toHaveBeenCalledWith('clerk_id', 'user_test123')
+  })
+
+  it('returns 500 when Supabase delete fails on user.deleted event', async () => {
+    const mockEvent = {
+      type: 'user.deleted',
+      data: {
+        id: 'user_test123',
+      },
+    }
+
+    mockVerify.mockReturnValueOnce(mockEvent)
+
+    // Mock Supabase delete error
+    mockEq.mockReturnValueOnce({
+      error: { message: 'Database error', code: 'DB_ERROR' },
+    })
+
+    const request = createRequest(
+      'http://localhost:3000/api/webhooks/clerk',
+      JSON.stringify(mockEvent),
+      {
+        'svix-id': 'msg_test',
+        'svix-timestamp': '1234567890',
+        'svix-signature': 'valid_signature',
+      },
+    )
+
+    const response = await POST(request)
+    const data = await response.json()
+
+    expect(response.status).toBe(500)
+    expect(data.error.code).toBe('DATABASE_ERROR')
   })
 })
