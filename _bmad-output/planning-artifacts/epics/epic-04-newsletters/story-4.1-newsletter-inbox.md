@@ -207,22 +207,48 @@ SUPABASE_SERVICE_ROLE_KEY=eyJxxx  # Admin key (bypass RLS)
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer migration `users` table
-- [ ] Créer `POST /api/webhooks/clerk` avec svix validation
-- [ ] Créer `src/lib/supabase/admin.ts`
-- [ ] Créer `InboxAddressCard` component
+- [x] Créer migration `users` table → ajout colonne `inbox_address` (migration 003)
+- [x] Mettre à jour `POST /api/webhooks/clerk` → génère `inbox_address` via `crypto.randomUUID()`
+- [x] `src/lib/supabase/admin.ts` → déjà existant, aucun changement nécessaire
+- [x] Créer `InboxAddressCard` component → `src/features/newsletters/components/InboxAddressCard.tsx`
+- [x] Mettre à jour types Supabase (`types.ts`) → ajout `inbox_address` au type `users`
+- [x] Ajouter traductions i18n (fr/en) pour `newsletters.inbox`
+- [x] Tests webhook mis à jour (vérifie `inbox_address` pattern UUID)
+- [x] Tests InboxAddressCard créés (5 tests : rendu, titre, bouton copier, clipboard + feedback visuel, erreur clipboard)
 
 ### Completion Notes
-_À remplir par l'agent_
+- Migration `003_inbox_address.sql` : ajoute `inbox_address TEXT UNIQUE NOT NULL` à `users`, génère des adresses pour les utilisateurs existants
+- Webhook `user.created` : génère `{uuid}@mail.briefly.app` automatiquement à la création du compte
+- `InboxAddressCard` : composant client avec bouton copier, i18n via `useTranslations('newsletters.inbox')`, suit le pattern section existant (`bg-card border...`)
+- Tous les tests Story 4.1 passent (13/13).
 
 ### File List
-_À remplir par l'agent_
+- `supabase/migrations/003_inbox_address.sql` (nouveau)
+- `src/app/api/webhooks/clerk/route.ts` (modifié)
+- `src/app/api/webhooks/clerk/__tests__/route.test.ts` (modifié)
+- `src/lib/supabase/types.ts` (modifié)
+- `src/features/newsletters/components/InboxAddressCard.tsx` (nouveau)
+- `src/features/newsletters/components/__tests__/InboxAddressCard.test.tsx` (nouveau)
+- `src/features/newsletters/index.ts` (nouveau)
+- `src/app/[locale]/(dashboard)/newsletters/page.tsx` (nouveau)
+- `messages/fr.json` (modifié)
+- `messages/en.json` (modifié)
+
+### Change Log
+- 2026-03-01 : Code review corrections (Claude Opus 4.6)
+  - [H1] Créé page `/newsletters` qui monte `InboxAddressCard` avec fetch `inbox_address` depuis Supabase
+  - [H2] Remplacé `createClient()` inline par `createAdminClient()` dans webhook route (type-safety + cohérence)
+  - [M1] Ajouté try/catch sur `navigator.clipboard.writeText()` pour gérer les erreurs gracieusement
+  - [M2] Créé barrel export `src/features/newsletters/index.ts`
+  - [M3] Ajouté test `user.deleted` avec erreur DB (webhook)
+  - [M4] Ajouté test feedback visuel copié + test erreur clipboard (InboxAddressCard)
+  - Mock webhook test mis à jour : `@supabase/supabase-js` → `@/lib/supabase/admin`
 
 ### Debug Log
-_À remplir par l'agent_
+- Fix mock clipboard dans test : `Object.assign(navigator, ...)` échoue en happy-dom → remplacé par `Object.defineProperty` avec `configurable: true`

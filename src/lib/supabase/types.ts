@@ -162,6 +162,7 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          inbox_address: string
           tier: string
           updated_at: string
         }
@@ -170,6 +171,7 @@ export type Database = {
           created_at?: string
           email: string
           id?: string
+          inbox_address: string
           tier?: string
           updated_at?: string
         }
@@ -178,6 +180,7 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          inbox_address?: string
           tier?: string
           updated_at?: string
         }

@@ -1,14 +1,11 @@
 import { NextRequest } from 'next/server'
 import { Webhook } from 'svix'
 import { WebhookEvent } from '@clerk/nextjs/server'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 import logger from '@/lib/utils/logger'
 import { apiResponse, apiError } from '@/lib/utils/apiResponse'
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-)
+const supabaseAdmin = createAdminClient()
 
 export async function POST(req: NextRequest) {
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET
@@ -56,9 +53,12 @@ export async function POST(req: NextRequest) {
       return apiError('NO_PRIMARY_EMAIL', 'No primary email', 400)
     }
 
+    const inboxAddress = `${crypto.randomUUID()}@mail.briefly.app`
+
     const { error } = await supabaseAdmin.from('users').insert({
       clerk_id: clerkId,
       email: primaryEmail,
+      inbox_address: inboxAddress,
       tier: 'free',
       created_at: new Date(created_at).toISOString(),
     })
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
       return apiError('DATABASE_ERROR', 'Database error', 500)
     }
 
-    logger.info({ clerkId, email: primaryEmail }, 'User created in Supabase')
+    logger.info({ clerkId, email: primaryEmail, inboxAddress }, 'User created in Supabase')
   }
 
   if (event.type === 'user.deleted') {

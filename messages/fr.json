@@ -47,7 +47,12 @@
   "newsletters": {
     "empty": "Ajoutez votre première newsletter",
     "addButton": "Ajouter une newsletter",
-    "limitReached": "{count}/5 newsletters (tier gratuit)"
+    "limitReached": "{count}/5 newsletters (tier gratuit)",
+    "inbox": {
+      "title": "Votre adresse de forwarding",
+      "copy": "Copier l'adresse",
+      "description": "Transférez vos newsletters vers cette adresse pour les recevoir dans Briefly."
+    }
   },
   "settings": {
     "title": "Paramètres",
