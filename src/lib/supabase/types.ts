@@ -34,6 +34,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      raw_emails: {
+        Row: {
+          id: string
+          user_id: string
+          sender_email: string
+          subject: string
+          content_text: string
+          content_html: string | null
+          received_at: string
+          processed_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          sender_email: string
+          subject: string
+          content_text: string
+          content_html?: string | null
+          received_at: string
+          processed_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          sender_email?: string
+          subject?: string
+          content_text?: string
+          content_html?: string | null
+          received_at?: string
+          processed_at?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "raw_emails_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       newsletters: {
         Row: {
           id: string

@@ -1,0 +1,13 @@
+name = "briefly-email-worker"
+main = "email-worker.js"
+compatibility_date = "2024-12-01"
+
+# Cloudflare Email Routing binding
+# Configure email routing in the Cloudflare Dashboard:
+# Email Routing > Routes > Catch-all → Worker: briefly-email-worker
+
+[vars]
+WEBHOOK_URL = "https://briefly.app/api/webhooks/email"
+
+# WEBHOOK_SECRET must be set via `wrangler secret put WEBHOOK_SECRET`
+# (never commit secrets in this file)
