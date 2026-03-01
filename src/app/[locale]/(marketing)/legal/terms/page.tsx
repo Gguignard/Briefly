@@ -26,7 +26,8 @@ export default async function TermsPage({ params }: Props) {
   const t = await getTranslations({ locale, namespace: 'marketing.legal.terms' })
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-16 prose prose-neutral">
+    <main className="max-w-3xl mx-auto px-4 py-16">
+      <div className="bg-card rounded-xl p-8 shadow-sm prose prose-violet max-w-none">
       <h1>{t('title')}</h1>
       <p className="text-muted-foreground text-sm">{t('last_updated')}</p>
 
@@ -56,6 +57,7 @@ export default async function TermsPage({ params }: Props) {
         {t('contact_intro')}{' '}
         <a href="mailto:hello@briefly.app">hello@briefly.app</a>
       </p>
+      </div>
     </main>
   )
 }

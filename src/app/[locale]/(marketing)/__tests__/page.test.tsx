@@ -25,10 +25,6 @@ vi.mock('@/components/marketing/CtaSection', () => ({
   default: () => <div data-testid="cta-section">CTA</div>,
 }))
 
-vi.mock('@/features/marketing/components/Footer', () => ({
-  default: () => <footer data-testid="footer">Footer</footer>,
-}))
-
 describe('LandingPage', () => {
   beforeEach(() => {
     process.env.NEXT_PUBLIC_BASE_URL = 'https://briefly.app'

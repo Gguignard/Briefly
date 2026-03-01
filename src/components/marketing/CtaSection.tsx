@@ -6,7 +6,7 @@ export default async function CtaSection({ locale }: { locale: string }) {
   const t = await getTranslations('marketing.cta')
 
   return (
-    <section className="py-20 bg-primary/5">
+    <section className="py-20 bg-primary/10 border-y border-primary/10">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <h2 className="text-3xl md:text-4xl font-bold">{t('title')}</h2>

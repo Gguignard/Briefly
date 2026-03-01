@@ -12,18 +12,18 @@ export default async function FeaturesSection() {
   const t = await getTranslations('marketing.features')
 
   return (
-    <section id="features" className="py-20 bg-muted/30">
+    <section id="features" className="py-20 bg-muted/50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center space-y-4 mb-12">
           <h2 className="text-3xl md:text-4xl font-bold">{t('title')}</h2>
-          <p className="text-lg text-muted-foreground">{t('subtitle')}</p>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{t('subtitle')}</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {FEATURES.map(({ key, icon: Icon }) => (
-            <Card key={key} className="border-border hover:shadow-md transition-shadow">
+            <Card key={key} className="border-border shadow-sm hover:shadow-md transition-shadow">
               <CardHeader>
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
-                  <Icon className="w-5 h-5 text-primary" aria-hidden="true" />
+                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
+                  <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
                 </div>
                 <CardTitle className="text-xl">{t(`${key}.title`)}</CardTitle>
               </CardHeader>

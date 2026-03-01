@@ -5,7 +5,6 @@ import HeroSection from '@/components/marketing/HeroSection'
 import FeaturesSection from '@/components/marketing/FeaturesSection'
 import SocialProofSection from '@/components/marketing/SocialProofSection'
 import CtaSection from '@/components/marketing/CtaSection'
-import Footer from '@/features/marketing/components/Footer'
 
 type Props = { params: Promise<{ locale: string }> }
 
@@ -102,7 +101,6 @@ export default async function LandingPage({ params }: Props) {
       <FeaturesSection />
       <SocialProofSection />
       <CtaSection locale={locale} />
-      <Footer locale={locale} />
     </>
   )
 }

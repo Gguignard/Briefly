@@ -45,13 +45,14 @@ export function PricingCard({
           {popularLabel}
         </Badge>
       )}
-      <CardHeader className="text-center pb-4">
-        <Badge variant={highlighted ? 'default' : 'secondary'} className="w-fit mx-auto mb-2">
+      <CardHeader className="text-center pb-2">
+        <Badge variant={highlighted ? 'default' : 'secondary'} className="w-fit mx-auto mb-3">
           {tierName}
         </Badge>
         <CardTitle className="text-3xl font-bold">{price}</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col">
+        <div className="border-t border-border mb-4" />
         <ul className="space-y-3 mb-6 flex-1" role="list">
           {features.map((feature, index) => (
             <li key={index} className="flex items-start gap-3">
