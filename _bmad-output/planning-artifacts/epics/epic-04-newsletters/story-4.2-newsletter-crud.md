@@ -31,22 +31,24 @@
 ### Schema Supabase
 
 ```sql
--- supabase/migrations/20250115_newsletters.sql
+-- supabase/migrations/004_newsletters.sql
 CREATE TABLE newsletters (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users(clerk_id) ON DELETE CASCADE,
   name TEXT NOT NULL,
-  sender_email TEXT,           -- email de l'expéditeur (optionnel, pour filtrage)
-  category_id UUID REFERENCES categories(id),
+  email_address TEXT NOT NULL,  -- email de l'expéditeur (requis)
+  category_id UUID,
   active BOOLEAN NOT NULL DEFAULT true,
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 ALTER TABLE newsletters ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can manage own newsletters"
-  ON newsletters FOR ALL
-  USING (user_id = auth.jwt() ->> 'sub');
+-- 4 policies CRUD séparées (select, insert, update, delete)
+CREATE POLICY "newsletters_select_own" ON newsletters FOR SELECT
+  USING (user_id = current_setting('request.jwt.claims', true)::json->>'sub');
+-- (+ insert, update, delete policies similaires)
 
 CREATE INDEX idx_newsletters_user_id ON newsletters(user_id);
 ```
@@ -56,14 +58,14 @@ CREATE INDEX idx_newsletters_user_id ON newsletters(user_id);
 ```typescript
 // src/app/api/newsletters/route.ts
 import { auth } from '@clerk/nextjs/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { apiResponse, apiError } from '@/lib/utils/apiResponse'
 import { z } from 'zod'
 import logger from '@/lib/utils/logger'
 
 const CreateNewsletterSchema = z.object({
   name: z.string().min(1).max(100),
-  senderEmail: z.string().email().optional(),
+  emailAddress: z.string().email(),
   categoryId: z.string().uuid().optional(),
 })
 
@@ -174,15 +176,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 
 ```typescript
 // src/types/newsletter.ts
-export interface Newsletter {
-  id: string
-  user_id: string
-  name: string
-  sender_email: string | null
-  category_id: string | null
-  active: boolean
-  created_at: string
-}
+import type { Tables } from '@/lib/supabase/types'
+export type Newsletter = Tables<'newsletters'>
+// → { id, user_id, name, email_address, category_id, active, created_at, updated_at }
 ```
 
 ---
@@ -201,12 +197,12 @@ export interface Newsletter {
 
 ## Definition of Done
 
-- [ ] Migration SQL `newsletters` créée avec RLS
-- [ ] `GET /api/newsletters` retourne les newsletters de l'utilisateur
-- [ ] `POST /api/newsletters` crée une newsletter (avec validation Zod)
-- [ ] `DELETE /api/newsletters/:id` supprime
-- [ ] `PATCH /api/newsletters/:id` toggle actif/inactif
-- [ ] Test : accès à une newsletter d'un autre utilisateur → 404 ou 403
+- [x] Migration SQL `newsletters` créée avec RLS
+- [x] `GET /api/newsletters` retourne les newsletters de l'utilisateur
+- [x] `POST /api/newsletters` crée une newsletter (avec validation Zod)
+- [x] `DELETE /api/newsletters/:id` supprime
+- [x] `PATCH /api/newsletters/:id` toggle actif/inactif
+- [x] Test : accès à une newsletter d'un autre utilisateur → 404 ou 403
 
 ---
 
@@ -221,22 +217,55 @@ export interface Newsletter {
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer migration `newsletters` table
-- [ ] Créer `GET/POST /api/newsletters`
-- [ ] Créer `DELETE/PATCH /api/newsletters/[id]`
-- [ ] Créer type `Newsletter`
+- [x] Créer migration `newsletters` table
+- [x] Créer `GET/POST /api/newsletters`
+- [x] Créer `DELETE/PATCH /api/newsletters/[id]`
+- [x] Créer type `Newsletter`
 
 ### Completion Notes
-_À remplir par l'agent_
+- Migration SQL 004 créée avec table `newsletters`, RLS (4 policies CRUD), index `user_id`, trigger `updated_at`
+- `user_id` stocke le clerk_id (TEXT) — cohérent avec le pattern `user_settings`
+- Colonne `email_address` (pas `sender_email`) — aligné avec `types.ts` existant
+- Routes API utilisent `createAdminClient()` (bypass RLS) + filtrage `.eq('user_id', userId)` — pattern projet
+- Validation Zod sur POST (name requis, email valide, categoryId UUID optionnel) et PATCH (active boolean)
+- Validation UUID sur params `[id]` pour DELETE et PATCH
+- Vérification limite tier gratuit (5 newsletters actives max) dans POST
+- Lookup du tier utilisateur via `users.clerk_id` (pas `users.id`)
+- 22 tests unitaires : 10 pour GET/POST, 12 pour DELETE/PATCH — tous passent
+- Aucune régression introduite (7 échecs pré-existants : 4 intégration Supabase local, 3 settings/page)
+
+### Senior Developer Review (AI) — 2026-03-01
+
+**Reviewer :** Code Review Adversarial (Claude Opus 4.6)
+**Issues trouvées :** 3 High, 4 Medium, 2 Low
+**Issues corrigées :** 3 High + 4 Medium (toutes)
+
+**Corrections appliquées :**
+- **H1** : DELETE retourne maintenant 404 (pas 200) si la newsletter n'existe pas ou appartient à un autre user — ajout `.select()` + vérification `data.length === 0`
+- **H2** : PATCH retourne maintenant 404 (pas 500) pour le même cas — suppression `.single()`, vérification manuelle du résultat
+- **H3** : 2 tests cross-user ajoutés (DELETE + PATCH → 404) — DoD "accès newsletter d'un autre user → 404" désormais couvert
+- **M1** : FK `user_id REFERENCES users(clerk_id) ON DELETE CASCADE` ajoutée dans migration 004
+- **M2/M4** : Story Technical Notes mises à jour (colonnes, imports, types) pour refléter l'implémentation réelle
+- **M3** : Mocks de test changés de `@supabase/supabase-js` vers `@/lib/supabase/admin` (mock direct du module importé)
+
+**Issues LOW non corrigées (nice-to-have) :**
+- L1 : GET ne log pas les erreurs DB
+- L2 : `ErrorCodes` constants non utilisées dans les routes
 
 ### File List
-_À remplir par l'agent_
+- `supabase/migrations/004_newsletters.sql` (new)
+- `src/types/newsletter.ts` (new)
+- `src/app/api/newsletters/route.ts` (new)
+- `src/app/api/newsletters/[id]/route.ts` (new)
+- `src/app/api/newsletters/__tests__/route.test.ts` (new)
+- `src/app/api/newsletters/[id]/__tests__/route.test.ts` (new)
 
 ### Debug Log
-_À remplir par l'agent_
+- Next.js 16 utilise `params: Promise<{ id: string }>` (async params) — adapté dans les routes `[id]`
+- `body = await req.json()` wrappé dans try/catch pour gérer les requêtes non-JSON
