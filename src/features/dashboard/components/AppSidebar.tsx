@@ -72,7 +72,7 @@ export function AppSidebar() {
   const locale = useLocale()
 
   return (
-    <aside className="hidden md:flex flex-col h-full w-64 border-r bg-background">
+    <aside className="hidden md:flex flex-col h-full w-64 border-r border-sidebar-border bg-sidebar">
       <div className="p-4 border-b">
         <Link href={`/${locale}`} className="text-xl font-bold">
           Briefly
@@ -88,7 +88,7 @@ export function MobileNav() {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className="flex md:hidden items-center justify-between p-4 border-b bg-background">
+    <div className="flex md:hidden items-center justify-between p-4 border-b border-sidebar-border bg-sidebar">
       <Link href={`/${locale}`} className="text-xl font-bold">
         Briefly
       </Link>

@@ -1,12 +1,12 @@
 import { getTranslations } from 'next-intl/server'
 import { Card, CardContent } from '@/components/ui/card'
-import { Users } from 'lucide-react'
+import { Users, Quote } from 'lucide-react'
 
 export default async function SocialProofSection() {
   const t = await getTranslations('marketing.social_proof')
 
   return (
-    <section className="py-20">
+    <section className="py-20 bg-background">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
         <div className="text-center space-y-8">
           <h2 className="text-3xl md:text-4xl font-bold">{t('title')}</h2>
@@ -18,10 +18,11 @@ export default async function SocialProofSection() {
           </div>
 
           {/* Testimonial */}
-          <Card className="max-w-2xl mx-auto">
-            <CardContent className="pt-6">
+          <Card className="max-w-2xl mx-auto shadow-sm">
+            <CardContent className="pt-8 pb-8 relative">
+              <Quote className="absolute top-4 left-6 w-8 h-8 text-primary/20" aria-hidden="true" />
               <blockquote className="space-y-4">
-                <p className="text-lg italic text-muted-foreground">
+                <p className="text-xl italic text-muted-foreground leading-relaxed">
                   &ldquo;{t('testimonial.quote')}&rdquo;
                 </p>
                 <footer className="text-sm">

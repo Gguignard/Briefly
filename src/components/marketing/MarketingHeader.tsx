@@ -14,6 +14,12 @@ export default async function MarketingHeader({ locale }: { locale: string }) {
           </Link>
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
             <Link
+              href={`/${locale}/#features`}
+              className="text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {t('features')}
+            </Link>
+            <Link
               href={`/${locale}/pricing`}
               className="text-muted-foreground transition-colors hover:text-foreground"
             >

@@ -45,7 +45,7 @@ export default async function MarketingFooter({ locale }: { locale: string }) {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
-                  href={`/${locale}/privacy`}
+                  href={`/${locale}/legal/privacy`}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {t('privacy')}
@@ -53,7 +53,7 @@ export default async function MarketingFooter({ locale }: { locale: string }) {
               </li>
               <li>
                 <Link
-                  href={`/${locale}/terms`}
+                  href={`/${locale}/legal/terms`}
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {t('terms')}
@@ -67,20 +67,12 @@ export default async function MarketingFooter({ locale }: { locale: string }) {
             <h3 className="text-sm font-semibold">{t('support')}</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link
-                  href={`/${locale}/help`}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {t('help')}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href={`/${locale}/contact`}
+                <a
+                  href="mailto:hello@briefly.app"
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {t('contact')}
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
