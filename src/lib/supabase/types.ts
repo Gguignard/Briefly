@@ -38,6 +38,7 @@ export type Database = {
         Row: {
           id: string
           user_id: string
+          newsletter_id: string | null
           sender_email: string
           subject: string
           content_text: string
@@ -49,6 +50,7 @@ export type Database = {
         Insert: {
           id?: string
           user_id: string
+          newsletter_id?: string | null
           sender_email: string
           subject: string
           content_text: string
@@ -60,6 +62,7 @@ export type Database = {
         Update: {
           id?: string
           user_id?: string
+          newsletter_id?: string | null
           sender_email?: string
           subject?: string
           content_text?: string
@@ -74,6 +77,13 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "raw_emails_newsletter_id_fkey"
+            columns: ["newsletter_id"]
+            isOneToOne: false
+            referencedRelation: "newsletters"
             referencedColumns: ["id"]
           },
         ]

@@ -10,7 +10,8 @@ function parseRedisUrl(url: string): ConnectionOptions {
       username: parsed.username || undefined,
       maxRetriesPerRequest: null, // Requis pour BullMQ
     }
-  } catch {
+  } catch (err) {
+    console.warn(`[Redis] Failed to parse REDIS_URL "${url}", falling back to localhost:6379`, err)
     return { host: 'localhost', port: 6379, maxRetriesPerRequest: null }
   }
 }

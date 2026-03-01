@@ -4,6 +4,7 @@
 CREATE TABLE raw_emails (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  newsletter_id UUID REFERENCES newsletters(id) ON DELETE SET NULL,
   sender_email TEXT NOT NULL,
   subject TEXT NOT NULL,
   content_text TEXT NOT NULL,
@@ -25,3 +26,4 @@ CREATE POLICY "Users can read own raw emails"
   );
 
 CREATE INDEX idx_raw_emails_user_id ON raw_emails(user_id);
+CREATE INDEX idx_raw_emails_newsletter_id ON raw_emails(newsletter_id);

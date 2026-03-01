@@ -18,12 +18,22 @@ export async function processEmailJob(jobId: string | undefined, data: EmailJobD
     return
   }
 
-  // 2. Stocker le contenu brut dans raw_emails
+  // 2. Résoudre la newsletter correspondante (best-effort)
   const supabase = createAdminClient()
+  const { data: newsletter } = await supabase
+    .from('newsletters')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('email_address', from)
+    .eq('active', true)
+    .single()
+
+  // 3. Stocker le contenu brut dans raw_emails
   const { data: rawEmailRecord, error } = await supabase
     .from('raw_emails')
     .insert({
       user_id: userId,
+      newsletter_id: newsletter?.id ?? null,
       sender_email: from,
       subject,
       content_text: text,
@@ -35,7 +45,7 @@ export async function processEmailJob(jobId: string | undefined, data: EmailJobD
 
   if (error) throw new Error(`Failed to store raw email: ${error.message}`)
 
-  // 3. Enqueue pour génération de résumé
+  // 4. Enqueue pour génération de résumé
   await summaryQueue.add('generate', {
     rawEmailId: rawEmailRecord.id,
     userId,
