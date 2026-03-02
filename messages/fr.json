@@ -45,9 +45,29 @@
     "badgeBasic": "Basique"
   },
   "newsletters": {
-    "empty": "Ajoutez votre première newsletter",
-    "addButton": "Ajouter une newsletter",
+    "title": "Mes newsletters",
+    "subtitle": "Gérez les newsletters que Briefly résume pour vous.",
+    "empty": "Ajoutez votre première newsletter et transférez-la vers votre adresse Briefly.",
+    "addButton": "Ajouter",
     "limitReached": "{count}/5 newsletters (tier gratuit)",
+    "limitMessage": "Limite atteinte.",
+    "upgrade": "Passez au Premium",
+    "upgradeDetail": "pour des newsletters illimitées.",
+    "card": {
+      "confirm": "Confirmer",
+      "cancel": "Annuler"
+    },
+    "modal": {
+      "title": "Ajouter une newsletter",
+      "description": "Entrez le nom de la newsletter et optionnellement l'adresse email de l'expéditeur.",
+      "nameLabel": "Nom",
+      "namePlaceholder": "ex. Morning Brew",
+      "emailLabel": "Email expéditeur (optionnel)",
+      "emailPlaceholder": "ex. newsletter@morningbrew.com",
+      "submit": "Ajouter",
+      "submitting": "Ajout en cours...",
+      "error": "Une erreur est survenue. Veuillez réessayer."
+    },
     "inbox": {
       "title": "Votre adresse de forwarding",
       "copy": "Copier l'adresse",

@@ -45,9 +45,29 @@
     "badgeBasic": "Basic"
   },
   "newsletters": {
-    "empty": "Add your first newsletter",
-    "addButton": "Add Newsletter",
+    "title": "My newsletters",
+    "subtitle": "Manage the newsletters that Briefly summarizes for you.",
+    "empty": "Add your first newsletter and forward it to your Briefly address.",
+    "addButton": "Add",
     "limitReached": "{count}/5 newsletters (free tier)",
+    "limitMessage": "Limit reached.",
+    "upgrade": "Upgrade to Premium",
+    "upgradeDetail": "for unlimited newsletters.",
+    "card": {
+      "confirm": "Confirm",
+      "cancel": "Cancel"
+    },
+    "modal": {
+      "title": "Add a newsletter",
+      "description": "Enter the newsletter name and optionally the sender email address.",
+      "nameLabel": "Name",
+      "namePlaceholder": "e.g. Morning Brew",
+      "emailLabel": "Sender email (optional)",
+      "emailPlaceholder": "e.g. newsletter@morningbrew.com",
+      "submit": "Add",
+      "submitting": "Adding...",
+      "error": "An error occurred. Please try again."
+    },
     "inbox": {
       "title": "Your forwarding address",
       "copy": "Copy address",
