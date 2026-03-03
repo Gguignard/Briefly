@@ -46,14 +46,16 @@ vi.mock('../AddNewsletterModal', () => ({
 vi.mock('../NewsletterCard', () => ({
   NewsletterCard: ({
     newsletter,
+    onToggle,
     onDelete,
   }: {
-    newsletter: { id: string; name: string }
+    newsletter: { id: string; name: string; active: boolean }
     onToggle: (id: string, active: boolean) => void
     onDelete: (id: string) => void
   }) => (
     <div data-testid={`card-${newsletter.id}`}>
       {newsletter.name}
+      <button onClick={() => onToggle(newsletter.id, !newsletter.active)}>Toggle</button>
       <button onClick={() => onDelete(newsletter.id)}>Delete</button>
     </div>
   ),
@@ -143,6 +145,48 @@ describe('NewsletterList', () => {
     expect(fetchMock).toHaveBeenCalledWith('/api/newsletters/nl-1', {
       method: 'DELETE',
     })
+  })
+
+  it('calls PATCH API and updates state on toggle', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true })
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(
+      <NewsletterList initialNewsletters={mockNewsletters} userTier="free" />,
+    )
+
+    // nl-1 is active, toggle it off
+    const toggleButtons = screen.getAllByText('Toggle')
+    fireEvent.click(toggleButtons[0])
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith('/api/newsletters/nl-1', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active: false }),
+      })
+    })
+  })
+
+  it('does not update state when toggle API fails', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: false })
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(
+      <NewsletterList initialNewsletters={mockNewsletters} userTier="free" />,
+    )
+
+    // Banner shows 1 active before toggle
+    expect(screen.getByTestId('limit-banner')).toHaveTextContent('1 - free')
+
+    const toggleButtons = screen.getAllByText('Toggle')
+    fireEvent.click(toggleButtons[0])
+
+    // After failed toggle, active count should remain 1
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalled()
+    })
+    expect(screen.getByTestId('limit-banner')).toHaveTextContent('1 - free')
   })
 
   it('disables add button when free tier at limit', () => {

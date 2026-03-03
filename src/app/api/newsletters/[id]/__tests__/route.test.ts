@@ -140,6 +140,42 @@ describe('PATCH /api/newsletters/[id]', () => {
     vi.clearAllMocks()
   })
 
+  // Helper to create table-aware mock for PATCH tests with limit check
+  function setupPatchMock(options: {
+    tier?: string
+    activeCount?: number
+    updateResult?: { data: unknown; error: unknown }
+  }) {
+    const { tier = 'free', activeCount = 0, updateResult = { data: [], error: null } } = options
+
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'users') {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              single: vi.fn().mockResolvedValue({ data: { tier }, error: null }),
+            }),
+          }),
+        }
+      }
+      // table === 'newsletters'
+      return {
+        select: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockResolvedValue({ count: activeCount, data: null, error: null }),
+          }),
+        }),
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              select: vi.fn().mockResolvedValue(updateResult),
+            }),
+          }),
+        }),
+      }
+    })
+  }
+
   it('returns 401 when not authenticated', async () => {
     mockAuth.mockResolvedValue({ userId: null })
 
@@ -203,6 +239,7 @@ describe('PATCH /api/newsletters/[id]', () => {
   it('returns 404 when newsletter belongs to another user', async () => {
     mockAuth.mockResolvedValue({ userId: 'user_123' })
 
+    // Deactivating skips limit check, so simple mock works
     mockFrom.mockReturnValue({
       update: vi.fn().mockReturnValue({
         eq: vi.fn().mockReturnValue({
@@ -225,7 +262,7 @@ describe('PATCH /api/newsletters/[id]', () => {
     expect(data.error.code).toBe('NOT_FOUND')
   })
 
-  it('toggles newsletter active status successfully', async () => {
+  it('toggles newsletter inactive successfully (no limit check)', async () => {
     mockAuth.mockResolvedValue({ userId: 'user_123' })
 
     const updatedNewsletter = {
@@ -259,17 +296,88 @@ describe('PATCH /api/newsletters/[id]', () => {
     expect(mockFrom).toHaveBeenCalledWith('newsletters')
   })
 
+  it('toggles newsletter active successfully when under limit', async () => {
+    mockAuth.mockResolvedValue({ userId: 'user_123' })
+
+    const updatedNewsletter = {
+      id: VALID_UUID,
+      user_id: 'user_123',
+      name: 'Tech Weekly',
+      email_address: 'tech@example.com',
+      active: true,
+    }
+
+    setupPatchMock({
+      tier: 'free',
+      activeCount: 3,
+      updateResult: { data: [updatedNewsletter], error: null },
+    })
+
+    const req = new NextRequest(`http://localhost:3000/api/newsletters/${VALID_UUID}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ active: true }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const response = await PATCH(req, makeParams(VALID_UUID))
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.data.active).toBe(true)
+  })
+
+  it('returns 403 LIMIT_REACHED when free tier at limit and activating', async () => {
+    mockAuth.mockResolvedValue({ userId: 'user_123' })
+
+    setupPatchMock({ tier: 'free', activeCount: 5 })
+
+    const req = new NextRequest(`http://localhost:3000/api/newsletters/${VALID_UUID}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ active: true }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const response = await PATCH(req, makeParams(VALID_UUID))
+    const data = await response.json()
+
+    expect(response.status).toBe(403)
+    expect(data.error.code).toBe('LIMIT_REACHED')
+  })
+
+  it('allows activation for paid tier regardless of count', async () => {
+    mockAuth.mockResolvedValue({ userId: 'user_123' })
+
+    const updatedNewsletter = {
+      id: VALID_UUID,
+      user_id: 'user_123',
+      name: 'Tech Weekly',
+      email_address: 'tech@example.com',
+      active: true,
+    }
+
+    setupPatchMock({
+      tier: 'paid',
+      activeCount: 10,
+      updateResult: { data: [updatedNewsletter], error: null },
+    })
+
+    const req = new NextRequest(`http://localhost:3000/api/newsletters/${VALID_UUID}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ active: true }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const response = await PATCH(req, makeParams(VALID_UUID))
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.data.active).toBe(true)
+  })
+
   it('returns 500 on database update error', async () => {
     mockAuth.mockResolvedValue({ userId: 'user_123' })
 
-    mockFrom.mockReturnValue({
-      update: vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
-          eq: vi.fn().mockReturnValue({
-            select: vi.fn().mockResolvedValue({ data: null, error: { message: 'Update failed' } }),
-          }),
-        }),
-      }),
+    setupPatchMock({
+      tier: 'free',
+      activeCount: 2,
+      updateResult: { data: null, error: { message: 'Update failed' } },
     })
 
     const req = new NextRequest(`http://localhost:3000/api/newsletters/${VALID_UUID}`, {

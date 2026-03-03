@@ -2,18 +2,12 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import type { Newsletter } from '@/types/newsletter'
 import { NewsletterCard } from './NewsletterCard'
 import { AddNewsletterModal } from './AddNewsletterModal'
 import { NewsletterLimitBanner, FREE_NEWSLETTER_LIMIT } from './NewsletterLimitBanner'
 import { Button } from '@/components/ui/button'
 import { Plus, MailOpen } from 'lucide-react'
-
-interface Newsletter {
-  id: string
-  name: string
-  email_address: string | null
-  active: boolean
-}
 
 interface Props {
   initialNewsletters: Newsletter[]
@@ -29,18 +23,20 @@ export function NewsletterList({ initialNewsletters, userTier }: Props) {
   const canAdd = userTier === 'paid' || activeCount < FREE_NEWSLETTER_LIMIT
 
   const handleToggle = async (id: string, active: boolean) => {
-    await fetch(`/api/newsletters/${id}`, {
+    const res = await fetch(`/api/newsletters/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ active }),
     })
+    if (!res.ok) return
     setNewsletters((prev) =>
       prev.map((n) => (n.id === id ? { ...n, active } : n)),
     )
   }
 
   const handleDelete = async (id: string) => {
-    await fetch(`/api/newsletters/${id}`, { method: 'DELETE' })
+    const res = await fetch(`/api/newsletters/${id}`, { method: 'DELETE' })
+    if (!res.ok) return
     setNewsletters((prev) => prev.filter((n) => n.id !== id))
   }
 

@@ -59,6 +59,27 @@ export async function PATCH(
   if (!parsed.success) return apiError('VALIDATION_ERROR', parsed.error.message, 400)
 
   const supabase = createAdminClient()
+
+  // Enforce free tier limit when activating a newsletter
+  if (parsed.data.active) {
+    const [{ count }, { data: user }] = await Promise.all([
+      supabase
+        .from('newsletters')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('active', true),
+      supabase
+        .from('users')
+        .select('tier')
+        .eq('clerk_id', userId)
+        .single(),
+    ])
+
+    if (user?.tier === 'free' && (count ?? 0) >= 5) {
+      return apiError('LIMIT_REACHED', 'Limite de 5 newsletters actives atteinte (tier gratuit)', 403)
+    }
+  }
+
   const { data, error } = await supabase
     .from('newsletters')
     .update({ active: parsed.data.active })

@@ -6,7 +6,7 @@ import logger from '@/lib/utils/logger'
 
 const CreateNewsletterSchema = z.object({
   name: z.string().min(1).max(100),
-  emailAddress: z.string().email(),
+  emailAddress: z.string().email().optional(),
   categoryId: z.string().uuid().optional(),
 })
 
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
     .insert({
       user_id: userId,
       name: parsed.data.name,
-      email_address: parsed.data.emailAddress,
+      email_address: parsed.data.emailAddress ?? null,
       category_id: parsed.data.categoryId,
     })
     .select()

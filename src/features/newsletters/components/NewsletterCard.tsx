@@ -2,16 +2,10 @@
 
 import { useState } from 'react'
 import { useTranslations } from 'next-intl'
+import type { Newsletter } from '@/types/newsletter'
 import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Trash2 } from 'lucide-react'
-
-interface Newsletter {
-  id: string
-  name: string
-  email_address: string | null
-  active: boolean
-}
 
 interface Props {
   newsletter: Newsletter

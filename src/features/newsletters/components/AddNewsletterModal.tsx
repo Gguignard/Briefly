@@ -10,15 +10,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import type { Newsletter } from '@/types/newsletter'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-
-interface Newsletter {
-  id: string
-  name: string
-  email_address: string | null
-  active: boolean
-}
 
 interface Props {
   open: boolean
@@ -85,25 +80,23 @@ export function AddNewsletterModal({ open, onClose, onAdd }: Props) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="newsletter-name">{t('nameLabel')}</Label>
-            <input
+            <Input
               id="newsletter-name"
               type="text"
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder={t('namePlaceholder')}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="newsletter-email">{t('emailLabel')}</Label>
-            <input
+            <Input
               id="newsletter-email"
               type="email"
               value={emailAddress}
               onChange={(e) => setEmailAddress(e.target.value)}
               placeholder={t('emailPlaceholder')}
-              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
