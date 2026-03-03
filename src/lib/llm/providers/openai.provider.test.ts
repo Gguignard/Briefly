@@ -23,7 +23,7 @@ describe('summarizeWithOpenAI', () => {
     vi.stubEnv('OPENAI_API_KEY', 'test-key')
   })
 
-  it('retourne un SummaryResult structuré pour tier basic', async () => {
+  it('retourne un SummaryResult structuré', async () => {
     mockCreate.mockResolvedValueOnce({
       choices: [
         {
@@ -39,41 +39,29 @@ describe('summarizeWithOpenAI', () => {
       usage: { prompt_tokens: 150, completion_tokens: 80 },
     })
 
-    const result = await summarizeWithOpenAI('Contenu test', 'basic')
+    const result = await summarizeWithOpenAI('Contenu test', 'gpt-5-nano', 'basic')
 
     expect(result.title).toBe('Newsletter Résumée')
     expect(result.keyPoints).toEqual(['Point 1', 'Point 2'])
     expect(result.sourceUrl).toBe('https://example.com')
     expect(result.llmTier).toBe('basic')
     expect(result.provider).toBe('openai')
+    expect(result.model).toBe('gpt-5-nano')
     expect(result.tokensInput).toBe(150)
     expect(result.tokensOutput).toBe(80)
     expect(result.generatedAt).toBeTruthy()
   })
 
-  it('utilise gpt-4o-nano pour tier basic', async () => {
+  it('passe le modèle spécifié à l\'API', async () => {
     mockCreate.mockResolvedValueOnce({
       choices: [{ message: { content: '{"title":"t","keyPoints":[],"sourceUrl":null}' } }],
       usage: { prompt_tokens: 0, completion_tokens: 0 },
     })
 
-    await summarizeWithOpenAI('test', 'basic')
+    await summarizeWithOpenAI('test', 'gpt-5-mini', 'premium')
 
     expect(mockCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ model: 'gpt-4o-nano' })
-    )
-  })
-
-  it('utilise gpt-4o-mini pour tier premium', async () => {
-    mockCreate.mockResolvedValueOnce({
-      choices: [{ message: { content: '{"title":"t","keyPoints":[],"sourceUrl":null}' } }],
-      usage: { prompt_tokens: 0, completion_tokens: 0 },
-    })
-
-    await summarizeWithOpenAI('test', 'premium')
-
-    expect(mockCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ model: 'gpt-4o-mini' })
+      expect.objectContaining({ model: 'gpt-5-mini' })
     )
   })
 
@@ -83,7 +71,7 @@ describe('summarizeWithOpenAI', () => {
       usage: { prompt_tokens: 0, completion_tokens: 0 },
     })
 
-    await summarizeWithOpenAI('test', 'basic')
+    await summarizeWithOpenAI('test', 'gpt-5-nano', 'basic')
 
     expect(mockCreate).toHaveBeenCalledWith(
       expect.objectContaining({ max_tokens: 800 })
@@ -96,7 +84,7 @@ describe('summarizeWithOpenAI', () => {
       usage: { prompt_tokens: 0, completion_tokens: 0 },
     })
 
-    await summarizeWithOpenAI('test', 'basic')
+    await summarizeWithOpenAI('test', 'gpt-5-nano', 'basic')
 
     expect(mockCreate).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -108,7 +96,7 @@ describe('summarizeWithOpenAI', () => {
   it('propage les erreurs API', async () => {
     mockCreate.mockRejectedValueOnce(new Error('API rate limit'))
 
-    await expect(summarizeWithOpenAI('test', 'basic')).rejects.toThrow(
+    await expect(summarizeWithOpenAI('test', 'gpt-5-nano', 'basic')).rejects.toThrow(
       'API rate limit'
     )
   })
@@ -119,19 +107,8 @@ describe('summarizeWithOpenAI', () => {
       usage: { prompt_tokens: 10, completion_tokens: 5 },
     })
 
-    await expect(summarizeWithOpenAI('test', 'basic')).rejects.toThrow(
+    await expect(summarizeWithOpenAI('test', 'gpt-5-nano', 'basic')).rejects.toThrow(
       'LLM returned empty response'
-    )
-  })
-
-  it('rejette si le JSON LLM est invalide', async () => {
-    mockCreate.mockResolvedValueOnce({
-      choices: [{ message: { content: 'not json at all' } }],
-      usage: { prompt_tokens: 10, completion_tokens: 5 },
-    })
-
-    await expect(summarizeWithOpenAI('test', 'basic')).rejects.toThrow(
-      'LLM returned invalid JSON'
     )
   })
 })

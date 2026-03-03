@@ -8,7 +8,7 @@
 
 ## Objectif
 
-Implémenter le moteur de génération de résumés par IA : service LLM abstrait (OpenAI + Anthropic), worker BullMQ `summary.generate`, système dual-tier (1 résumé premium/jour pour les gratuits, tous premium pour les payants), stockage des résumés, et contrôle des coûts.
+Implémenter le moteur de génération de résumés par IA : service LLM abstrait (OpenAI + Groq), worker BullMQ `summary.generate`, système dual-tier (1 résumé premium/jour pour les gratuits, tous premium pour les payants), stockage des résumés, et contrôle des coûts.
 
 ---
 
@@ -16,7 +16,7 @@ Implémenter le moteur de génération de résumés par IA : service LLM abstrai
 
 | Story | Titre | Priority | Complexity | Effort |
 |-------|-------|----------|------------|--------|
-| [5.1](./story-5.1-llm-service.md) | Service LLM abstrait (OpenAI + Anthropic) | P0 | Medium (3 pts) | 1 day |
+| [5.1](./story-5.1-llm-service.md) | Service LLM abstrait (OpenAI + Groq) | P0 | Medium (3 pts) | 1 day |
 | [5.2](./story-5.2-summary-worker.md) | Worker `summary.generate` | P0 | Medium (3 pts) | 1 day |
 | [5.3](./story-5.3-dual-tier-llm.md) | Logique dual-tier : premium vs basic | P0 | Low (2 pts) | 0.5 day |
 | [5.4](./story-5.4-summary-storage.md) | Stockage et rétention des résumés (90j) | P1 | Low (2 pts) | 0.5 day |
@@ -33,7 +33,7 @@ Implémenter le moteur de génération de résumés par IA : service LLM abstrai
 - FR19 : Résumé structuré : titre, points clés, lien source
 - FR20 : Tier gratuit → 1 résumé premium/jour, reste en basic LLM
 - FR21 : Tier payant → tous les résumés en LLM premium
-- FR22 : Fallback : si OpenAI fail → Anthropic (retry x3)
+- FR22 : Fallback : si provider primaire fail → provider secondaire (retry x3)
 - FR23 : Output max 800 tokens par résumé
 - FR24 : Coût cible ≤ 0.5€/mois/utilisateur gratuit, ≤ 1.5€/mois/utilisateur payant
 
@@ -46,7 +46,9 @@ BullMQ: summary.generate job
          ↓
   LLMService.summarize()
   ├── Vérifier tier + quota daily premium
-  ├── Sélectionner modèle (basic: gpt-5-nano / premium: claude-haiku-3-5)
+  ├── Sélectionner modèle via MODEL_CONFIG[tier]
+  │   basic:   gpt-5-nano (OpenAI) → llama-3.1-8b-instant (Groq)
+  │   premium: qwen-3-32b (Groq)  → gpt-5-mini (OpenAI)
   ├── Générer résumé (retry x3, fallback)
   └── Stocker dans summaries table
          ↓
@@ -59,5 +61,5 @@ BullMQ: summary.generate job
 
 | Tier | Modèle principal | Fallback |
 |------|-----------------|---------|
-| Basic | OpenAI `gpt-4o-nano` | Anthropic `claude-haiku-4-5` |
-| Premium | Anthropic `claude-haiku-4-5` | OpenAI `gpt-4o-mini` |
+| Basic | OpenAI `gpt-5-nano` | Groq `llama-3.1-8b-instant` |
+| Premium | Groq `qwen-3-32b` | OpenAI `gpt-5-mini` |

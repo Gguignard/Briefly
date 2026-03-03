@@ -1,4 +1,4 @@
-# Story 5.1 : Service LLM Abstrait (OpenAI + Anthropic)
+# Story 5.1 : Service LLM Abstrait (OpenAI + Groq)
 
 **Epic :** Epic 5 - Moteur de Résumés IA
 **Priority :** P0 (Critical)
@@ -10,7 +10,7 @@
 ## User Story
 
 **As a** system,
-**I want** a unified LLM service abstracting OpenAI and Anthropic APIs,
+**I want** a unified LLM service abstracting OpenAI and Groq APIs,
 **so that** the summarization pipeline can switch between providers transparently with automatic fallback.
 
 ---
@@ -18,7 +18,7 @@
 ## Acceptance Criteria
 
 1. ✅ `LLMService.summarize()` accepte un contenu texte et retourne un résumé structuré
-2. ✅ Sélection du modèle selon le tier : `gpt-4o-nano` (basic) ou `claude-haiku-4-5` (premium)
+2. ✅ Sélection du modèle selon le tier : `gpt-5-nano` (basic primary) / `llama-3.1-8b-instant` (basic fallback) ou `qwen-3-32b` (premium primary) / `gpt-5-mini` (premium fallback)
 3. ✅ Retry x3 avec backoff exponentiel sur les erreurs API
 4. ✅ Fallback automatique : si le modèle primaire échoue après 3 retries → modèle secondaire
 5. ✅ Output limité à 800 tokens
@@ -32,14 +32,32 @@
 ### Installation
 
 ```bash
-npm install openai @anthropic-ai/sdk
+pnpm add openai
 ```
+
+> **Note :** Groq utilise le SDK `openai` avec un `baseURL` différent. Pas de dépendance supplémentaire.
 
 ### `src/lib/llm/types.ts`
 
 ```typescript
 export type LLMTier = 'basic' | 'premium'
-export type LLMProvider = 'openai' | 'anthropic'
+export type LLMProvider = 'openai' | 'groq'
+
+export interface LLMModelConfig {
+  model: string
+  provider: LLMProvider
+}
+
+export const MODEL_CONFIG: Record<LLMTier, { primary: LLMModelConfig; fallback: LLMModelConfig }> = {
+  basic: {
+    primary:  { model: 'gpt-5-nano', provider: 'openai' },
+    fallback: { model: 'llama-3.1-8b-instant', provider: 'groq' },
+  },
+  premium: {
+    primary:  { model: 'qwen-3-32b', provider: 'groq' },
+    fallback: { model: 'gpt-5-mini', provider: 'openai' },
+  },
+}
 
 export interface SummaryResult {
   title: string
@@ -47,6 +65,7 @@ export interface SummaryResult {
   sourceUrl: string | null
   llmTier: LLMTier
   provider: LLMProvider
+  model: string
   tokensInput: number
   tokensOutput: number
   generatedAt: string
@@ -54,150 +73,6 @@ export interface SummaryResult {
 
 export interface LLMCallOptions {
   tier: LLMTier
-  maxTokens?: number
-}
-```
-
-### `src/lib/llm/prompts.ts`
-
-```typescript
-export const SUMMARY_SYSTEM_PROMPT = `Tu es un assistant spécialisé dans la synthèse de newsletters.
-Génère un résumé structuré en JSON avec ce format exact :
-{
-  "title": "Titre accrocheur (max 80 chars)",
-  "keyPoints": ["Point clé 1", "Point clé 2", "Point clé 3"],
-  "sourceUrl": "URL de la newsletter si présente, sinon null"
-}
-Sois concis. Maximum 3 points clés. Chaque point max 120 chars. Réponds uniquement en JSON valide.`
-
-export const SUMMARY_USER_TEMPLATE = (content: string) =>
-  `Résume cette newsletter :\n\n${content.slice(0, 6000)}`
-```
-
-### `src/lib/llm/openai.ts`
-
-```typescript
-import OpenAI from 'openai'
-import { SummaryResult } from './types'
-
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! })
-
-export async function summarizeWithOpenAI(
-  content: string,
-  tier: 'basic' | 'premium'
-): Promise<SummaryResult> {
-  const model = tier === 'premium' ? 'gpt-4o-mini' : 'gpt-4o-nano'
-
-  const response = await client.chat.completions.create({
-    model,
-    max_tokens: 800,
-    response_format: { type: 'json_object' },
-    messages: [
-      { role: 'system', content: SUMMARY_SYSTEM_PROMPT },
-      { role: 'user', content: SUMMARY_USER_TEMPLATE(content) },
-    ],
-  })
-
-  const parsed = JSON.parse(response.choices[0].message.content ?? '{}')
-
-  return {
-    ...parsed,
-    llmTier: tier,
-    provider: 'openai',
-    tokensInput: response.usage?.prompt_tokens ?? 0,
-    tokensOutput: response.usage?.completion_tokens ?? 0,
-    generatedAt: new Date().toISOString(),
-  }
-}
-```
-
-### `src/lib/llm/anthropic.ts`
-
-```typescript
-import Anthropic from '@anthropic-ai/sdk'
-import { SUMMARY_SYSTEM_PROMPT, SUMMARY_USER_TEMPLATE } from './prompts'
-import { SummaryResult } from './types'
-
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
-
-export async function summarizeWithAnthropic(
-  content: string,
-  tier: 'basic' | 'premium'
-): Promise<SummaryResult> {
-  const response = await client.messages.create({
-    model: 'claude-haiku-4-5',
-    max_tokens: 800,
-    system: SUMMARY_SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: SUMMARY_USER_TEMPLATE(content) }],
-  })
-
-  const text = response.content[0].type === 'text' ? response.content[0].text : '{}'
-  const parsed = JSON.parse(text)
-
-  return {
-    ...parsed,
-    llmTier: tier,
-    provider: 'anthropic',
-    tokensInput: response.usage.input_tokens,
-    tokensOutput: response.usage.output_tokens,
-    generatedAt: new Date().toISOString(),
-  }
-}
-```
-
-### `src/lib/llm/service.ts` — Service principal avec retry + fallback
-
-```typescript
-import { summarizeWithOpenAI } from './openai'
-import { summarizeWithAnthropic } from './anthropic'
-import { LLMCallOptions, SummaryResult } from './types'
-import logger, { logError } from '@/lib/utils/logger'
-
-async function withRetry<T>(
-  fn: () => Promise<T>,
-  retries = 3,
-  delay = 1000
-): Promise<T> {
-  for (let attempt = 1; attempt <= retries; attempt++) {
-    try {
-      return await fn()
-    } catch (err) {
-      if (attempt === retries) throw err
-      await new Promise(r => setTimeout(r, delay * Math.pow(2, attempt - 1)))
-    }
-  }
-  throw new Error('Max retries exceeded')
-}
-
-export async function summarize(
-  content: string,
-  options: LLMCallOptions
-): Promise<SummaryResult> {
-  const { tier, maxTokens = 800 } = options
-
-  // Modèle primaire selon le tier
-  const primaryProvider = tier === 'premium' ? 'anthropic' : 'openai'
-  const fallbackProvider = tier === 'premium' ? 'openai' : 'anthropic'
-
-  const primaryFn = primaryProvider === 'anthropic'
-    ? () => summarizeWithAnthropic(content, tier)
-    : () => summarizeWithOpenAI(content, tier)
-
-  const fallbackFn = fallbackProvider === 'anthropic'
-    ? () => summarizeWithAnthropic(content, tier)
-    : () => summarizeWithOpenAI(content, tier)
-
-  try {
-    return await withRetry(primaryFn)
-  } catch (primaryErr) {
-    logger.warn({ tier, primaryProvider }, 'Primary LLM failed, trying fallback')
-    try {
-      return await withRetry(fallbackFn)
-    } catch (fallbackErr) {
-      logError(fallbackErr as Error, { tier, primaryProvider, fallbackProvider })
-      throw fallbackErr
-    }
-  }
 }
 ```
 
@@ -206,7 +81,7 @@ export async function summarize(
 ```bash
 # .env.local
 OPENAI_API_KEY=sk-xxx
-ANTHROPIC_API_KEY=sk-ant-xxx
+GROQ_API_KEY=gsk_xxx
 ```
 
 ---
@@ -224,7 +99,7 @@ ANTHROPIC_API_KEY=sk-ant-xxx
 
 ## Definition of Done
 
-- [x] `src/lib/llm/service.ts`, `openai.ts`, `anthropic.ts`, `types.ts`, `prompts.ts` créés
+- [x] `src/lib/llm/llmService.ts`, `providers/openai.provider.ts`, `providers/groq.provider.ts`, `types.ts`, `prompts.ts`, `validation.ts` créés
 - [x] Retry x3 + fallback fonctionnel (testé avec mock)
 - [x] Output JSON parsé correctement
 - [x] Tokens loggés après chaque appel
@@ -243,7 +118,7 @@ ANTHROPIC_API_KEY=sk-ant-xxx
 ## References
 
 - [OpenAI Node SDK](https://github.com/openai/openai-node)
-- [Anthropic TypeScript SDK](https://github.com/anthropics/anthropic-sdk-typescript)
+- [Groq API](https://console.groq.com/docs/openai) (compatible OpenAI SDK)
 
 ---
 
@@ -257,27 +132,31 @@ Claude Opus 4.6
 
 ### Tasks
 - [x] Créer `src/lib/llm/types.ts`, `prompts.ts`
-- [x] Créer `src/lib/llm/openai.ts` et `anthropic.ts`
-- [x] Créer `src/lib/llm/service.ts` avec retry + fallback
-- [x] Ajouter `OPENAI_API_KEY` et `ANTHROPIC_API_KEY` dans `.env.example` (déjà présent)
+- [x] Créer `src/lib/llm/providers/openai.provider.ts` et `providers/groq.provider.ts`
+- [x] Créer `src/lib/llm/llmService.ts` avec retry + fallback + MODEL_CONFIG routing
+- [x] Ajouter `OPENAI_API_KEY` et `GROQ_API_KEY` dans `.env.example`
+- [x] Migration Anthropic → Groq (suppression `@anthropic-ai/sdk`)
 
 ### Completion Notes
-- Implémenté le service LLM abstrait avec providers OpenAI et Anthropic
-- `types.ts` : types `LLMTier`, `LLMProvider`, `SummaryResult`, `LLMCallOptions`
+- Implémenté le service LLM abstrait avec providers OpenAI et Groq
+- `types.ts` : types `LLMTier`, `LLMProvider`, `SummaryResult`, `LLMCallOptions`, `MODEL_CONFIG` centralisé
 - `prompts.ts` : prompt système versionné + template utilisateur (troncature à 6000 chars)
-- `openai.ts` : provider OpenAI avec modèles `gpt-4o-nano` (basic) / `gpt-4o-mini` (premium), max 800 tokens, format JSON, logging tokens
-- `anthropic.ts` : provider Anthropic avec `claude-haiku-4-5`, max 800 tokens, logging tokens
-- `service.ts` : `withRetry()` (3 tentatives, backoff exponentiel) + `summarize()` avec fallback automatique (basic: OpenAI→Anthropic, premium: Anthropic→OpenAI)
-- 31 tests unitaires couvrant : structure des types, prompts, providers (modèle, max_tokens, format, erreurs, content null/non-text), retry logic (succès, échec, backoff), fallback (basic, premium, double échec), comptage retries
-- Dépendances installées : `openai@6.25.0`, `@anthropic-ai/sdk@0.78.0`
-- `.env.example` contenait déjà les clés API LLM
+- `providers/openai.provider.ts` : provider OpenAI avec lazy init, accepte model en paramètre
+- `providers/groq.provider.ts` : provider Groq via SDK OpenAI (`baseURL: https://api.groq.com/openai/v1`), lazy init
+- `validation.ts` : `parseLLMResponse()` — validation JSON + extraction typée (pas de spread aveugle)
+- `llmService.ts` : `withRetry()` (3 tentatives, backoff exponentiel) + `summarize()` avec routing `MODEL_CONFIG[tier]` et fallback automatique
+- Config modèles : basic (OpenAI `gpt-5-nano` → Groq `llama-3.1-8b-instant`), premium (Groq `qwen-3-32b` → OpenAI `gpt-5-mini`)
+- 41 tests unitaires co-localisés couvrant : types, prompts, validation, providers, retry, fallback 4 modèles
+- Dépendance unique : `openai@6.25.0` (Groq réutilise le même SDK)
+- `@anthropic-ai/sdk` supprimé — plus de dépendance Anthropic
 - 0 régressions introduites (7 échecs pré-existants dans Supabase/Settings)
 
 ### Review Follow-ups (AI)
-- [x] [AI-Review][MEDIUM] M1 — Noms de modèles alignés : ACs et epic index mis à jour avec `gpt-4o-nano`/`gpt-4o-mini`/`claude-haiku-4-5`
-- [x] [AI-Review][MEDIUM] M2 — Structure fichiers réorganisée : `providers/openai.provider.ts`, `providers/anthropic.provider.ts`, `llmService.ts`, tests co-localisés, barrel `index.ts`
-- [x] [AI-Review][MEDIUM] M3 — Confirmé by design : Anthropic n'a qu'un modèle (haiku), différenciation côté OpenAI (nano/mini)
+- [x] [AI-Review][MEDIUM] M1 — Noms de modèles alignés avec implémentation réelle
+- [x] [AI-Review][MEDIUM] M2 — Structure fichiers réorganisée : `providers/`, tests co-localisés, barrel `index.ts`
+- [x] [AI-Review][MEDIUM] M3 — Résolu par migration Groq : diversification providers complète
 - [x] [AI-Review][MEDIUM] M4 — `withRetry` rendu privé (non exporté), barrel `index.ts` expose uniquement `summarize` + types
+- [x] [Post-Review] Migration Anthropic → Groq : suppression `@anthropic-ai/sdk`, ajout Groq provider, 4 modèles configurés via `MODEL_CONFIG`
 
 ### File List
 - `src/lib/llm/index.ts` (nouveau — barrel export)
@@ -286,14 +165,15 @@ Claude Opus 4.6
 - `src/lib/llm/prompts.ts` (nouveau)
 - `src/lib/llm/validation.ts` (nouveau — ajouté par review)
 - `src/lib/llm/validation.test.ts` (nouveau — co-localisé)
-- `src/lib/llm/llmService.ts` (nouveau — renommé de service.ts)
+- `src/lib/llm/llmService.ts` (nouveau)
 - `src/lib/llm/llmService.test.ts` (nouveau — co-localisé)
-- `src/lib/llm/providers/openai.provider.ts` (nouveau — renommé de openai.ts)
+- `src/lib/llm/providers/openai.provider.ts` (nouveau)
 - `src/lib/llm/providers/openai.provider.test.ts` (nouveau — co-localisé)
-- `src/lib/llm/providers/anthropic.provider.ts` (nouveau — renommé de anthropic.ts)
-- `src/lib/llm/providers/anthropic.provider.test.ts` (nouveau — co-localisé)
-- `package.json` (modifié — ajout openai + @anthropic-ai/sdk)
+- `src/lib/llm/providers/groq.provider.ts` (nouveau)
+- `src/lib/llm/providers/groq.provider.test.ts` (nouveau — co-localisé)
+- `package.json` (modifié — ajout openai, suppression @anthropic-ai/sdk)
 - `pnpm-lock.yaml` (modifié)
+- `.env.example` (modifié — GROQ_API_KEY remplace ANTHROPIC_API_KEY)
 
 ### Debug Log
 - Mock `vi.fn().mockImplementation()` ne fonctionne pas comme constructeur pour `new OpenAI()` / `new Anthropic()` → résolu avec `class MockOpenAI` dans `vi.mock()`
@@ -310,19 +190,24 @@ Claude Opus 4.6
 
 **Issues corrigées (3 HIGH) :**
 - H1 — Ajout `validation.ts` : parse et validation explicite de la sortie LLM (try/catch JSON.parse, extraction de champs typés, rejet des arrays/primitives). Élimine le spread aveugle `...parsed` de données non-fiables.
-- H2 — Lazy initialization des clients OpenAI/Anthropic : validation de la présence des env vars au premier appel (plus de crash à l'import), suppression des assertions non-null `!`.
+- H2 — Lazy initialization des clients OpenAI/Groq : validation de la présence des env vars au premier appel (plus de crash à l'import), suppression des assertions non-null `!`.
 - H3 — Suppression de `maxTokens` inutilisé dans `LLMCallOptions` (code mort).
 
 **Issues MEDIUM corrigées (4) :**
-- M1 — ACs et epic index alignés avec les noms de modèles réels (`gpt-4o-nano`/`gpt-4o-mini`/`claude-haiku-4-5`)
+- M1 — ACs et epic index alignés avec les noms de modèles réels
 - M2 — Fichiers réorganisés selon conventions architecture : `providers/`, `llmService.ts`, tests co-localisés, barrel `index.ts`
-- M3 — Confirmé by design : asymétrie Anthropic intentionnelle (un seul modèle haiku)
+- M3 — Résolu par migration Groq : diversification providers complète (4 modèles distincts)
 - M4 — `withRetry` rendu privé, barrel `index.ts` n'expose que l'API publique (`summarize` + types)
 
-**Tests :** 39 tests passent (structure co-localisée). 0 régression (7 échecs pré-existants Supabase/Settings inchangés).
+**Migration post-review : Anthropic → Groq**
+- Suppression `@anthropic-ai/sdk`, création `groq.provider.ts` (SDK OpenAI avec `baseURL` Groq)
+- `MODEL_CONFIG` centralisé : basic (OpenAI→Groq), premium (Groq→OpenAI)
+- Premium fallback (`gpt-5-mini`) clairement supérieur au basic primary (`gpt-5-nano`)
+
+**Tests :** 41 tests passent (structure co-localisée). 0 régression (7 échecs pré-existants Supabase/Settings inchangés).
 
 **Fichiers ajoutés/réorganisés par review :**
 - `src/lib/llm/validation.ts` — module de validation sortie LLM
 - `src/lib/llm/index.ts` — barrel export API publique
-- `src/lib/llm/providers/` — providers déplacés selon convention architecture
+- `src/lib/llm/providers/groq.provider.ts` — provider Groq via SDK OpenAI
 - Tests co-localisés avec les sources (suppression `__tests__/`)

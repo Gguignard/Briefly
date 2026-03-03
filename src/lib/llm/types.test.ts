@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { SUMMARY_SYSTEM_PROMPT, SUMMARY_USER_TEMPLATE } from './prompts'
+import { MODEL_CONFIG } from './types'
 import type { SummaryResult, LLMCallOptions, LLMTier, LLMProvider } from './types'
 
 describe('LLM Types', () => {
@@ -10,6 +11,7 @@ describe('LLM Types', () => {
       sourceUrl: null,
       llmTier: 'basic',
       provider: 'openai',
+      model: 'gpt-5-nano',
       tokensInput: 100,
       tokensOutput: 50,
       generatedAt: '2026-01-01T00:00:00.000Z',
@@ -20,6 +22,7 @@ describe('LLM Types', () => {
     expect(result.sourceUrl).toBeNull()
     expect(result.llmTier).toBe('basic')
     expect(result.provider).toBe('openai')
+    expect(result.model).toBe('gpt-5-nano')
     expect(result.tokensInput).toBe(100)
     expect(result.tokensOutput).toBe(50)
     expect(result.generatedAt).toBeTruthy()
@@ -39,10 +42,28 @@ describe('LLM Types', () => {
     expect(tiers).toContain('premium')
   })
 
-  it('LLMProvider accepte openai et anthropic', () => {
-    const providers: LLMProvider[] = ['openai', 'anthropic']
+  it('LLMProvider accepte openai et groq', () => {
+    const providers: LLMProvider[] = ['openai', 'groq']
     expect(providers).toContain('openai')
-    expect(providers).toContain('anthropic')
+    expect(providers).toContain('groq')
+  })
+})
+
+describe('MODEL_CONFIG', () => {
+  it('basic primary utilise gpt-5-nano via OpenAI', () => {
+    expect(MODEL_CONFIG.basic.primary).toEqual({ model: 'gpt-5-nano', provider: 'openai' })
+  })
+
+  it('basic fallback utilise llama-3.1-8b-instant via Groq', () => {
+    expect(MODEL_CONFIG.basic.fallback).toEqual({ model: 'llama-3.1-8b-instant', provider: 'groq' })
+  })
+
+  it('premium primary utilise qwen-3-32b via Groq', () => {
+    expect(MODEL_CONFIG.premium.primary).toEqual({ model: 'qwen-3-32b', provider: 'groq' })
+  })
+
+  it('premium fallback utilise gpt-5-mini via OpenAI', () => {
+    expect(MODEL_CONFIG.premium.fallback).toEqual({ model: 'gpt-5-mini', provider: 'openai' })
   })
 })
 

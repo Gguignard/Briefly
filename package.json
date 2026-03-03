@@ -14,7 +14,6 @@
     "workers": "tsx src/workers/index.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.78.0",
     "@clerk/localizations": "^3.37.0",
     "@clerk/nextjs": "^6.38.2",
     "@radix-ui/react-dialog": "^1.1.15",

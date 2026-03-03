@@ -8,15 +8,18 @@ let client: OpenAI | null = null
 
 function getClient(): OpenAI {
   if (!client) {
-    if (!process.env.OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY environment variable is not set')
+    if (!process.env.GROQ_API_KEY) {
+      throw new Error('GROQ_API_KEY environment variable is not set')
     }
-    client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+    client = new OpenAI({
+      apiKey: process.env.GROQ_API_KEY,
+      baseURL: 'https://api.groq.com/openai/v1',
+    })
   }
   return client
 }
 
-export async function summarizeWithOpenAI(
+export async function summarizeWithGroq(
   content: string,
   model: string,
   tier: LLMTier
@@ -36,7 +39,7 @@ export async function summarizeWithOpenAI(
   const parsed = parseLLMResponse(response.choices[0].message.content)
 
   logger.info(
-    { provider: 'openai', model, tier, tokensInput, tokensOutput },
+    { provider: 'groq', model, tier, tokensInput, tokensOutput },
     'LLM call completed'
   )
 
@@ -45,7 +48,7 @@ export async function summarizeWithOpenAI(
     keyPoints: parsed.keyPoints,
     sourceUrl: parsed.sourceUrl,
     llmTier: tier,
-    provider: 'openai',
+    provider: 'groq',
     model,
     tokensInput,
     tokensOutput,
