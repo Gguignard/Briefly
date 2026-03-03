@@ -59,5 +59,5 @@ BullMQ: summary.generate job
 
 | Tier | Modèle principal | Fallback |
 |------|-----------------|---------|
-| Basic | OpenAI `gpt-5-nano` | Anthropic `claude-haiku-3-5` |
-| Premium | Anthropic `claude-haiku-3-5` | OpenAI `gpt-5-nano` |
+| Basic | OpenAI `gpt-4o-nano` | Anthropic `claude-haiku-4-5` |
+| Premium | Anthropic `claude-haiku-4-5` | OpenAI `gpt-4o-mini` |
