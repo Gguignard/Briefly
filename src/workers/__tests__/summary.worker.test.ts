@@ -55,7 +55,9 @@ describe('processSummaryJob', () => {
   }
 
   const mockSummariesChain = {
-    insert: vi.fn(),
+    insert: vi.fn().mockReturnThis(),
+    select: vi.fn().mockReturnThis(),
+    single: vi.fn(),
   }
 
   const mockSupabase = {
@@ -97,9 +99,12 @@ describe('processSummaryJob', () => {
       data: { content_text: 'Long newsletter content...', sender_email: 'news@example.com' },
       error: null,
     })
-    mockSummariesChain.insert.mockResolvedValueOnce({ error: null })
+    mockSummariesChain.single.mockResolvedValueOnce({
+      data: { id: 'summary-uuid-1' },
+      error: null,
+    })
     setupEqChain()
-    vi.mocked(getLLMTierForUser).mockReturnValue('premium')
+    vi.mocked(getLLMTierForUser).mockResolvedValue('premium')
     vi.mocked(summarize).mockResolvedValue(mockSummaryResult)
     vi.mocked(trackLLMCost).mockResolvedValue()
   }
@@ -147,8 +152,8 @@ describe('processSummaryJob', () => {
       expect.objectContaining({ processed_at: expect.any(String) }),
     )
 
-    // Verify cost tracking
-    expect(trackLLMCost).toHaveBeenCalledWith('user-123', mockSummaryResult)
+    // Verify cost tracking with summary_id and userTier
+    expect(trackLLMCost).toHaveBeenCalledWith('user-123', mockSummaryResult, 'summary-uuid-1', 'paid')
   })
 
   it('utilise le tier basic pour les utilisateurs free', async () => {
@@ -156,10 +161,13 @@ describe('processSummaryJob', () => {
       data: { content_text: 'Content...', sender_email: 'news@example.com' },
       error: null,
     })
-    mockSummariesChain.insert.mockResolvedValueOnce({ error: null })
+    mockSummariesChain.single.mockResolvedValueOnce({
+      data: { id: 'summary-uuid-2' },
+      error: null,
+    })
     setupEqChain()
 
-    vi.mocked(getLLMTierForUser).mockReturnValue('basic')
+    vi.mocked(getLLMTierForUser).mockResolvedValue('basic')
     vi.mocked(summarize).mockResolvedValue({ ...mockSummaryResult, llmTier: 'basic' })
     vi.mocked(trackLLMCost).mockResolvedValue()
 
@@ -190,9 +198,9 @@ describe('processSummaryJob', () => {
       data: { content_text: 'Content...', sender_email: 'news@example.com' },
       error: null,
     })
-    mockSummariesChain.insert.mockResolvedValueOnce({ error: { message: 'Insert failed' } })
+    mockSummariesChain.single.mockResolvedValueOnce({ data: null, error: { message: 'Insert failed' } })
 
-    vi.mocked(getLLMTierForUser).mockReturnValue('premium')
+    vi.mocked(getLLMTierForUser).mockResolvedValue('premium')
     vi.mocked(summarize).mockResolvedValue(mockSummaryResult)
 
     await expect(processSummaryJob('job-4', baseJobData)).rejects.toThrow(
@@ -209,7 +217,7 @@ describe('processSummaryJob', () => {
       error: null,
     })
 
-    vi.mocked(getLLMTierForUser).mockReturnValue('premium')
+    vi.mocked(getLLMTierForUser).mockResolvedValue('premium')
     vi.mocked(summarize).mockRejectedValue(new Error('LLM timeout'))
 
     await expect(processSummaryJob('job-5', baseJobData)).rejects.toThrow('LLM timeout')
@@ -222,10 +230,13 @@ describe('processSummaryJob', () => {
       data: { content_text: 'Content...', sender_email: 'news@example.com' },
       error: null,
     })
-    mockSummariesChain.insert.mockResolvedValueOnce({ error: null })
+    mockSummariesChain.single.mockResolvedValueOnce({
+      data: { id: 'summary-uuid-6' },
+      error: null,
+    })
     setupEqChain({ error: { message: 'Update failed' } })
 
-    vi.mocked(getLLMTierForUser).mockReturnValue('premium')
+    vi.mocked(getLLMTierForUser).mockResolvedValue('premium')
     vi.mocked(summarize).mockResolvedValue(mockSummaryResult)
 
     await expect(processSummaryJob('job-6', baseJobData)).rejects.toThrow(

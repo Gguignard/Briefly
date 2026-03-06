@@ -29,24 +29,28 @@ export async function processSummaryJob(
   }
 
   // 2. Déterminer le tier LLM
-  const llmTier = getLLMTierForUser(userId, userTier)
+  const llmTier = await getLLMTierForUser(userId, userTier)
 
   // 3. Générer le résumé
   const result = await summarize(rawEmail.content_text, { tier: llmTier })
 
   // 4. Stocker le résumé
-  const { error: insertError } = await supabase.from('summaries').insert({
-    user_id: userId,
-    raw_email_id: rawEmailId,
-    title: result.title,
-    key_points: result.keyPoints,
-    source_url: result.sourceUrl,
-    llm_tier: result.llmTier,
-    llm_provider: result.provider,
-    tokens_input: result.tokensInput,
-    tokens_output: result.tokensOutput,
-    generated_at: result.generatedAt,
-  })
+  const { data: summaryRow, error: insertError } = await supabase
+    .from('summaries')
+    .insert({
+      user_id: userId,
+      raw_email_id: rawEmailId,
+      title: result.title,
+      key_points: result.keyPoints,
+      source_url: result.sourceUrl,
+      llm_tier: result.llmTier,
+      llm_provider: result.provider,
+      tokens_input: result.tokensInput,
+      tokens_output: result.tokensOutput,
+      generated_at: result.generatedAt,
+    })
+    .select('id')
+    .single()
 
   if (insertError) throw new Error(`Failed to store summary: ${insertError.message}`)
 
@@ -59,7 +63,7 @@ export async function processSummaryJob(
   if (updateError) throw new Error(`Failed to update processed_at: ${updateError.message}`)
 
   // 6. Tracker le coût
-  await trackLLMCost(userId, result)
+  await trackLLMCost(userId, result, summaryRow?.id, userTier)
 
   logger.info({ jobId, userId, llmTier: result.llmTier }, 'Summary generated')
 }

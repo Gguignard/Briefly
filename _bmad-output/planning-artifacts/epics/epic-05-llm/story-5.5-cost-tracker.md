@@ -19,7 +19,7 @@
 
 1. ✅ Chaque appel LLM stocke `tokens_input`, `tokens_output`, `provider` dans `summaries`
 2. ✅ `trackLLMCost()` calcule le coût en centimes et l'ajoute dans `llm_costs` table
-3. ✅ Coûts calculés selon les tarifs OpenAI et Anthropic actuels
+3. ✅ Coûts calculés selon les tarifs OpenAI et Groq actuels
 4. ✅ Requête d'agrégat disponible : coût total par utilisateur sur le mois en cours
 5. ✅ Seuil d'alerte : si un utilisateur gratuit dépasse 0.8€/mois → log warning
 
@@ -134,10 +134,10 @@ const { data } = await supabase
 
 ## Definition of Done
 
-- [ ] Migration `llm_costs` créée
-- [ ] `src/lib/llm/cost-tracker.ts` créé
-- [ ] Log warning si seuil 0.8€/mois dépassé pour un user free
-- [ ] Test : vérifier l'insertion dans `llm_costs` après génération d'un résumé
+- [x] Migration `llm_costs` créée
+- [x] `src/lib/llm/cost-tracker.ts` créé
+- [x] Log warning si seuil 0.8€/mois dépassé pour un user free
+- [x] Test : vérifier l'insertion dans `llm_costs` après génération d'un résumé
 
 ---
 
@@ -151,21 +151,38 @@ const { data } = await supabase
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer migration `llm_costs`
-- [ ] Créer `src/lib/llm/cost-tracker.ts`
-- [ ] Intégrer dans `summary.worker.ts`
+- [x] Créer migration `llm_costs`
+- [x] Créer `src/lib/llm/cost-tracker.ts`
+- [x] Intégrer dans `summary.worker.ts`
 
 ### Completion Notes
-_À remplir par l'agent_
+- Migration 008 créée pour mettre à jour le schema `llm_costs` : ajout `tokens_input`/`tokens_output`, `cost_cents` (centimes d'euro), `summary_id` (FK vers summaries), index `(user_id, created_at)` ; suppression `tokens_used`/`cost_usd`
+- `cost-tracker.ts` réécrit : `calculateCostCents()` exporté, `trackLLMCost()` avec `summary_id` optionnel, vérification seuil mensuel 0.8€ avec log warning, `getMonthlyUserCost()` pour agrégat mensuel (AC4)
+- `summary.worker.ts` mis à jour : récupère l'ID du summary inséré via `.select('id').single()` et le passe à `trackLLMCost()`
+- 12 tests unitaires pour cost-tracker (calculateCostCents, trackLLMCost, getMonthlyUserCost)
+- Tests du worker mis à jour pour la nouvelle chaîne d'appels summaries
+- Suite complète : 312 PASS, 7 FAIL pré-existants (intégration Supabase + UI non liés)
+
+### Code Review Fixes (2026-03-06)
+- **H1** : `trackLLMCost` accepte maintenant `userTier` — le seuil 0.8€ n'est vérifié que pour les free users (AC5)
+- **H2** : Migration 008 corrigée — données legacy remises à 0 (au lieu d'une conversion USD→EUR erronée)
+- **M1** : RLS activé sur `llm_costs` avec politique SELECT par user + ALL pour service_role
+- **M2** : AC3 corrigé — "OpenAI et Groq" au lieu de "OpenAI et Anthropic"
+- **M3** : +2 tests pour `gpt-5-mini` et `llama-3.1-8b-instant` (+1 test paid user skip threshold)
+- Suite : 21 tests cost-tracker + worker PASS
 
 ### File List
-_À remplir par l'agent_
+- `supabase/migrations/008_llm_costs_update.sql` (nouveau)
+- `src/lib/llm/cost-tracker.ts` (modifié)
+- `src/lib/llm/cost-tracker.test.ts` (modifié)
+- `src/workers/summary.worker.ts` (modifié)
+- `src/workers/__tests__/summary.worker.test.ts` (modifié)
 
 ### Debug Log
-_À remplir par l'agent_
+Aucun problème rencontré.
