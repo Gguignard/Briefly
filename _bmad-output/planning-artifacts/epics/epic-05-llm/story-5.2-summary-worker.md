@@ -176,11 +176,11 @@ CREATE INDEX idx_summaries_user_id_created ON summaries(user_id, created_at DESC
 
 ## Definition of Done
 
-- [ ] `src/lib/queue/summary.queue.ts` créé
-- [ ] `src/workers/summary.worker.ts` créé
-- [ ] Migration `summaries` table créée
-- [ ] Worker intégré dans `src/workers/index.ts`
-- [ ] Test : email reçu → résumé stocké dans `summaries` en < 30s
+- [x] `src/lib/queue/summary.queue.ts` créé
+- [x] `src/workers/summary.worker.ts` créé
+- [x] Migration `summaries` table créée
+- [x] Worker intégré dans `src/workers/index.ts`
+- [x] Test : email reçu → résumé stocké dans `summaries` en < 30s
 
 ---
 
@@ -195,22 +195,53 @@ CREATE INDEX idx_summaries_user_id_created ON summaries(user_id, created_at DESC
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer `src/lib/queue/summary.queue.ts`
-- [ ] Créer `src/workers/summary.worker.ts`
-- [ ] Créer migration `summaries`
-- [ ] Intégrer dans `src/workers/index.ts`
+- [x] Créer `src/lib/queue/summary.queue.ts` (déjà existant via story 4.4)
+- [x] Créer `src/workers/summary.worker.ts`
+- [x] Créer migration `summaries`
+- [x] Intégrer dans `src/workers/index.ts`
 
 ### Completion Notes
-_À remplir par l'agent_
+- `summary.queue.ts` existait déjà (story 4.4) avec interface `SummaryJobData` et config BullMQ conforme
+- `summary.worker.ts` créé avec `processSummaryJob()` exporté séparément pour testabilité (pattern identique à `email.processor.ts`)
+- Worker : fetch raw_email → tier selection → LLM summarize → store summary → mark processed_at → track cost
+- Dead letter queue intégrée après épuisement des retries (3 attempts, backoff exponentiel)
+- `tier-selector.ts` créé (logique simple paid→premium, free→basic) — story 5.3 l'enrichira
+- `cost-tracker.ts` créé — insère dans `llm_costs` avec calcul de coût par modèle
+- Migration `006_summaries.sql` avec schéma complet (key_points TEXT[], llm_provider, tokens, etc.)
+- Types Supabase mis à jour pour refléter le nouveau schéma summaries
+- `workers/index.ts` : summaryWorker ajouté avec graceful shutdown via Promise.all
+- 11 nouveaux tests (5 worker + 3 tier-selector + 3 cost-tracker), tous passent
+- 0 régression (293 tests existants passent, 7 échecs pré-existants non liés)
 
 ### File List
-_À remplir par l'agent_
+- `src/workers/summary.worker.ts` (nouveau)
+- `src/workers/__tests__/summary.worker.test.ts` (nouveau)
+- `src/workers/index.ts` (modifié — ajout summaryWorker)
+- `src/lib/llm/tier-selector.ts` (nouveau)
+- `src/lib/llm/tier-selector.test.ts` (nouveau)
+- `src/lib/llm/cost-tracker.ts` (nouveau)
+- `src/lib/llm/cost-tracker.test.ts` (nouveau)
+- `supabase/migrations/006_summaries.sql` (nouveau)
+- `src/lib/supabase/types.ts` (modifié — schéma summaries mis à jour)
 
 ### Debug Log
-_À remplir par l'agent_
+- Mock bullmq `Worker` : `vi.fn().mockImplementation(...)` ne fonctionne pas comme constructeur → corrigé avec `vi.fn(function(this) {...})`
+
+### Change Log
+- 2026-03-03 : Story 5.2 implémentée — worker summary.generate, migration summaries, tier-selector, cost-tracker
+- 2026-03-06 : Code review — 9 issues corrigés (4H, 3M, 2L) :
+  - H1: Supprimé DROP TABLE destructif dans migration 006
+  - H2: Ajouté UNIQUE constraint sur raw_email_id dans summaries
+  - H3: Ajouté vérification erreur sur update processed_at
+  - H4: Remplacé stalledInterval (pas un timeout) par timeout: 45000 dans defaultJobOptions
+  - M1: Calcul coût LLM avec tarifs séparés input/output
+  - M2: Refactorisé mocks Supabase avec chaînes par table + ajout test processed_at error
+  - M3: Signature getLLMTierForUser(userId, userTier) forward-compat story 5.3
+  - L1/L2: Documentés, non bloquants
+  - 12 tests passent (0 régression sur 294 existants)

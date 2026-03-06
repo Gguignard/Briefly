@@ -13,6 +13,7 @@ export const summaryQueue = new Queue<SummaryJobData>('summary.generate', {
   defaultJobOptions: {
     attempts: 3,
     backoff: { type: 'exponential', delay: 5000 },
+    timeout: 45000,
     removeOnComplete: { count: 100 },
     removeOnFail: { count: 500 },
   },

@@ -125,31 +125,64 @@ export type Database = {
         Row: {
           id: string
           user_id: string
-          newsletter_id: string
+          raw_email_id: string
           title: string
-          content: string
+          key_points: string[]
+          source_url: string | null
           llm_tier: string
+          llm_provider: string
+          tokens_input: number
+          tokens_output: number
+          generated_at: string
+          read_at: string | null
           created_at: string
         }
         Insert: {
           id?: string
           user_id: string
-          newsletter_id: string
+          raw_email_id: string
           title: string
-          content: string
+          key_points: string[]
+          source_url?: string | null
           llm_tier: string
+          llm_provider: string
+          tokens_input: number
+          tokens_output: number
+          generated_at: string
+          read_at?: string | null
           created_at?: string
         }
         Update: {
           id?: string
           user_id?: string
-          newsletter_id?: string
+          raw_email_id?: string
           title?: string
-          content?: string
+          key_points?: string[]
+          source_url?: string | null
           llm_tier?: string
+          llm_provider?: string
+          tokens_input?: number
+          tokens_output?: number
+          generated_at?: string
+          read_at?: string | null
           created_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "summaries_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "summaries_raw_email_id_fkey"
+            columns: ["raw_email_id"]
+            isOneToOne: false
+            referencedRelation: "raw_emails"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_settings: {
         Row: {
