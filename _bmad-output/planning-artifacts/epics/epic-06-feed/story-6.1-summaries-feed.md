@@ -207,10 +207,10 @@ export default function LocaleLayout({ children }) {
 
 ## Definition of Done
 
-- [ ] `GET /api/summaries` retourne les résumés paginés
-- [ ] `SummariesFeed` avec TanStack Query, skeleton, état vide
-- [ ] Compteur unread visible
-- [ ] Page accessible sur `/fr/summaries`
+- [x] `GET /api/summaries` retourne les résumés paginés
+- [x] `SummariesFeed` avec TanStack Query, skeleton, état vide
+- [x] Compteur unread visible
+- [x] Page accessible sur `/fr/summaries`
 
 ---
 
@@ -225,22 +225,37 @@ export default function LocaleLayout({ children }) {
 ## Dev Agent Record
 
 ### Status
-Not Started
+Done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer `GET /api/summaries` avec pagination et filtre
-- [ ] Créer `src/app/[locale]/(dashboard)/summaries/page.tsx`
-- [ ] Créer `SummariesFeed` et `SummaryCardSkeleton`
-- [ ] Configurer TanStack Query provider dans layout
+- [x] Créer `GET /api/summaries` avec pagination et filtre
+- [x] Créer `src/app/[locale]/(dashboard)/summaries/page.tsx`
+- [x] Créer `SummariesFeed` et `SummaryCardSkeleton`
+- [x] Configurer TanStack Query provider dans layout
 
 ### Completion Notes
-_À remplir par l'agent_
+- Installé `@tanstack/react-query` v5.90.21
+- Créé un `QueryProvider` client component wrappé dans le locale layout (avec et sans Clerk)
+- API route utilise `createAdminClient` (cohérent avec les routes existantes) + résolution user_id interne depuis clerk_id
+- SummaryCard inclut : titre, key_points en liste, badge tier, indicateur non-lu, lien source
+- Ajouté clé de traduction `summaries.title` dans fr.json et en.json
+- Type-check : aucune erreur dans les fichiers créés/modifiés
+- Tests : aucune régression (les 7 échecs étaient pré-existants)
 
 ### File List
-_À remplir par l'agent_
+- `src/app/api/summaries/route.ts` (créé)
+- `src/components/providers/QueryProvider.tsx` (créé)
+- `src/features/summaries/components/SummariesFeed.tsx` (créé)
+- `src/features/summaries/components/SummaryCard.tsx` (créé)
+- `src/features/summaries/components/SummaryCardSkeleton.tsx` (créé)
+- `src/features/summaries/index.ts` (créé)
+- `src/app/[locale]/(dashboard)/summaries/page.tsx` (créé)
+- `src/app/[locale]/layout.tsx` (modifié — ajout QueryProvider)
+- `messages/fr.json` (modifié — ajout summaries.title)
+- `messages/en.json` (modifié — ajout summaries.title)
 
 ### Debug Log
-_À remplir par l'agent_
+- Aucun problème rencontré

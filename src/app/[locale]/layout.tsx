@@ -6,6 +6,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { routing, locales, type Locale } from '@/i18n/routing'
 import { ClerkProvider } from '@clerk/nextjs'
 import { frFR, enUS } from '@clerk/localizations'
+import { QueryProvider } from '@/components/providers/QueryProvider'
 import '../globals.css'
 
 function isValidLocale(locale: string): locale is Locale {
@@ -89,12 +90,16 @@ export default async function LocaleLayout({
         {hasClerkKey ? (
           <ClerkProvider localization={clerkLocalization}>
             <NextIntlClientProvider messages={messages}>
-              {children}
+              <QueryProvider>
+                {children}
+              </QueryProvider>
             </NextIntlClientProvider>
           </ClerkProvider>
         ) : (
           <NextIntlClientProvider messages={messages}>
-            {children}
+            <QueryProvider>
+              {children}
+            </QueryProvider>
           </NextIntlClientProvider>
         )}
       </body>

@@ -38,11 +38,16 @@
     "offerDescription": "Tier gratuit — 5 newsletters max"
   },
   "summaries": {
+    "title": "Mes résumés",
     "empty": "Vos premiers résumés arriveront demain matin !",
     "newCount": "{count, plural, one {# nouveau résumé disponible} other {# nouveaux résumés disponibles}}",
     "readMore": "Lire la newsletter complète",
     "badgePremium": "Premium",
-    "badgeBasic": "Basique"
+    "badgeBasic": "Basique",
+    "readIndicator": "Lu",
+    "justNow": "À l'instant",
+    "hoursAgo": "Il y a {hours}h",
+    "yesterday": "Hier"
   },
   "newsletters": {
     "title": "Mes newsletters",
