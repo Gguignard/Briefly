@@ -17,6 +17,7 @@ export type SummaryCardData = {
   raw_emails: {
     sender_email: string
     subject: string
+    newsletter_id: string | null
   }
 }
 
@@ -50,7 +51,7 @@ export function SummaryCard({ summary, onNavigate }: SummaryCardProps) {
             {summary.title}
           </Link>
           <p className="text-xs text-muted-foreground mt-0.5">
-            {summary.raw_emails.sender_email} · {formatRelativeDate(summary.generated_at, t)}
+            {summary.raw_emails.sender_email} · {formatRelativeDate(summary.generated_at, t, locale)}
           </p>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
@@ -97,14 +98,22 @@ export function SummaryCard({ summary, onNavigate }: SummaryCardProps) {
 
 export function formatRelativeDate(
   dateStr: string,
-  t: (key: string, values?: Record<string, string | number>) => string
+  t: (key: string, values?: Record<string, string | number>) => string,
+  locale: string = 'fr'
 ): string {
   const date = new Date(dateStr)
+  if (isNaN(date.getTime())) return t('justNow')
+
   const now = new Date()
-  const diffHours = Math.floor((now.getTime() - date.getTime()) / 3600000)
+  const diffMs = now.getTime() - date.getTime()
+  if (diffMs < 0) return t('justNow')
+
+  const diffHours = Math.floor(diffMs / 3600000)
 
   if (diffHours < 1) return t('justNow')
   if (diffHours < 24) return t('hoursAgo', { hours: diffHours })
   if (diffHours < 48) return t('yesterday')
-  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+
+  const localeMap: Record<string, string> = { fr: 'fr-FR', en: 'en-US' }
+  return date.toLocaleDateString(localeMap[locale] ?? locale, { day: 'numeric', month: 'short' })
 }

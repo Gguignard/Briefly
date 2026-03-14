@@ -40,6 +40,7 @@
   "summaries": {
     "title": "Mes résumés",
     "empty": "Vos premiers résumés arriveront demain matin !",
+    "error": "Impossible de charger vos résumés. Veuillez réessayer.",
     "newCount": "{count, plural, one {# nouveau résumé disponible} other {# nouveaux résumés disponibles}}",
     "readMore": "Lire la newsletter complète",
     "badgePremium": "Premium",
@@ -47,7 +48,8 @@
     "readIndicator": "Lu",
     "justNow": "À l'instant",
     "hoursAgo": "Il y a {hours}h",
-    "yesterday": "Hier"
+    "yesterday": "Hier",
+    "loadingSkeleton": "Chargement du résumé"
   },
   "newsletters": {
     "title": "Mes newsletters",

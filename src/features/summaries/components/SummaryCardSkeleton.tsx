@@ -1,8 +1,11 @@
+import { useTranslations } from 'next-intl'
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function SummaryCardSkeleton() {
+  const t = useTranslations('summaries')
+
   return (
-    <div className="border rounded-xl p-4 space-y-3" aria-busy="true" aria-label="Loading summary">
+    <div className="border rounded-xl p-4 space-y-3" aria-busy="true" aria-label={t('loadingSkeleton')}>
       <div className="flex items-start justify-between gap-2">
         <div className="space-y-2 flex-1 min-w-0">
           <Skeleton className="h-5 w-3/4" />

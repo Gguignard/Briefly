@@ -52,6 +52,7 @@ const baseSummary = {
   raw_emails: {
     sender_email: 'tech@newsletter.com',
     subject: 'Tech Weekly #42',
+    newsletter_id: 'nl-1',
   },
 }
 
@@ -154,6 +155,13 @@ describe('SummaryCard', () => {
     expect(link.className).toContain('focus-visible:ring-2')
   })
 
+  it('renders empty key points list gracefully', () => {
+    render(<SummaryCard summary={{ ...baseSummary, key_points: [] }} />)
+
+    const list = screen.getByRole('list')
+    expect(list.children).toHaveLength(0)
+  })
+
   it('calls onNavigate when title is clicked', () => {
     const onNavigate = vi.fn()
     render(<SummaryCard summary={baseSummary} onNavigate={onNavigate} />)
@@ -190,8 +198,24 @@ describe('formatRelativeDate', () => {
 
   it('returns formatted date for older dates', () => {
     const oldDate = '2026-01-15T10:00:00Z'
-    const result = formatRelativeDate(oldDate, mockT)
+    const result = formatRelativeDate(oldDate, mockT, 'fr')
     expect(result).toContain('15')
     expect(result).toContain('janv')
+  })
+
+  it('returns "just now" for future dates', () => {
+    const future = new Date(Date.now() + 3600 * 1000).toISOString()
+    expect(formatRelativeDate(future, mockT)).toBe("À l'instant")
+  })
+
+  it('returns "just now" for invalid date strings', () => {
+    expect(formatRelativeDate('not-a-date', mockT)).toBe("À l'instant")
+  })
+
+  it('uses en-US locale for English', () => {
+    const oldDate = '2026-01-15T10:00:00Z'
+    const result = formatRelativeDate(oldDate, mockT, 'en')
+    expect(result).toContain('15')
+    expect(result).toContain('Jan')
   })
 })

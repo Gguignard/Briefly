@@ -197,7 +197,7 @@ export function SummaryCardSkeleton() {
 ## Dev Agent Record
 
 ### Status
-review
+done
 
 ### Agent Model Used
 Claude Opus 4.6
@@ -214,7 +214,16 @@ Claude Opus 4.6
 - Type `SummaryCardData` exporté depuis l'index pour réutilisation
 - `useMarkAsRead` non intégré (dépendance Story 6.4) — remplacé par `onNavigate` callback
 - Clés i18n ajoutées : `readIndicator`, `justNow`, `hoursAgo`, `yesterday` (fr + en)
-- 20 tests unitaires : 17 pour SummaryCard + 3 pour SummaryCardSkeleton — tous passent
+- 24 tests unitaires : 21 pour SummaryCard + 3 pour SummaryCardSkeleton — tous passent
+
+### Code Review Fixes (2026-03-14)
+- [H1] `formatRelativeDate` utilise maintenant le locale dynamique (fr-FR/en-US) au lieu de hardcoder fr-FR
+- [H2] `SummaryCardData.raw_emails` inclut `newsletter_id` pour cohérence avec le type API
+- [H3] `SummariesFeed` type `SummaryCardData` au lieu de `any`
+- [M1] Test ajouté pour `key_points: []`
+- [M2] `formatRelativeDate` gère les dates futures et invalides + tests ajoutés
+- [M3] `SummaryCardSkeleton` utilise `useTranslations` pour l'aria-label i18n
+- `src/features/summaries/components/SummariesFeed.tsx` ajouté à la File List (modifié pour typage)
 
 ### File List
 - `src/features/summaries/components/SummaryCard.tsx` (modifié)
@@ -224,6 +233,7 @@ Claude Opus 4.6
 - `src/features/summaries/components/__tests__/SummaryCardSkeleton.test.tsx` (créé)
 - `messages/fr.json` (modifié — clés i18n ajoutées)
 - `messages/en.json` (modifié — clés i18n ajoutées)
+- `src/features/summaries/components/SummariesFeed.tsx` (modifié — typage `any` → `SummaryCardData`)
 
 ### Debug Log
 - Aucun problème rencontré

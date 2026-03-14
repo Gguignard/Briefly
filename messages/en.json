@@ -40,6 +40,7 @@
   "summaries": {
     "title": "My summaries",
     "empty": "Your first summaries will arrive tomorrow morning!",
+    "error": "Unable to load your summaries. Please try again.",
     "newCount": "{count} new summar{count, plural, one {y} other {ies}} available",
     "readMore": "Read full newsletter",
     "badgePremium": "Premium",
@@ -47,7 +48,8 @@
     "readIndicator": "Read",
     "justNow": "Just now",
     "hoursAgo": "{hours}h ago",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "loadingSkeleton": "Loading summary"
   },
   "newsletters": {
     "title": "My newsletters",
