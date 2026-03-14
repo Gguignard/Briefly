@@ -49,7 +49,12 @@
     "justNow": "À l'instant",
     "hoursAgo": "Il y a {hours}h",
     "yesterday": "Hier",
-    "loadingSkeleton": "Chargement du résumé"
+    "loadingSkeleton": "Chargement du résumé",
+    "backToSummaries": "Retour aux résumés",
+    "keyPointsHeading": "POINTS CLÉS",
+    "readOriginal": "Lire la newsletter originale",
+    "source": "Source : {sender}",
+    "notFound": "Résumé introuvable"
   },
   "newsletters": {
     "title": "Mes newsletters",

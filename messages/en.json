@@ -49,7 +49,12 @@
     "justNow": "Just now",
     "hoursAgo": "{hours}h ago",
     "yesterday": "Yesterday",
-    "loadingSkeleton": "Loading summary"
+    "loadingSkeleton": "Loading summary",
+    "backToSummaries": "Back to summaries",
+    "keyPointsHeading": "KEY POINTS",
+    "readOriginal": "Read original newsletter",
+    "source": "Source: {sender}",
+    "notFound": "Summary not found"
   },
   "newsletters": {
     "title": "My newsletters",
