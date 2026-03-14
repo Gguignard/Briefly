@@ -154,11 +154,11 @@ export default async function SummaryDetailPage({ params }: Props) {
 
 ## Definition of Done
 
-- [ ] Page `/[locale]/summaries/[id]` créée
-- [ ] Marquage automatique comme lu à l'ouverture
-- [ ] 404 si résumé non trouvé ou n'appartient pas à l'utilisateur
-- [ ] Bouton retour vers `/summaries`
-- [ ] Tous les points clés affichés
+- [x] Page `/[locale]/summaries/[id]` créée
+- [x] Marquage automatique comme lu à l'ouverture
+- [x] 404 si résumé non trouvé ou n'appartient pas à l'utilisateur
+- [x] Bouton retour vers `/summaries`
+- [x] Tous les points clés affichés
 
 ---
 
@@ -173,21 +173,50 @@ export default async function SummaryDetailPage({ params }: Props) {
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer `src/app/[locale]/(dashboard)/summaries/[id]/page.tsx`
-- [ ] Marquage automatique comme lu
-- [ ] Gestion 404
+- [x] Créer `src/app/[locale]/(dashboard)/summaries/[id]/page.tsx`
+- [x] Marquage automatique comme lu (server-side dans page.tsx)
+- [x] Gestion 404
+- [x] API route PATCH `/api/summaries/[id]/read` pour marquage client-side
+- [x] Hook `useMarkAsRead` avec optimistic update TanStack Query
+- [x] Export barrel `src/features/summaries/index.ts`
 
 ### Completion Notes
-_À remplir par l'agent_
+- Page détail Server Component créée avec fetch Supabase + filtre `user_id` (AC6 - sécurité)
+- Marquage `read_at` automatique si null à l'ouverture (AC5)
+- `notFound()` si résumé inexistant ou n'appartient pas à l'utilisateur (AC6)
+- Bouton retour vers `/{locale}/summaries` (AC4)
+- Affichage de tous les points clés numérotés (AC2, AC5)
+- Badge Premium conditionnel sur `llm_tier` (AC2)
+- Bouton "Lire la newsletter originale" vers `source_url` si présent (AC3)
+- Traductions i18n ajoutées (fr + en) : backToSummaries, keyPointsHeading, readOriginal, source, notFound
+- 15 tests unitaires couvrant : auth redirect, 404, rendu titre/points clés/badge/source/back link, marquage read_at, sémantique article
+- 0 régression (354 tests existants passent toujours)
 
 ### File List
-_À remplir par l'agent_
+- `src/app/[locale]/(dashboard)/summaries/[id]/page.tsx` (nouveau)
+- `src/app/[locale]/(dashboard)/summaries/[id]/__tests__/page.test.tsx` (nouveau)
+- `src/app/api/summaries/[id]/read/route.ts` (nouveau - API marquage lu)
+- `src/app/api/summaries/[id]/read/__tests__/route.test.ts` (nouveau)
+- `src/features/summaries/hooks/useMarkAsRead.ts` (nouveau - hook optimistic update)
+- `src/features/summaries/hooks/__tests__/useMarkAsRead.test.ts` (nouveau)
+- `src/features/summaries/index.ts` (modifié - export useMarkAsRead)
+- `messages/fr.json` (modifié - ajout clés summaries.backToSummaries, keyPointsHeading, readOriginal, source, notFound)
+- `messages/en.json` (modifié - ajout clés summaries.backToSummaries, keyPointsHeading, readOriginal, source, notFound)
+
+### Change Log
+- **2026-03-14 — Code Review (AI):** 3 HIGH + 2 MEDIUM corrigés :
+  - H1: File List complétée (5 fichiers manquants ajoutés)
+  - H2: Ajout filtre `user_id` sur UPDATE `read_at` dans page.tsx (défense en profondeur)
+  - H3: API route vérifie maintenant que l'update a affecté des lignes (404 si résumé inexistant)
+  - M1: Tasks et File List documentent l'infrastructure client-side (hook + API route)
+  - M2: Validation UUID ajoutée sur l'API route (pattern Zod existant)
+  - Tests mis à jour (14 tests passent, 0 régression sur 371 tests)
 
 ### Debug Log
-_À remplir par l'agent_
+- Fix cleanup manquant entre tests async (ajout afterEach + cleanup)

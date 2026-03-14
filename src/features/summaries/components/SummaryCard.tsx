@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl'
 import { ExternalLink, CheckCircle2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { useMarkAsRead } from '../hooks/useMarkAsRead'
 
 export type SummaryCardData = {
   id: string
@@ -30,6 +31,12 @@ export function SummaryCard({ summary, onNavigate }: SummaryCardProps) {
   const locale = useLocale()
   const t = useTranslations('summaries')
   const isRead = !!summary.read_at
+  const { markAsRead } = useMarkAsRead(summary.id)
+
+  const handleNavigate = () => {
+    markAsRead()
+    onNavigate?.()
+  }
 
   return (
     <article
@@ -46,7 +53,7 @@ export function SummaryCard({ summary, onNavigate }: SummaryCardProps) {
           <Link
             href={`/${locale}/summaries/${summary.id}`}
             className="font-semibold text-base hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm line-clamp-2"
-            onClick={onNavigate}
+            onClick={handleNavigate}
           >
             {summary.title}
           </Link>
@@ -86,7 +93,7 @@ export function SummaryCard({ summary, onNavigate }: SummaryCardProps) {
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 text-xs text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
-          onClick={onNavigate}
+          onClick={handleNavigate}
         >
           {t('readMore')}
           <ExternalLink className="h-3 w-3" aria-hidden="true" />

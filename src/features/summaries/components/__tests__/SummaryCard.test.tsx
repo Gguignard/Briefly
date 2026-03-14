@@ -37,6 +37,11 @@ vi.mock('@/lib/utils', () => ({
   cn: (...classes: any[]) => classes.filter(Boolean).join(' '),
 }))
 
+const mockMarkAsRead = vi.fn()
+vi.mock('../../hooks/useMarkAsRead', () => ({
+  useMarkAsRead: () => ({ markAsRead: mockMarkAsRead }),
+}))
+
 const baseSummary = {
   id: 'sum-1',
   title: 'Top 5 des tendances tech 2026',
@@ -59,6 +64,7 @@ const baseSummary = {
 describe('SummaryCard', () => {
   afterEach(() => {
     cleanup()
+    vi.clearAllMocks()
   })
 
   it('renders title, sender email, and date', () => {
@@ -167,6 +173,29 @@ describe('SummaryCard', () => {
     render(<SummaryCard summary={baseSummary} onNavigate={onNavigate} />)
 
     screen.getByText('Top 5 des tendances tech 2026').click()
+    expect(onNavigate).toHaveBeenCalled()
+  })
+
+  it('calls markAsRead when title link is clicked', () => {
+    render(<SummaryCard summary={baseSummary} />)
+
+    screen.getByText('Top 5 des tendances tech 2026').click()
+    expect(mockMarkAsRead).toHaveBeenCalled()
+  })
+
+  it('calls markAsRead when source link is clicked', () => {
+    render(<SummaryCard summary={baseSummary} />)
+
+    screen.getByText('Lire la newsletter complète').click()
+    expect(mockMarkAsRead).toHaveBeenCalled()
+  })
+
+  it('calls both markAsRead and onNavigate on title click', () => {
+    const onNavigate = vi.fn()
+    render(<SummaryCard summary={baseSummary} onNavigate={onNavigate} />)
+
+    screen.getByText('Top 5 des tendances tech 2026').click()
+    expect(mockMarkAsRead).toHaveBeenCalled()
     expect(onNavigate).toHaveBeenCalled()
   })
 })

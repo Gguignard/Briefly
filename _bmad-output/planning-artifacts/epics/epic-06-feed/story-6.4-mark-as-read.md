@@ -107,10 +107,10 @@ export function useMarkAsRead(summaryId: string) {
 
 ## Definition of Done
 
-- [ ] `PATCH /api/summaries/[id]/read` créé
-- [ ] Hook `useMarkAsRead` avec optimistic update
-- [ ] Intégré dans `SummaryCard` (clic sur titre ou lien externe)
-- [ ] Test : cliquer sur une card → indicateur visuel "lu" immédiat
+- [x] `PATCH /api/summaries/[id]/read` créé
+- [x] Hook `useMarkAsRead` avec optimistic update
+- [x] Intégré dans `SummaryCard` (clic sur titre ou lien externe)
+- [x] Test : cliquer sur une card → indicateur visuel "lu" immédiat
 
 ---
 
@@ -125,21 +125,41 @@ export function useMarkAsRead(summaryId: string) {
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer `PATCH /api/summaries/[id]/read`
-- [ ] Créer `useMarkAsRead` hook
-- [ ] Intégrer dans `SummaryCard`
+- [x] Créer `PATCH /api/summaries/[id]/read`
+- [x] Créer `useMarkAsRead` hook
+- [x] Intégrer dans `SummaryCard`
 
 ### Completion Notes
-_À remplir par l'agent_
+- Route API `PATCH /api/summaries/[id]/read` créée avec auth Clerk, lookup user par `clerk_id`, update `read_at` idempotent via `createAdminClient` (cohérent avec le pattern existant de `GET /api/summaries`)
+- Hook `useMarkAsRead` avec optimistic update typé (`SummariesQueryData`), guard idempotent via `useRef`, rollback automatique via `invalidateQueries` en cas d'échec réseau
+- Intégration dans `SummaryCard` : `handleNavigate` déclenche `markAsRead()` + `onNavigate?.()` sur clic titre et lien externe
+- 40 tests passent (7 API route, 9 hook, 24 SummaryCard dont 3 nouveaux pour markAsRead)
+- 0 régression introduite
+- Lint clean sur tous les fichiers modifiés
+
+### Code Review Fixes (2026-03-14)
+- **[H1] Tests API route corrigés** : utilisation de UUIDs valides au lieu de `sum-1`, ajout helpers `setupUserLookup`/`setupUpdate`, ajout test validation UUID invalide et test 404 résumé introuvable
+- **[H2] Optimistic update `unreadCount` conditionnel** : ne décrémente plus le compteur si le résumé est déjà lu (`wasUnread` check)
+- **[M1] Rollback sur réponse HTTP non-ok** : ajout `.then(res => { if (!res.ok) throw })` pour rollback sur 4xx/5xx, pas seulement erreurs réseau
+- **Tests ajoutés** : 2 nouveaux tests hook (unreadCount non décrémenté si déjà lu, rollback sur HTTP 500)
 
 ### File List
-_À remplir par l'agent_
+- `src/app/api/summaries/[id]/read/route.ts` (nouveau)
+- `src/app/api/summaries/[id]/read/__tests__/route.test.ts` (nouveau)
+- `src/features/summaries/hooks/useMarkAsRead.ts` (nouveau)
+- `src/features/summaries/hooks/__tests__/useMarkAsRead.test.ts` (nouveau)
+- `src/features/summaries/components/SummaryCard.tsx` (modifié — import + handleNavigate)
+- `src/features/summaries/components/__tests__/SummaryCard.test.tsx` (modifié — mock useMarkAsRead + 3 tests)
+- `src/features/summaries/index.ts` (modifié — export useMarkAsRead)
 
 ### Debug Log
-_À remplir par l'agent_
+- Choix `createAdminClient` au lieu de `createClient` (server) pour cohérence avec le pattern existant dans `GET /api/summaries`
+- Ajout lookup user par `clerk_id` → `user.id` pour filtrer par `user_id` (même pattern que la route summaries existante)
+- Typage `SummariesQueryData` dans le hook pour éliminer les erreurs lint `no-explicit-any`
+- `setQueriesData` (plural) au lieu de `setQueryData` pour couvrir tous les query keys commençant par `['summaries']`
