@@ -236,6 +236,11 @@ Claude Opus 4.6
 - [x] Créer `SummariesFeed` et `SummaryCardSkeleton`
 - [x] Configurer TanStack Query provider dans layout
 
+#### Review Follow-ups (AI)
+- [ ] [AI-Review][MEDIUM] Ajouter prefetch SSR avec HydrationBoundary (décision architecturale : accès DB direct vs API fetch) [src/app/[locale]/(dashboard)/summaries/page.tsx]
+- [ ] [AI-Review][MEDIUM] Ajouter tests pour SummariesFeed et GET /api/summaries
+- [ ] [AI-Review][LOW] Ajouter `newsletter_id` au type `SummaryCardData.raw_emails` pour cohérence avec la query API
+
 ### Completion Notes
 - Installé `@tanstack/react-query` v5.90.21
 - Créé un `QueryProvider` client component wrappé dans le locale layout (avec et sans Clerk)
@@ -245,17 +250,27 @@ Claude Opus 4.6
 - Type-check : aucune erreur dans les fichiers créés/modifiés
 - Tests : aucune régression (les 7 échecs étaient pré-existants)
 
+### Code Review Fixes (2026-03-14)
+- [H1] `unreadCount` : requête séparée pour le total non-lu global (pas juste la page courante)
+- [H2] Validation du paramètre `page` avec fallback à 1 si NaN ou négatif
+- [H3] Gestion d'erreur ajoutée dans `SummariesFeed` (état `isError` + message i18n)
+- [M1] `formatRelativeDate` : locale dynamique au lieu de `fr-FR` hardcodé
+- [M2] Type `SummaryCardData` utilisé au lieu de `any` dans le mapping
+- [M4] SSR prefetch noté comme action item (décision architecturale requise)
+
 ### File List
-- `src/app/api/summaries/route.ts` (créé)
+- `src/app/api/summaries/route.ts` (créé, modifié review)
 - `src/components/providers/QueryProvider.tsx` (créé)
-- `src/features/summaries/components/SummariesFeed.tsx` (créé)
-- `src/features/summaries/components/SummaryCard.tsx` (créé)
+- `src/features/summaries/components/SummariesFeed.tsx` (créé, modifié review)
+- `src/features/summaries/components/SummaryCard.tsx` (créé, modifié review)
 - `src/features/summaries/components/SummaryCardSkeleton.tsx` (créé)
+- `src/features/summaries/components/__tests__/SummaryCard.test.tsx` (créé)
+- `src/features/summaries/components/__tests__/SummaryCardSkeleton.test.tsx` (créé)
 - `src/features/summaries/index.ts` (créé)
 - `src/app/[locale]/(dashboard)/summaries/page.tsx` (créé)
 - `src/app/[locale]/layout.tsx` (modifié — ajout QueryProvider)
-- `messages/fr.json` (modifié — ajout summaries.title)
-- `messages/en.json` (modifié — ajout summaries.title)
+- `messages/fr.json` (modifié — ajout summaries.title, summaries.error)
+- `messages/en.json` (modifié — ajout summaries.title, summaries.error)
 
 ### Debug Log
 - Aucun problème rencontré
