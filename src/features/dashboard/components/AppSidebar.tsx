@@ -1,113 +1,61 @@
 'use client'
 
 import Link from 'next/link'
-import { useLocale, useTranslations } from 'next-intl'
 import { usePathname } from 'next/navigation'
-import {
-  FileText,
-  Mail,
-  FolderOpen,
-  Settings,
-  CreditCard,
-  Menu,
-} from 'lucide-react'
-import { useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { SignOutButton } from '@/features/auth/components/SignOutButton'
-import { Button } from '@/components/ui/button'
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet'
+import { UserButton, useUser } from '@clerk/nextjs'
+import { NAV_ITEMS } from './navConfig'
 
-const navItems = [
-  { key: 'summaries', href: '/summaries', icon: FileText },
-  { key: 'newsletters', href: '/newsletters', icon: Mail },
-  { key: 'categories', href: '/categories', icon: FolderOpen },
-  { key: 'settings', href: '/settings', icon: Settings },
-  { key: 'billing', href: '/billing', icon: CreditCard },
-] as const
-
-function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+export function AppSidebar() {
   const locale = useLocale()
   const t = useTranslations('nav')
   const pathname = usePathname()
+  const { user, isLoaded } = useUser()
 
   return (
-    <>
-      <nav className="flex-1 p-4 space-y-1">
-        {navItems.map(({ key, href, icon: Icon }) => {
-          const fullHref = `/${locale}${href}`
-          const isActive = pathname.startsWith(fullHref)
+    <div className="flex flex-col h-full p-3">
+      {/* Logo */}
+      <Link href={`/${locale}/summaries`} className="px-3 py-2 mb-4">
+        <span className="text-lg font-bold">Briefly</span>
+      </Link>
+
+      {/* Navigation */}
+      <nav className="flex-1 space-y-1" aria-label={t('mainNav')}>
+        {NAV_ITEMS.map(({ key, icon: Icon, path }) => {
+          const href = `/${locale}${path}`
+          const isActive = pathname.startsWith(href)
 
           return (
             <Link
               key={key}
-              href={fullHref}
-              onClick={onNavigate}
+              href={href}
+              aria-current={isActive ? 'page' : undefined}
               className={cn(
-                'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
                 isActive
-                  ? 'bg-accent text-accent-foreground'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  ? 'bg-primary/10 text-primary font-medium'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               )}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="h-4 w-4 shrink-0" />
               {t(key)}
             </Link>
           )
         })}
       </nav>
 
-      <div className="p-4 border-t">
+      {/* User + Sign out */}
+      <div className="border-t pt-3 space-y-2">
+        <div className="flex items-center gap-2 px-3 py-1">
+          <UserButton afterSignOutUrl={`/${locale}`} />
+          <span className="text-xs text-muted-foreground truncate">
+            {isLoaded ? user?.primaryEmailAddress?.emailAddress : '...'}
+          </span>
+        </div>
         <SignOutButton />
       </div>
-    </>
-  )
-}
-
-export function AppSidebar() {
-  const locale = useLocale()
-
-  return (
-    <aside className="hidden md:flex flex-col h-full w-64 border-r border-sidebar-border bg-sidebar">
-      <div className="p-4 border-b">
-        <Link href={`/${locale}`} className="text-xl font-bold">
-          Briefly
-        </Link>
-      </div>
-      <SidebarContent />
-    </aside>
-  )
-}
-
-export function MobileNav() {
-  const locale = useLocale()
-  const [open, setOpen] = useState(false)
-
-  return (
-    <div className="flex md:hidden items-center justify-between p-4 border-b border-sidebar-border bg-sidebar">
-      <Link href={`/${locale}`} className="text-xl font-bold">
-        Briefly
-      </Link>
-      <Sheet open={open} onOpenChange={setOpen}>
-        <SheetTrigger asChild>
-          <Button variant="ghost" size="sm">
-            <Menu className="h-5 w-5" />
-            <span className="sr-only">Menu</span>
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="p-0 w-64">
-          <SheetTitle className="p-4 border-b text-xl font-bold">
-            Briefly
-          </SheetTitle>
-          <div className="flex flex-col h-[calc(100%-57px)]">
-            <SidebarContent onNavigate={() => setOpen(false)} />
-          </div>
-        </SheetContent>
-      </Sheet>
     </div>
   )
 }

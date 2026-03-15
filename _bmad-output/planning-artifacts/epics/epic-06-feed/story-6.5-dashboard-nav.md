@@ -208,10 +208,10 @@ export function MobileNav() {
 
 ## Definition of Done
 
-- [ ] `src/app/[locale]/(dashboard)/layout.tsx` créé
-- [ ] `AppSidebar` desktop fonctionnel avec lien actif
-- [ ] `MobileNav` bottom bar mobile fonctionnelle
-- [ ] Test responsive : sidebar visible ≥ 768px, bottom nav visible < 768px
+- [x] `src/app/[locale]/(dashboard)/layout.tsx` créé
+- [x] `AppSidebar` desktop fonctionnel avec lien actif
+- [x] `MobileNav` bottom bar mobile fonctionnelle
+- [x] Test responsive : sidebar visible ≥ 768px, bottom nav visible < 768px
 
 ---
 
@@ -226,21 +226,52 @@ export function MobileNav() {
 ## Dev Agent Record
 
 ### Status
-Not Started
+Complete
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer `src/app/[locale]/(dashboard)/layout.tsx`
-- [ ] Créer `AppSidebar` component
-- [ ] Créer `MobileNav` component
+- [x] Créer `src/app/[locale]/(dashboard)/layout.tsx` — layout responsive avec sidebar desktop + bottom nav mobile
+- [x] Créer `AppSidebar` component — navigation 5 items, UserButton + email, SignOutButton, lien actif bg-primary/10
+- [x] Créer `MobileNav` component — bottom bar 4 items (icônes + labels), lien actif text-primary
 
 ### Completion Notes
-_À remplir par l'agent_
+- Refactored layout existant pour correspondre aux AC : sidebar `w-56` fixe desktop, bottom bar fixe mobile, `overflow-hidden` sur container, padding `pb-20` mobile pour compenser la bottom nav
+- `MobileNav` séparé dans son propre fichier (`MobileNav.tsx`) au lieu d'être co-localisé dans `AppSidebar.tsx` — meilleure séparation des responsabilités
+- Icônes alignées sur la spec : `BookOpen` (résumés), `Mail` (newsletters), `Tag` (catégories), `Settings`, `CreditCard` (facturation)
+- `UserButton` Clerk + email utilisateur ajoutés en bas de sidebar desktop (AC6)
+- MobileNav n'inclut pas Facturation (4 items au lieu de 5) — espace limité en bottom bar mobile
+- 19 tests unitaires écrits et passent (11 AppSidebar + 8 MobileNav)
+- 7 échecs de tests préexistants (Supabase integration, Settings, etc.) — non liés à cette story
 
 ### File List
-_À remplir par l'agent_
+- `src/app/[locale]/(dashboard)/layout.tsx` — modifié
+- `src/features/dashboard/components/AppSidebar.tsx` — réécrit
+- `src/features/dashboard/components/MobileNav.tsx` — créé
+- `src/features/dashboard/components/navConfig.ts` — créé (config nav partagée)
+- `src/features/dashboard/index.ts` — modifié (export MobileNav)
+- `src/features/dashboard/components/__tests__/AppSidebar.test.tsx` — créé
+- `src/features/dashboard/components/__tests__/MobileNav.test.tsx` — créé
+- `messages/en.json` — modifié (ajout clé `nav.mainNav`)
+- `messages/fr.json` — modifié (ajout clé `nav.mainNav`)
+
+### Code Review (AI) — 2026-03-15
+**Reviewer:** Claude Opus 4.6
+**Issues trouvées:** 2 HIGH, 4 MEDIUM, 2 LOW
+**Issues corrigées:** 2 HIGH, 4 MEDIUM (6 total)
+
+#### Corrections appliquées :
+1. **[H1] redirect sans locale** — Ajout `getLocale()` + préfixe locale dans `redirect()` du layout
+2. **[H2] aria-current manquant** — Ajout `aria-current="page"` sur les liens actifs (AppSidebar + MobileNav)
+3. **[M1] Scope contamination** — Documenté (package.json/pnpm-lock.yaml = dépendances Stripe, hors scope 6.5)
+4. **[M2] Duplication NAV_ITEMS** — Extraction dans `navConfig.ts` partagé avec flag `mobileVisible`
+5. **[M3] Landmarks nav sans aria-label** — Ajout `aria-label` sur `<nav>` desktop et mobile
+6. **[M4] Loading state useUser** — Ajout fallback `'...'` pendant chargement Clerk
+
+#### Issues LOW non corrigées (par choix) :
+- [L1] Double mécanisme sign-out (UserButton + SignOutButton) — choix UX intentionnel
+- [L2] `startsWith` matching trop large — risque faible avec les routes actuelles
 
 ### Debug Log
-_À remplir par l'agent_
+Aucun problème rencontré. Implémentation directe à partir de la spec.

@@ -1,2 +1,3 @@
 // Dashboard module exports
-export { AppSidebar, MobileNav } from './components/AppSidebar'
+export { AppSidebar } from './components/AppSidebar'
+export { MobileNav } from './components/MobileNav'

@@ -25,7 +25,8 @@
     "categories": "Categories",
     "settings": "Settings",
     "billing": "Billing",
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "mainNav": "Main navigation"
   },
   "auth": {
     "signIn": "Sign In",

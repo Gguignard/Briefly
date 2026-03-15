@@ -25,7 +25,8 @@
     "categories": "Catégories",
     "settings": "Paramètres",
     "billing": "Facturation",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "mainNav": "Navigation principale"
   },
   "auth": {
     "signIn": "Se connecter",
