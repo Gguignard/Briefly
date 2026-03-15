@@ -250,6 +250,7 @@ export type Database = {
           email: string
           id: string
           inbox_address: string
+          stripe_customer_id: string | null
           tier: string
           updated_at: string
         }
@@ -259,6 +260,7 @@ export type Database = {
           email: string
           id?: string
           inbox_address: string
+          stripe_customer_id?: string | null
           tier?: string
           updated_at?: string
         }
@@ -268,6 +270,7 @@ export type Database = {
           email?: string
           id?: string
           inbox_address?: string
+          stripe_customer_id?: string | null
           tier?: string
           updated_at?: string
         }

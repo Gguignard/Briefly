@@ -87,6 +87,35 @@
       "description": "Forward your newsletters to this address to receive them in Briefly."
     }
   },
+  "billing": {
+    "title": "Billing",
+    "subtitle": "Manage your Briefly subscription.",
+    "upgrade": {
+      "title": "Upgrade to Premium",
+      "price": "€5/month",
+      "roi": "5h saved per week >> €5 per month",
+      "cta": "Start Premium trial",
+      "features": {
+        "unlimited": "Unlimited newsletters",
+        "premium_llm": "All summaries with premium LLM",
+        "categories": "Custom categorization",
+        "support": "Priority support"
+      }
+    },
+    "subscription": {
+      "title": "Active Premium subscription",
+      "badge": "Premium",
+      "renewalDate": "Next renewal: {date}",
+      "manage": "Manage subscription",
+      "loading": "Loading...",
+      "error": "Unable to open the billing portal. Please try again."
+    },
+    "checkout": {
+      "success": "Welcome to Briefly Premium! Your subscription is active.",
+      "canceled": "Checkout canceled. You can subscribe at any time.",
+      "alreadySubscribed": "You are already subscribed to Briefly Premium."
+    }
+  },
   "settings": {
     "title": "Settings",
     "account": {

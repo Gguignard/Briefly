@@ -87,6 +87,35 @@
       "description": "Transférez vos newsletters vers cette adresse pour les recevoir dans Briefly."
     }
   },
+  "billing": {
+    "title": "Facturation",
+    "subtitle": "Gérez votre abonnement Briefly.",
+    "upgrade": {
+      "title": "Passez au Premium",
+      "price": "5€/mois",
+      "roi": "5h économisées par semaine >> 5€ par mois",
+      "cta": "Commencer l'essai Premium",
+      "features": {
+        "unlimited": "Newsletters illimitées",
+        "premium_llm": "Tous les résumés en LLM premium",
+        "categories": "Catégorisation personnalisée",
+        "support": "Support prioritaire"
+      }
+    },
+    "subscription": {
+      "title": "Abonnement Premium actif",
+      "badge": "Premium",
+      "renewalDate": "Prochain renouvellement : {date}",
+      "manage": "Gérer l'abonnement",
+      "loading": "Chargement...",
+      "error": "Impossible d'ouvrir le portail de facturation. Veuillez réessayer."
+    },
+    "checkout": {
+      "success": "Bienvenue dans Briefly Premium ! Votre abonnement est actif.",
+      "canceled": "Abonnement annulé. Vous pouvez vous abonner à tout moment.",
+      "alreadySubscribed": "Vous êtes déjà abonné à Briefly Premium."
+    }
+  },
   "settings": {
     "title": "Paramètres",
     "account": {
