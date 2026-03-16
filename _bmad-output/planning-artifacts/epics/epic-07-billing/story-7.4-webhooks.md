@@ -32,104 +32,11 @@
 
 ```typescript
 // src/app/api/webhooks/stripe/route.ts
-import { stripe } from '@/lib/stripe'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { clerkClient } from '@clerk/nextjs/server'
-import { apiResponse, apiError } from '@/lib/utils/apiResponse'
-import logger, { logError } from '@/lib/utils/logger'
-import Stripe from 'stripe'
-
-export async function POST(req: Request) {
-  const body = await req.text()
-  const sig = req.headers.get('stripe-signature') ?? ''
-
-  let event: Stripe.Event
-  try {
-    event = stripe.webhooks.constructEvent(
-      body, sig, process.env.STRIPE_WEBHOOK_SECRET!
-    )
-  } catch (err) {
-    logger.warn({ err }, 'Invalid Stripe webhook signature')
-    return apiError('INVALID_SIGNATURE', 'Signature invalide', 400)
-  }
-
-  const supabase = createAdminClient()
-
-  try {
-    switch (event.type) {
-      case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session
-        const userId = session.metadata?.userId
-        if (!userId) break
-
-        const subscriptionId = session.subscription as string
-        const sub = await stripe.subscriptions.retrieve(subscriptionId)
-
-        // Mettre à jour Supabase
-        await supabase.from('subscriptions').upsert({
-          user_id: userId,
-          stripe_subscription_id: subscriptionId,
-          stripe_customer_id: session.customer as string,
-          status: 'active',
-          current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
-        })
-        await supabase.from('users').update({ tier: 'paid' }).eq('id', userId)
-
-        // Mettre à jour Clerk publicMetadata
-        const clerk = await clerkClient()
-        await clerk.users.updateUser(userId, {
-          publicMetadata: { tier: 'paid' },
-        })
-
-        logger.info({ userId }, 'User upgraded to paid tier')
-        break
-      }
-
-      case 'customer.subscription.deleted': {
-        const sub = event.data.object as Stripe.Subscription
-        const userId = sub.metadata?.userId
-        if (!userId) break
-
-        await supabase
-          .from('subscriptions')
-          .update({ status: 'canceled' })
-          .eq('stripe_subscription_id', sub.id)
-        await supabase.from('users').update({ tier: 'free' }).eq('id', userId)
-
-        const clerk = await clerkClient()
-        await clerk.users.updateUser(userId, {
-          publicMetadata: { tier: 'free' },
-        })
-
-        logger.info({ userId }, 'User downgraded to free tier')
-        break
-      }
-
-      case 'customer.subscription.updated': {
-        const sub = event.data.object as Stripe.Subscription
-        await supabase
-          .from('subscriptions')
-          .update({
-            status: sub.status,
-            current_period_end: new Date(sub.current_period_end * 1000).toISOString(),
-          })
-          .eq('stripe_subscription_id', sub.id)
-        break
-      }
-
-      case 'invoice.payment_failed': {
-        const invoice = event.data.object as Stripe.Invoice
-        logger.warn({ customerId: invoice.customer }, 'Payment failed')
-        break
-      }
-    }
-  } catch (err) {
-    logError(err as Error, { eventType: event.type })
-    return apiError('WEBHOOK_ERROR', 'Erreur de traitement', 500)
-  }
-
-  return apiResponse({ received: true })
-}
+// Utilise metadata.clerkId (cohérent avec le checkout story 7.3)
+// Lookup user par clerk_id → UUID interne pour les tables subscriptions
+// Validation STRIPE_WEBHOOK_SECRET au chargement du module
+// Vérification des erreurs Supabase sur chaque opération
+// Voir le fichier source pour l'implémentation complète
 ```
 
 ### Désactiver le body parsing Next.js (requis pour la vérification de signature Stripe)
@@ -145,7 +52,7 @@ export async function POST(req: Request) {
 
 **Requires :**
 - Story 7.1 : Stripe configuré + `stripe` client
-- Story 7.3 : Checkout (crée les sessions avec `userId` dans metadata)
+- Story 7.3 : Checkout (crée les sessions avec `clerkId` dans metadata)
 
 **Blocks :**
 - Story 7.5 : Annulation (dépend du tier synchronisé)
@@ -155,9 +62,9 @@ export async function POST(req: Request) {
 
 ## Definition of Done
 
-- [ ] `POST /api/webhooks/stripe` créé avec validation signature
-- [ ] `checkout.session.completed` → tier 'paid' dans Supabase + Clerk
-- [ ] `customer.subscription.deleted` → tier 'free' dans Supabase + Clerk
+- [x] `POST /api/webhooks/stripe` créé avec validation signature
+- [x] `checkout.session.completed` → tier 'paid' dans Supabase + Clerk
+- [x] `customer.subscription.deleted` → tier 'free' dans Supabase + Clerk
 - [ ] Test avec `stripe listen --forward-to localhost:3000/api/webhooks/stripe`
 
 ---
@@ -180,21 +87,58 @@ export async function POST(req: Request) {
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer `POST /api/webhooks/stripe`
-- [ ] Handlers pour les 4 événements Stripe
-- [ ] Sync Supabase + Clerk
+- [x] Créer `POST /api/webhooks/stripe`
+- [x] Handlers pour les 4 événements Stripe
+- [x] Sync Supabase + Clerk
 
 ### Completion Notes
-_À remplir par l'agent_
+Implémentation complète de la route webhook Stripe avec les adaptations suivantes par rapport aux notes techniques :
+- Utilisation de `clerkId` (au lieu de `userId`) dans les metadata, en cohérence avec le checkout (Story 7.3)
+- Lookup user par `clerk_id` pour obtenir l'UUID interne nécessaire à la table `subscriptions`
+- Ajout de `onConflict: 'stripe_subscription_id'` sur l'upsert pour garantir l'idempotence (AC6)
+- Ajout du type `subscriptions` dans les types Supabase (table existante via migration 009 mais absente des types TS)
+
+18 tests unitaires couvrant tous les ACs (post code-review) :
+- AC1 : Validation signature HMAC (2 tests)
+- AC2 : checkout.session.completed → tier paid (3 tests)
+- AC3 : customer.subscription.deleted → tier free (2 tests) + fallback DB lookup (2 tests)
+- AC4 : customer.subscription.updated → status + period_end (1 test) + tier sync (2 tests)
+- AC5 : invoice.payment_failed → log warning (1 test)
+- AC6 : Idempotence — upsert onConflict (1 test) + duplicate event (1 test)
+- Edge cases : erreur handler, erreur Supabase, événement inconnu, header manquant (4 tests)
 
 ### File List
-_À remplir par l'agent_
+- `src/app/api/webhooks/stripe/route.ts` (nouveau)
+- `src/app/api/webhooks/stripe/__tests__/route.test.ts` (nouveau)
+- `src/lib/supabase/types.ts` (modifié — ajout type subscriptions)
+
+### Change Log
+- 2026-03-16 : Implémentation Story 7.4 — Route webhook Stripe, 4 handlers événements, sync Supabase + Clerk, 13 tests unitaires
+- 2026-03-16 : Code review fixes — 1 CRITICAL, 3 HIGH, 2 MEDIUM corrigés, 18 tests (détails ci-dessous)
+
+### Senior Developer Review (AI)
+
+**Reviewer :** Greg (via Claude Opus 4.6)
+**Date :** 2026-03-16
+
+#### Issues corrigées :
+1. **CRITICAL** — 13/13 tests échouaient (STRIPE_WEBHOOK_SECRET absent du setup test) → ajout env vars dans le fichier de test
+2. **HIGH** — Aucune vérification d'erreur Supabase sur les opérations DB → ajout `{ error }` checks avec throw (déjà corrigé par l'agent dev avant la review)
+3. **HIGH** — `customer.subscription.updated` ne synchronisait pas le tier → ajout synchro tier pour statuts `active`/`canceled` + Clerk metadata
+4. **HIGH** — Test d'idempotence superficiel → split en 2 tests : vérification `onConflict` + duplicate event handling
+5. **MEDIUM** — `subscription.deleted` dépendait exclusivement de `metadata.clerkId` → ajout fallback lookup via `subscriptions` → `users` table
+6. **MEDIUM** — Ajout test pour retour 500 quand Supabase upsert échoue
+
+#### Issues non corrigées (LOW) :
+- `Request` au lieu de `NextRequest` (fonctionne, inconsistance cosmétique)
+- DoD item de test manuel non coché (hors scope automatisation)
 
 ### Debug Log
-_À remplir par l'agent_
+- Adaptation metadata `clerkId` vs `userId` : le checkout (Story 7.3) utilise `metadata: { clerkId }`, pas `userId` comme indiqué dans les notes techniques
+- 7 échecs pré-existants dans la suite de tests (4 intégration Supabase ECONNREFUSED, 3 settings page mock) — aucune régression introduite

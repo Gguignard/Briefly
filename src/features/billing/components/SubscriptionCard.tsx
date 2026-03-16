@@ -24,6 +24,10 @@ export function SubscriptionCard({ currentPeriodEnd }: SubscriptionCardProps) {
     setError(false)
     try {
       const res = await fetch('/api/billing/portal', { method: 'POST' })
+      if (!res.ok) {
+        setError(true)
+        return
+      }
       const { data } = await res.json()
       if (data?.url) {
         window.location.href = data.url
