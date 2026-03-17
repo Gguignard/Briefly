@@ -5,7 +5,10 @@ import { z } from 'zod'
 import logger from '@/lib/utils/logger'
 
 const PatchNewsletterSchema = z.object({
-  active: z.boolean(),
+  active: z.boolean().optional(),
+  categoryId: z.string().uuid().nullable().optional(),
+}).refine(data => data.active !== undefined || data.categoryId !== undefined, {
+  message: 'Au moins un champ (active ou categoryId) requis',
 })
 
 export async function DELETE(
@@ -80,15 +83,19 @@ export async function PATCH(
     }
   }
 
+  const updates: Record<string, unknown> = {}
+  if (parsed.data.active !== undefined) updates.active = parsed.data.active
+  if (parsed.data.categoryId !== undefined) updates.category_id = parsed.data.categoryId
+
   const { data, error } = await supabase
     .from('newsletters')
-    .update({ active: parsed.data.active })
+    .update(updates)
     .eq('id', id)
     .eq('user_id', userId)
     .select()
 
   if (error) return apiError('INTERNAL_ERROR', 'Erreur de mise à jour', 500)
   if (!data || data.length === 0) return apiError('NOT_FOUND', 'Newsletter introuvable', 404)
-  logger.info({ userId, newsletterId: id, active: parsed.data.active }, 'Newsletter toggled')
+  logger.info({ userId, newsletterId: id, updates }, 'Newsletter updated')
   return apiResponse(data[0])
 }

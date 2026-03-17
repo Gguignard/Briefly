@@ -161,30 +161,52 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 
 ## Definition of Done
 
-- [ ] Migration `categories` créée avec RLS
-- [ ] `GET/POST /api/categories` et `PATCH/DELETE /api/categories/[id]` créés
-- [ ] Limite 3 catégories pour tier gratuit en place
+- [x] Migration `categories` créée avec RLS
+- [x] `GET/POST /api/categories` et `PATCH/DELETE /api/categories/[id]` créés
+- [x] Limite 3 catégories pour tier gratuit en place
 
 ---
 
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer migration `categories`
-- [ ] Créer les routes API CRUD
-- [ ] Ajouter limite tier gratuit
+- [x] Créer migration `categories`
+- [x] Créer les routes API CRUD
+- [x] Ajouter limite tier gratuit
 
 ### Completion Notes
-_À remplir par l'agent_
+- Migration `010_categories.sql` : table `categories` avec RLS (4 policies CRUD), index sur `user_id`, FK `newsletters.category_id → categories.id ON DELETE SET NULL`, contrainte unicité `(user_id, name)`
+- `GET /api/categories` : liste les catégories de l'utilisateur triées par `created_at`
+- `POST /api/categories` : création avec validation Zod (nom 1-50 chars, couleur hex optionnelle), limite 3 pour tier gratuit, vérification doublon nom
+- `PATCH /api/categories/[id]` : mise à jour nom et/ou couleur avec validation UUID, scope user_id, retourne 404 si catégorie non trouvée
+- `DELETE /api/categories/[id]` : vérifie existence, désassigne newsletters (avec gestion erreur), puis supprime, retourne 404 si non trouvée
+- Adaptations vs story spec : `createAdminClient()` (pattern projet), `user_id TEXT REFERENCES users(clerk_id)` (cohérence newsletters), `params: Promise<{id}>` (Next.js 15), validation JSON body robuste
+- Logging Pino sur toutes les opérations CRUD (cohérence avec newsletters)
+- 30 tests unitaires couvrant : auth 401, validation 400/UUID, CRUD succès, limite tier gratuit 403, doublon nom 409, 404 catégorie non trouvée, erreur unassign newsletters, erreurs DB 500
 
 ### File List
-_À remplir par l'agent_
+- `supabase/migrations/010_categories.sql` (nouveau)
+- `src/app/api/categories/route.ts` (nouveau)
+- `src/app/api/categories/[id]/route.ts` (nouveau)
+- `src/app/api/categories/__tests__/route.test.ts` (nouveau)
+- `src/app/api/categories/[id]/__tests__/route.test.ts` (nouveau)
+
+### Change Log
+- 2026-03-16 : Code review (Claude Opus 4.6) — 6 issues corrigées :
+  - [H2] DELETE retourne 404 si catégorie inexistante (au lieu de faux 200)
+  - [H3] PATCH retourne 404 si catégorie inexistante (au lieu de 500)
+  - [M1] Ajout logging Pino (cohérence architecture rule #6)
+  - [M2] Gestion erreur unassign newsletters dans DELETE
+  - [M3] Validation UUID sur paramètre `id` (PATCH/DELETE)
+  - [M4] Contrainte unicité `(user_id, name)` en migration + vérification applicative POST
+  - Tests : 24 → 30 (+6 nouveaux cas : 404, UUID invalide, doublon, erreur unassign)
 
 ### Debug Log
-_À remplir par l'agent_
+- 30/30 tests passent (PASS)
+- Suite complète : 471 PASS, 7 FAIL pré-existants (tests d'intégration Supabase + settings — non liés à cette story)

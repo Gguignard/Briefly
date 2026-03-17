@@ -136,29 +136,51 @@ const handleCategoryChange = async (categoryId: string | null) => {
 
 ## Definition of Done
 
-- [ ] `CategorySelect` composant créé
-- [ ] Intégré dans `NewsletterCard`
-- [ ] Assigner / désassigner fonctionnel
+- [x] `CategorySelect` composant créé
+- [x] Intégré dans `NewsletterCard`
+- [x] Assigner / désassigner fonctionnel
 
 ---
 
 ## Dev Agent Record
 
 ### Status
-Not Started
+review
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer `CategorySelect` component
-- [ ] Intégrer dans `NewsletterCard`
+- [x] Créer `CategorySelect` component
+- [x] Intégrer dans `NewsletterCard`
 
 ### Completion Notes
-_À remplir par l'agent_
+- Extended `PatchNewsletterSchema` to accept optional `categoryId` (UUID nullable) alongside `active`
+- Built dynamic `updates` object to support partial PATCH (active only, categoryId only, or both)
+- Created `Select` UI component (Radix UI based, consistent with project's UI pattern)
+- Created `CategorySelect` component with i18n support ("None"/"Aucune" placeholder)
+- Updated `NewsletterCard` to display colored category badge and include `CategorySelect` dropdown
+- Updated `NewsletterList` to fetch categories on mount and pass `onCategoryChange` handler
+- Added i18n keys for both fr.json and en.json
+- Added `categories` table to Supabase types.ts
+- Created `Category` type alias
+- All 43 story-related tests pass (18 route + 10 card + 11 list + 4 CategorySelect)
+- No regressions introduced (488/495 pass, 7 pre-existing failures unrelated)
 
 ### File List
-_À remplir par l'agent_
+- `src/lib/supabase/types.ts` — added `categories` table definition
+- `src/types/category.ts` — new Category type
+- `src/components/ui/select.tsx` — new Select UI component (Radix UI)
+- `src/features/categories/components/CategorySelect.tsx` — new CategorySelect component
+- `src/features/newsletters/components/NewsletterCard.tsx` — added category badge + CategorySelect
+- `src/features/newsletters/components/NewsletterList.tsx` — added categories fetch + onCategoryChange
+- `src/app/api/newsletters/[id]/route.ts` — extended PATCH schema for categoryId
+- `messages/fr.json` — added categoryPlaceholder, noCategory keys
+- `messages/en.json` — added categoryPlaceholder, noCategory keys
+- `src/app/api/newsletters/[id]/__tests__/route.test.ts` — added 3 categoryId tests
+- `src/features/newsletters/components/__tests__/NewsletterCard.test.tsx` — updated props + category tests
+- `src/features/newsletters/components/__tests__/NewsletterList.test.tsx` — updated mocks + category test
+- `src/features/categories/components/__tests__/CategorySelect.test.tsx` — new 4 tests
 
 ### Debug Log
-_À remplir par l'agent_
+_Aucun problème majeur rencontré._

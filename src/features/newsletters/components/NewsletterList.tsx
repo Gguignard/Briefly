@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import type { Newsletter } from '@/types/newsletter'
+import type { Category } from '@/types/category'
 import { NewsletterCard } from './NewsletterCard'
 import { AddNewsletterModal } from './AddNewsletterModal'
 import { NewsletterLimitBanner, FREE_NEWSLETTER_LIMIT } from './NewsletterLimitBanner'
@@ -16,11 +17,19 @@ interface Props {
 
 export function NewsletterList({ initialNewsletters, userTier }: Props) {
   const [newsletters, setNewsletters] = useState(initialNewsletters)
+  const [categories, setCategories] = useState<Category[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const t = useTranslations('newsletters')
 
   const activeCount = newsletters.filter((n) => n.active).length
   const canAdd = userTier === 'paid' || activeCount < FREE_NEWSLETTER_LIMIT
+
+  useEffect(() => {
+    fetch('/api/categories')
+      .then((r) => r.json())
+      .then((r) => setCategories(r.data ?? []))
+      .catch(() => {})
+  }, [])
 
   const handleToggle = async (id: string, active: boolean) => {
     const res = await fetch(`/api/newsletters/${id}`, {
@@ -38,6 +47,18 @@ export function NewsletterList({ initialNewsletters, userTier }: Props) {
     const res = await fetch(`/api/newsletters/${id}`, { method: 'DELETE' })
     if (!res.ok) return
     setNewsletters((prev) => prev.filter((n) => n.id !== id))
+  }
+
+  const handleCategoryChange = async (id: string, categoryId: string | null) => {
+    const res = await fetch(`/api/newsletters/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ categoryId }),
+    })
+    if (!res.ok) return
+    setNewsletters((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, category_id: categoryId } : n)),
+    )
   }
 
   const handleAdd = (newsletter: Newsletter) => {
@@ -70,8 +91,10 @@ export function NewsletterList({ initialNewsletters, userTier }: Props) {
             <NewsletterCard
               key={n.id}
               newsletter={n}
+              categories={categories}
               onToggle={handleToggle}
               onDelete={handleDelete}
+              onCategoryChange={handleCategoryChange}
             />
           ))}
         </div>

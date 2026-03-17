@@ -48,15 +48,19 @@ vi.mock('../NewsletterCard', () => ({
     newsletter,
     onToggle,
     onDelete,
+    onCategoryChange,
   }: {
     newsletter: { id: string; name: string; active: boolean }
+    categories: unknown[]
     onToggle: (id: string, active: boolean) => void
     onDelete: (id: string) => void
+    onCategoryChange: (id: string, categoryId: string | null) => void
   }) => (
     <div data-testid={`card-${newsletter.id}`}>
       {newsletter.name}
       <button onClick={() => onToggle(newsletter.id, !newsletter.active)}>Toggle</button>
       <button onClick={() => onDelete(newsletter.id)}>Delete</button>
+      <button onClick={() => onCategoryChange(newsletter.id, 'cat-1')}>SetCategory</button>
     </div>
   ),
 }))
@@ -73,7 +77,18 @@ describe('NewsletterList', () => {
   })
 
   beforeEach(() => {
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }))
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation((url: string) => {
+        if (url === '/api/categories') {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({ data: [{ id: 'cat-1', name: 'Tech', color: '#3b82f6' }] }),
+          })
+        }
+        return Promise.resolve({ ok: true })
+      }),
+    )
   })
 
   it('renders empty state when no newsletters', () => {
@@ -125,7 +140,15 @@ describe('NewsletterList', () => {
   })
 
   it('removes newsletter from list on delete', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true })
+    const fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url === '/api/categories') {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ data: [] }),
+        })
+      }
+      return Promise.resolve({ ok: true })
+    })
     vi.stubGlobal('fetch', fetchMock)
 
     render(
@@ -148,7 +171,15 @@ describe('NewsletterList', () => {
   })
 
   it('calls PATCH API and updates state on toggle', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true })
+    const fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url === '/api/categories') {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ data: [] }),
+        })
+      }
+      return Promise.resolve({ ok: true })
+    })
     vi.stubGlobal('fetch', fetchMock)
 
     render(
@@ -169,7 +200,15 @@ describe('NewsletterList', () => {
   })
 
   it('does not update state when toggle API fails', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: false })
+    const fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url === '/api/categories') {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ data: [] }),
+        })
+      }
+      return Promise.resolve({ ok: false })
+    })
     vi.stubGlobal('fetch', fetchMock)
 
     render(
@@ -200,6 +239,34 @@ describe('NewsletterList', () => {
     render(<NewsletterList initialNewsletters={fiveActive} userTier="free" />)
 
     expect(screen.getByRole('button', { name: /Add/i })).toBeDisabled()
+  })
+
+  it('calls PATCH API with categoryId on category change', async () => {
+    const fetchMock = vi.fn().mockImplementation((url: string) => {
+      if (url === '/api/categories') {
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ data: [{ id: 'cat-1', name: 'Tech', color: '#3b82f6' }] }),
+        })
+      }
+      return Promise.resolve({ ok: true })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    render(
+      <NewsletterList initialNewsletters={mockNewsletters} userTier="free" />,
+    )
+
+    const setCategoryButtons = screen.getAllByText('SetCategory')
+    fireEvent.click(setCategoryButtons[0])
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith('/api/newsletters/nl-1', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoryId: 'cat-1' }),
+      })
+    })
   })
 
   it('enables add button for paid tier regardless of count', () => {

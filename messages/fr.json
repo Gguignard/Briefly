@@ -68,7 +68,9 @@
     "upgradeDetail": "pour des newsletters illimitées.",
     "card": {
       "confirm": "Confirmer",
-      "cancel": "Annuler"
+      "cancel": "Annuler",
+      "categoryPlaceholder": "Catégorie...",
+      "noCategory": "Aucune"
     },
     "modal": {
       "title": "Ajouter une newsletter",

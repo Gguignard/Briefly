@@ -206,12 +206,96 @@ describe('PATCH /api/newsletters/[id]', () => {
     expect(data.error.code).toBe('VALIDATION_ERROR')
   })
 
-  it('returns 400 on invalid body (missing active)', async () => {
+  it('returns 400 on invalid body (no valid field)', async () => {
     mockAuth.mockResolvedValue({ userId: 'user_123' })
 
     const req = new NextRequest(`http://localhost:3000/api/newsletters/${VALID_UUID}`, {
       method: 'PATCH',
       body: JSON.stringify({ name: 'wrong field' }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const response = await PATCH(req, makeParams(VALID_UUID))
+    const data = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(data.error.code).toBe('VALIDATION_ERROR')
+  })
+
+  it('updates categoryId successfully', async () => {
+    mockAuth.mockResolvedValue({ userId: 'user_123' })
+
+    const categoryId = '660e8400-e29b-41d4-a716-446655440001'
+    const updatedNewsletter = {
+      id: VALID_UUID,
+      user_id: 'user_123',
+      name: 'Tech Weekly',
+      email_address: 'tech@example.com',
+      active: true,
+      category_id: categoryId,
+    }
+
+    mockFrom.mockReturnValue({
+      update: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            select: vi.fn().mockResolvedValue({ data: [updatedNewsletter], error: null }),
+          }),
+        }),
+      }),
+    })
+
+    const req = new NextRequest(`http://localhost:3000/api/newsletters/${VALID_UUID}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ categoryId }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const response = await PATCH(req, makeParams(VALID_UUID))
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.data.category_id).toBe(categoryId)
+  })
+
+  it('unassigns category with null categoryId', async () => {
+    mockAuth.mockResolvedValue({ userId: 'user_123' })
+
+    const updatedNewsletter = {
+      id: VALID_UUID,
+      user_id: 'user_123',
+      name: 'Tech Weekly',
+      email_address: 'tech@example.com',
+      active: true,
+      category_id: null,
+    }
+
+    mockFrom.mockReturnValue({
+      update: vi.fn().mockReturnValue({
+        eq: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            select: vi.fn().mockResolvedValue({ data: [updatedNewsletter], error: null }),
+          }),
+        }),
+      }),
+    })
+
+    const req = new NextRequest(`http://localhost:3000/api/newsletters/${VALID_UUID}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ categoryId: null }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const response = await PATCH(req, makeParams(VALID_UUID))
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.data.category_id).toBeNull()
+  })
+
+  it('returns 400 for invalid categoryId format', async () => {
+    mockAuth.mockResolvedValue({ userId: 'user_123' })
+
+    const req = new NextRequest(`http://localhost:3000/api/newsletters/${VALID_UUID}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ categoryId: 'not-a-uuid' }),
       headers: { 'Content-Type': 'application/json' },
     })
     const response = await PATCH(req, makeParams(VALID_UUID))
