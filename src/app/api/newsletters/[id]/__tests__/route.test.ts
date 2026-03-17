@@ -234,14 +234,27 @@ describe('PATCH /api/newsletters/[id]', () => {
       category_id: categoryId,
     }
 
-    mockFrom.mockReturnValue({
-      update: vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'categories') {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({ data: { id: categoryId }, error: null }),
+              }),
+            }),
+          }),
+        }
+      }
+      return {
+        update: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
-            select: vi.fn().mockResolvedValue({ data: [updatedNewsletter], error: null }),
+            eq: vi.fn().mockReturnValue({
+              select: vi.fn().mockResolvedValue({ data: [updatedNewsletter], error: null }),
+            }),
           }),
         }),
-      }),
+      }
     })
 
     const req = new NextRequest(`http://localhost:3000/api/newsletters/${VALID_UUID}`, {
@@ -288,6 +301,46 @@ describe('PATCH /api/newsletters/[id]', () => {
 
     expect(response.status).toBe(200)
     expect(data.data.category_id).toBeNull()
+  })
+
+  it('returns 404 when categoryId belongs to another user', async () => {
+    mockAuth.mockResolvedValue({ userId: 'user_123' })
+
+    const otherCategoryId = '660e8400-e29b-41d4-a716-446655440099'
+
+    mockFrom.mockImplementation((table: string) => {
+      if (table === 'categories') {
+        return {
+          select: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({
+                single: vi.fn().mockResolvedValue({ data: null, error: { code: 'PGRST116' } }),
+              }),
+            }),
+          }),
+        }
+      }
+      return {
+        update: vi.fn().mockReturnValue({
+          eq: vi.fn().mockReturnValue({
+            eq: vi.fn().mockReturnValue({
+              select: vi.fn().mockResolvedValue({ data: [], error: null }),
+            }),
+          }),
+        }),
+      }
+    })
+
+    const req = new NextRequest(`http://localhost:3000/api/newsletters/${VALID_UUID}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ categoryId: otherCategoryId }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const response = await PATCH(req, makeParams(VALID_UUID))
+    const data = await response.json()
+
+    expect(response.status).toBe(404)
+    expect(data.error.code).toBe('NOT_FOUND')
   })
 
   it('returns 400 for invalid categoryId format', async () => {

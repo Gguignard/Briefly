@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useTranslations } from 'next-intl'
 import type { Newsletter } from '@/types/newsletter'
 import type { Category } from '@/types/category'
@@ -17,19 +18,16 @@ interface Props {
 
 export function NewsletterList({ initialNewsletters, userTier }: Props) {
   const [newsletters, setNewsletters] = useState(initialNewsletters)
-  const [categories, setCategories] = useState<Category[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const t = useTranslations('newsletters')
 
+  const { data: categories = [] } = useQuery<Category[]>({
+    queryKey: ['categories'],
+    queryFn: () => fetch('/api/categories').then((r) => r.json()).then((r) => r.data ?? []),
+  })
+
   const activeCount = newsletters.filter((n) => n.active).length
   const canAdd = userTier === 'paid' || activeCount < FREE_NEWSLETTER_LIMIT
-
-  useEffect(() => {
-    fetch('/api/categories')
-      .then((r) => r.json())
-      .then((r) => setCategories(r.data ?? []))
-      .catch(() => {})
-  }, [])
 
   const handleToggle = async (id: string, active: boolean) => {
     const res = await fetch(`/api/newsletters/${id}`, {

@@ -141,30 +141,56 @@ if (categoryId) {
 
 ## Definition of Done
 
-- [ ] `CategoryFilter` composant créé et intégré dans la page summaries
-- [ ] Query param `?categoryId` persisté dans l'URL
-- [ ] Feed filtré selon la catégorie sélectionnée
+- [x] `CategoryFilter` composant créé et intégré dans la page summaries
+- [x] Query param `?categoryId` persisté dans l'URL
+- [x] Feed filtré selon la catégorie sélectionnée
 
 ---
 
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer `CategoryFilter` component
-- [ ] Intégrer dans `SummariesFeed` avec query param
-- [ ] Étendre `GET /api/summaries` pour le filtre categoryId
+- [x] Créer `CategoryFilter` component
+- [x] Intégrer dans `SummariesFeed` avec query param
+- [x] Étendre `GET /api/summaries` pour le filtre categoryId
 
 ### Completion Notes
-_À remplir par l'agent_
+- `CategoryFilter` : composant avec boutons pill (Toutes + catégories utilisateur), indicateurs couleur, gestion URL via `useSearchParams`/`useRouter`. Masqué si aucune catégorie. Traductions i18n (`summaries.allCategories`).
+- `SummariesFeed` : lit `categoryId` depuis les search params, l'inclut dans la queryKey et le fetch API.
+- `GET /api/summaries` : filtre conditionnel via inner join `raw_emails.newsletters.category_id` quand `categoryId` est présent. Select dynamique pour éviter le filtrage inner join quand non nécessaire.
+- Corrigé test `PATCH /api/newsletters/[id]` : mock manquant pour la vérification catégorie (`supabase.from('categories').select`).
+- Corrigé tests `NewsletterList` : ajout `QueryClientProvider` wrapper manquant après ajout de `useQuery` pour les catégories (story 8.2).
+- Tests : CategoryFilter 5/5, SummariesFeed 3/3, API summaries 7/7, route newsletters 19/19, NewsletterList 11/11.
 
 ### File List
-_À remplir par l'agent_
+- src/features/categories/components/CategoryFilter.tsx (nouveau)
+- src/features/categories/components/__tests__/CategoryFilter.test.tsx (nouveau)
+- src/features/summaries/components/SummariesFeed.tsx (modifié)
+- src/features/summaries/components/__tests__/SummariesFeed.test.tsx (nouveau)
+- src/app/api/summaries/route.ts (modifié)
+- src/app/api/summaries/__tests__/route.test.ts (nouveau — review)
+- src/app/[locale]/(dashboard)/summaries/page.tsx (modifié)
+- src/app/api/newsletters/[id]/route.ts (modifié — validation catégorie)
+- src/app/api/newsletters/[id]/__tests__/route.test.ts (modifié)
+- src/features/newsletters/components/NewsletterCard.tsx (modifié — color-mix CSS)
+- src/features/newsletters/components/NewsletterList.tsx (modifié — useQuery catégories)
+- src/features/newsletters/components/__tests__/NewsletterList.test.tsx (modifié)
+- messages/en.json (modifié)
+- messages/fr.json (modifié)
+
+### Change Log (Code Review — 2026-03-17)
+- **H1** : Corrigé `CategoryFilter` — URL trailing `?` quand aucun paramètre restant. Ajout condition `qs ? pathname?qs : pathname`.
+- **H2** : Ajouté validation UUID + vérification appartenance utilisateur pour `categoryId` dans `GET /api/summaries`. Import `zod`.
+- **H3** : Complété File List avec 3 fichiers manquants (`route.ts newsletters`, `NewsletterCard.tsx`, `NewsletterList.tsx`).
+- **M1** : Créé `src/app/api/summaries/__tests__/route.test.ts` — 6 tests couvrant auth, validation, ownership, pagination, filtrage.
+- **M2** : Ajouté vérification `r.ok` dans `SummariesFeed` fetch pour propager correctement les erreurs HTTP vers React Query.
 
 ### Debug Log
-_À remplir par l'agent_
+- Test `PATCH /api/newsletters/[id] updates categoryId successfully` échouait : le mock `mockFrom.mockReturnValue` ne gérait pas l'appel `supabase.from('categories')` pour la vérification d'appartenance. Corrigé avec `mockFrom.mockImplementation` table-aware.
+- 11 tests `NewsletterList` échouaient : `No QueryClient set` — le composant utilise `useQuery` pour les catégories (ajouté en 8.2) mais les tests ne wrappaient pas avec `QueryClientProvider`. Ajout du wrapper à tous les renders.

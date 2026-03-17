@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server'
 import { SummariesFeed } from '@/features/summaries/components/SummariesFeed'
+import { CategoryFilter } from '@/features/categories/components/CategoryFilter'
 
 export default async function SummariesPage() {
   const t = await getTranslations('summaries')
@@ -7,6 +8,7 @@ export default async function SummariesPage() {
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-4">
       <h1 className="text-2xl font-semibold">{t('title')}</h1>
+      <CategoryFilter />
       <SummariesFeed />
     </div>
   )

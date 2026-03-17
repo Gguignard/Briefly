@@ -55,7 +55,8 @@
     "keyPointsHeading": "KEY POINTS",
     "readOriginal": "Read original newsletter",
     "source": "Source: {sender}",
-    "notFound": "Summary not found"
+    "notFound": "Summary not found",
+    "allCategories": "All"
   },
   "newsletters": {
     "title": "My newsletters",

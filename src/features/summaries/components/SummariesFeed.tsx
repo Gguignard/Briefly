@@ -1,6 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
+import { useSearchParams } from 'next/navigation'
 import { SummaryCard, type SummaryCardData } from './SummaryCard'
 import { SummaryCardSkeleton } from './SummaryCardSkeleton'
 import { Mail, AlertCircle } from 'lucide-react'
@@ -8,10 +9,19 @@ import { useTranslations } from 'next-intl'
 
 export function SummariesFeed() {
   const t = useTranslations('summaries')
+  const searchParams = useSearchParams()
+  const categoryId = searchParams.get('categoryId')
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['summaries', { page: 1 }],
-    queryFn: () => fetch('/api/summaries').then((r) => r.json()),
+    queryKey: ['summaries', { page: 1, categoryId }],
+    queryFn: () => {
+      const params = new URLSearchParams({ page: '1' })
+      if (categoryId) params.set('categoryId', categoryId)
+      return fetch(`/api/summaries?${params}`).then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        return r.json()
+      })
+    },
     staleTime: 60 * 1000,
   })
 

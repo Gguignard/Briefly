@@ -83,6 +83,20 @@ export async function PATCH(
     }
   }
 
+  // Verify category belongs to current user before assigning
+  if (parsed.data.categoryId) {
+    const { data: cat } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('id', parsed.data.categoryId)
+      .eq('user_id', userId)
+      .single()
+
+    if (!cat) {
+      return apiError('NOT_FOUND', 'Catégorie introuvable', 404)
+    }
+  }
+
   const updates: Record<string, unknown> = {}
   if (parsed.data.active !== undefined) updates.active = parsed.data.active
   if (parsed.data.categoryId !== undefined) updates.category_id = parsed.data.categoryId

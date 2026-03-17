@@ -55,7 +55,8 @@
     "keyPointsHeading": "POINTS CLÉS",
     "readOriginal": "Lire la newsletter originale",
     "source": "Source : {sender}",
-    "notFound": "Résumé introuvable"
+    "notFound": "Résumé introuvable",
+    "allCategories": "Toutes"
   },
   "newsletters": {
     "title": "Mes newsletters",
