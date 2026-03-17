@@ -58,6 +58,46 @@ describe('CategorySelect', () => {
     expect(screen.getByText('Tech')).toBeInTheDocument()
   })
 
+  it('calls onSelect with categoryId when a category is clicked', async () => {
+    const onSelect = vi.fn()
+    render(
+      <CategorySelect
+        categories={categories}
+        currentCategoryId={null}
+        onSelect={onSelect}
+      />,
+    )
+
+    // Open the dropdown
+    fireEvent.click(screen.getByRole('combobox'))
+
+    // Click on "Tech" option
+    const techOption = await screen.findByText('Tech')
+    fireEvent.click(techOption)
+
+    expect(onSelect).toHaveBeenCalledWith('cat-1')
+  })
+
+  it('calls onSelect with null when "None" is clicked', async () => {
+    const onSelect = vi.fn()
+    render(
+      <CategorySelect
+        categories={categories}
+        currentCategoryId="cat-1"
+        onSelect={onSelect}
+      />,
+    )
+
+    // Open the dropdown
+    fireEvent.click(screen.getByRole('combobox'))
+
+    // Click on "None" option
+    const noneOption = await screen.findByRole('option', { name: 'None' })
+    fireEvent.click(noneOption)
+
+    expect(onSelect).toHaveBeenCalledWith(null)
+  })
+
   it('renders with empty categories list', () => {
     render(
       <CategorySelect

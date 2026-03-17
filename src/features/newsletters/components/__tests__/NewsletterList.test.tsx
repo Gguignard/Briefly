@@ -1,6 +1,16 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { render, screen, cleanup, fireEvent, waitFor } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { NewsletterList } from '../NewsletterList'
+
+function createWrapper() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  })
+  return ({ children }: { children: React.ReactNode }) => (
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+  )
+}
 
 vi.mock('next-intl', () => ({
   useTranslations: () => (key: string, params?: Record<string, unknown>) => {
@@ -92,7 +102,7 @@ describe('NewsletterList', () => {
   })
 
   it('renders empty state when no newsletters', () => {
-    render(<NewsletterList initialNewsletters={[]} userTier="free" />)
+    render(<NewsletterList initialNewsletters={[]} userTier="free" />, { wrapper: createWrapper() })
 
     expect(
       screen.getByText(
@@ -104,6 +114,7 @@ describe('NewsletterList', () => {
   it('renders newsletter cards when newsletters exist', () => {
     render(
       <NewsletterList initialNewsletters={mockNewsletters} userTier="free" />,
+      { wrapper: createWrapper() },
     )
 
     expect(screen.getByTestId('card-nl-1')).toBeInTheDocument()
@@ -115,6 +126,7 @@ describe('NewsletterList', () => {
   it('renders limit banner with active count', () => {
     render(
       <NewsletterList initialNewsletters={mockNewsletters} userTier="free" />,
+      { wrapper: createWrapper() },
     )
 
     // Only 1 active newsletter (nl-1)
@@ -124,13 +136,14 @@ describe('NewsletterList', () => {
   it('renders add button', () => {
     render(
       <NewsletterList initialNewsletters={mockNewsletters} userTier="free" />,
+      { wrapper: createWrapper() },
     )
 
     expect(screen.getByRole('button', { name: /Add/i })).toBeInTheDocument()
   })
 
   it('opens modal when add button is clicked', () => {
-    render(<NewsletterList initialNewsletters={[]} userTier="free" />)
+    render(<NewsletterList initialNewsletters={[]} userTier="free" />, { wrapper: createWrapper() })
 
     expect(screen.queryByTestId('add-modal')).not.toBeInTheDocument()
 
@@ -153,6 +166,7 @@ describe('NewsletterList', () => {
 
     render(
       <NewsletterList initialNewsletters={mockNewsletters} userTier="free" />,
+      { wrapper: createWrapper() },
     )
 
     expect(screen.getByTestId('card-nl-1')).toBeInTheDocument()
@@ -184,6 +198,7 @@ describe('NewsletterList', () => {
 
     render(
       <NewsletterList initialNewsletters={mockNewsletters} userTier="free" />,
+      { wrapper: createWrapper() },
     )
 
     // nl-1 is active, toggle it off
@@ -213,6 +228,7 @@ describe('NewsletterList', () => {
 
     render(
       <NewsletterList initialNewsletters={mockNewsletters} userTier="free" />,
+      { wrapper: createWrapper() },
     )
 
     // Banner shows 1 active before toggle
@@ -236,7 +252,7 @@ describe('NewsletterList', () => {
       active: true,
     }))
 
-    render(<NewsletterList initialNewsletters={fiveActive} userTier="free" />)
+    render(<NewsletterList initialNewsletters={fiveActive} userTier="free" />, { wrapper: createWrapper() })
 
     expect(screen.getByRole('button', { name: /Add/i })).toBeDisabled()
   })
@@ -255,6 +271,7 @@ describe('NewsletterList', () => {
 
     render(
       <NewsletterList initialNewsletters={mockNewsletters} userTier="free" />,
+      { wrapper: createWrapper() },
     )
 
     const setCategoryButtons = screen.getAllByText('SetCategory')
@@ -277,7 +294,7 @@ describe('NewsletterList', () => {
       active: true,
     }))
 
-    render(<NewsletterList initialNewsletters={fiveActive} userTier="paid" />)
+    render(<NewsletterList initialNewsletters={fiveActive} userTier="paid" />, { wrapper: createWrapper() })
 
     expect(screen.getByRole('button', { name: /Add/i })).toBeEnabled()
   })

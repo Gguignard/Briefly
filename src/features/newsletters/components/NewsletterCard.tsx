@@ -32,7 +32,7 @@ export function NewsletterCard({ newsletter, categories, onToggle, onDelete, onC
             <span
               className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium"
               style={{
-                backgroundColor: category.color + '20',
+                backgroundColor: `color-mix(in srgb, ${category.color} 12%, transparent)`,
                 color: category.color,
               }}
             >
