@@ -1,23 +1,29 @@
 import { getTranslations } from 'next-intl/server'
 import { ExternalLink } from 'lucide-react'
 
-function getBullBoardUrl(): string | null {
+function getBullBoardUrl(includeToken: boolean): string | null {
   const base = process.env.BULL_BOARD_URL
   if (!base) return null
-  const token = process.env.BULL_BOARD_TOKEN
-  if (token) {
+  try {
     const url = new URL(base)
-    url.searchParams.set('token', token)
+    if (includeToken) {
+      const token = process.env.BULL_BOARD_TOKEN
+      if (token) {
+        url.searchParams.set('token', token)
+      }
+    }
     return url.toString()
+  } catch {
+    return null
   }
-  return base
 }
 
 export default async function AdminQueuesPage() {
   const t = await getTranslations('admin.queues')
-  const bullBoardUrl = getBullBoardUrl()
+  const iframeUrl = getBullBoardUrl(true)
+  const externalUrl = getBullBoardUrl(false)
 
-  if (!bullBoardUrl) {
+  if (!iframeUrl) {
     return (
       <div className="space-y-4">
         <h1 className="text-2xl font-semibold">{t('title')}</h1>
@@ -31,7 +37,7 @@ export default async function AdminQueuesPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{t('title')}</h1>
         <a
-          href={bullBoardUrl}
+          href={externalUrl!}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
@@ -42,7 +48,7 @@ export default async function AdminQueuesPage() {
       </div>
       <p className="text-sm text-muted-foreground">{t('description')}</p>
       <iframe
-        src={bullBoardUrl}
+        src={iframeUrl}
         className="h-[calc(100vh-12rem)] w-full rounded-lg border"
         title="Bull Board"
       />

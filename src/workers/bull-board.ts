@@ -8,8 +8,6 @@ import { cleanupQueue } from '@/lib/queue/cleanup.queue'
 import logger from '@/lib/utils/logger'
 
 const BULL_BOARD_PORT = parseInt(process.env.BULL_BOARD_PORT ?? '3001', 10)
-const BULL_BOARD_TOKEN = process.env.BULL_BOARD_TOKEN
-
 export function createBullBoardServer() {
   const serverAdapter = new ExpressAdapter()
   serverAdapter.setBasePath('/queues')
@@ -25,11 +23,12 @@ export function createBullBoardServer() {
 
   const app = express()
 
-  // Token-based auth middleware
+  // Token-based auth middleware — reads env per-request for token rotation support
   app.use('/queues', (req, res, next) => {
-    if (BULL_BOARD_TOKEN) {
+    const expectedToken = process.env.BULL_BOARD_TOKEN
+    if (expectedToken) {
       const token = req.query.token ?? req.headers['x-bull-board-token']
-      if (token !== BULL_BOARD_TOKEN) {
+      if (token !== expectedToken) {
         res.status(403).json({ error: 'Forbidden' })
         return
       }
@@ -42,9 +41,21 @@ export function createBullBoardServer() {
   return app
 }
 
+let serverHandle: ReturnType<ReturnType<typeof express>['listen']> | null = null
+
 export function startBullBoard() {
   const app = createBullBoardServer()
-  app.listen(BULL_BOARD_PORT, () => {
+  serverHandle = app.listen(BULL_BOARD_PORT, () => {
     logger.info(`Bull Board: http://localhost:${BULL_BOARD_PORT}/queues`)
+  })
+}
+
+export function stopBullBoard(): Promise<void> {
+  return new Promise((resolve) => {
+    if (serverHandle) {
+      serverHandle.close(() => resolve())
+    } else {
+      resolve()
+    }
   })
 }

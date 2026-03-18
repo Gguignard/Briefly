@@ -60,7 +60,7 @@ describe('AdminQueuesPage', () => {
     expect(iframe).toHaveAttribute('src', 'http://localhost:3001/queues')
   })
 
-  it('appends token to iframe URL when BULL_BOARD_TOKEN is set', async () => {
+  it('appends token to iframe URL but not to external link', async () => {
     process.env.BULL_BOARD_URL = 'http://localhost:3001/queues'
     process.env.BULL_BOARD_TOKEN = 'my-secret'
 
@@ -70,6 +70,10 @@ describe('AdminQueuesPage', () => {
 
     const iframe = screen.getByTitle('Bull Board')
     expect(iframe).toHaveAttribute('src', 'http://localhost:3001/queues?token=my-secret')
+
+    // External link should NOT contain the token
+    const link = screen.getByText('Open in new tab')
+    expect(link).toHaveAttribute('href', 'http://localhost:3001/queues')
   })
 
   it('renders external link to Bull Board', async () => {
@@ -83,6 +87,20 @@ describe('AdminQueuesPage', () => {
     expect(link).toHaveAttribute('href', 'http://localhost:3001/queues')
     expect(link).toHaveAttribute('target', '_blank')
     expect(link).toHaveAttribute('rel', 'noopener noreferrer')
+  })
+
+  it('shows not configured message when BULL_BOARD_URL is invalid', async () => {
+    process.env.BULL_BOARD_URL = 'not-a-valid-url'
+
+    const { default: AdminQueuesPage } = await import('../page')
+    const result = await AdminQueuesPage()
+    render(result as React.ReactElement)
+
+    expect(screen.getByText('Queue Monitoring')).toBeInTheDocument()
+    expect(
+      screen.getByText('Bull Board is not configured. Set BULL_BOARD_URL in your environment variables.')
+    ).toBeInTheDocument()
+    expect(screen.queryByTitle('Bull Board')).not.toBeInTheDocument()
   })
 
   it('renders description text', async () => {

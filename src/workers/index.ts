@@ -2,7 +2,7 @@ import { emailWorker } from './email.worker'
 import { summaryWorker } from './summary.worker'
 import { cleanupWorker } from './cleanup.worker'
 import { registerCleanupCron } from '@/lib/queue/cleanup.queue'
-import { startBullBoard } from './bull-board'
+import { startBullBoard, stopBullBoard } from './bull-board'
 import logger from '@/lib/utils/logger'
 
 registerCleanupCron().catch((err) => {
@@ -15,7 +15,7 @@ logger.info('Workers started')
 
 async function gracefulShutdown() {
   logger.info('Shutting down workers...')
-  await Promise.all([emailWorker.close(), summaryWorker.close(), cleanupWorker.close()])
+  await Promise.all([emailWorker.close(), summaryWorker.close(), cleanupWorker.close(), stopBullBoard()])
   logger.info('Workers closed gracefully')
   process.exit(0)
 }

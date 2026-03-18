@@ -124,7 +124,7 @@ app.listen(3001, () => console.log('Bull Board: http://localhost:3001/queues'))
 ## Dev Agent Record
 
 ### Status
-review
+done
 
 ### Agent Model Used
 Claude Opus 4.6
@@ -140,21 +140,22 @@ Claude Opus 4.6
 - Protection par token (`BULL_BOARD_TOKEN`) via query param ou header `x-bull-board-token`
 - Page admin `/admin/queues` avec iframe Bull Board (protégée par le layout admin Clerk existant)
 - `BULL_BOARD_URL` env var pour configurer l'URL Bull Board côté Next.js
-- 14 tests ajoutés (9 bull-board server + 5 page admin queues), tous passent
+- 18 tests ajoutés (12 bull-board server + 6 page admin queues), tous passent
 - Traductions FR/EN ajoutées pour la page queues
 
 ### File List
 - `src/workers/bull-board.ts` (nouveau) — serveur Express Bull Board avec auth token
 - `src/workers/index.ts` (modifié) — import et démarrage de Bull Board
 - `src/app/[locale]/admin/queues/page.tsx` (nouveau) — page admin avec iframe
-- `src/workers/__tests__/bull-board.test.ts` (nouveau) — 9 tests unitaires
-- `src/app/[locale]/admin/queues/__tests__/page.test.tsx` (nouveau) — 5 tests unitaires
+- `src/workers/__tests__/bull-board.test.ts` (nouveau) — 12 tests unitaires
+- `src/app/[locale]/admin/queues/__tests__/page.test.tsx` (nouveau) — 6 tests unitaires
 - `messages/fr.json` (modifié) — traductions admin.queues
 - `messages/en.json` (modifié) — traductions admin.queues
 - `package.json` (modifié) — nouvelles dépendances
 
 ### Change Log
 - 2026-03-18 : Implémentation complète story 9.3 — Bull Board monitoring des queues BullMQ
+- 2026-03-19 : Code review fixes — graceful shutdown Bull Board, token per-request, try/catch URL invalide, token non exposé dans lien externe, @types/express en devDependencies, tests ajoutés (12+6)
 
 ### Debug Log
 - Mock ExpressAdapter/BullMQAdapter : nécessite des classes (pas des fonctions) pour `new` en vitest
