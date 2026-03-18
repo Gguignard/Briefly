@@ -181,6 +181,11 @@
     "confirm": "Confirm",
     "delete": "Delete"
   },
+  "admin": {
+    "title": "Briefly Admin",
+    "dashboardTitle": "Admin Dashboard",
+    "dashboardWelcome": "Welcome to the admin panel."
+  },
   "marketing": {
     "meta": {
       "title": "Briefly — AI Newsletter Summaries | Free",

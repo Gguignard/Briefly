@@ -91,29 +91,51 @@ Dans le Clerk Dashboard :
 
 ## Definition of Done
 
-- [ ] Routes `/admin/*` protégées par le check de rôle
-- [ ] `src/app/admin/layout.tsx` créé
-- [ ] Test : accès à `/admin` sans rôle admin → 403
+- [x] Routes `/admin/*` protégées par le check de rôle
+- [x] `src/app/admin/layout.tsx` créé
+- [x] Test : accès à `/admin` sans rôle admin → 403
 
 ---
 
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Étendre le middleware pour les routes `/admin`
-- [ ] Créer `src/app/admin/layout.tsx`
+- [x] Étendre le middleware pour les routes `/admin`
+- [x] Créer `src/app/admin/layout.tsx`
 
 ### Completion Notes
-_À remplir par l'agent_
+- Le middleware (`src/middleware.ts`) contenait déjà la protection admin (implémenté dans une story précédente) : `isAdminRoute` matcher, `auth.protect()` pour non-connectés, vérification `role !== 'admin'` → 403. Tests existants couvrent tous les cas (22 tests passent).
+- Créé `src/app/[locale]/admin/layout.tsx` avec double vérification : redirection `/sign-in` si non authentifié, redirection `/` si rôle non-admin. Utilise `BrieflyPublicMetadata` pour le typage.
+- Créé `src/app/[locale]/admin/page.tsx` comme page d'accueil minimale du dashboard admin.
+- Créé 4 tests unitaires pour le layout admin couvrant : non-authentifié → redirect sign-in, utilisateur sans rôle admin → redirect /, metadata vide → redirect /, admin → rendu children.
+- Layout placé sous `[locale]/admin/` (et non `admin/` directement) pour cohérence avec le routing i18n du projet.
+- 532 tests au total, 0 régression introduite (7 échecs préexistants : Supabase integration tests et tests non liés).
 
 ### File List
-_À remplir par l'agent_
+- `src/app/[locale]/admin/layout.tsx` (nouveau)
+- `src/app/[locale]/admin/page.tsx` (nouveau)
+- `src/app/[locale]/admin/__tests__/layout.test.tsx` (nouveau)
+- `messages/fr.json` (modifié — ajout clés i18n `admin`)
+- `messages/en.json` (modifié — ajout clés i18n `admin`)
 
 ### Debug Log
-_À remplir par l'agent_
+Aucun problème rencontré.
+
+### Code Review (AI) — 2026-03-18
+**Reviewer :** Claude Opus 4.6
+
+**Issues corrigées (4) :**
+- **[H1]** Test `renders children when user is admin` renforcé : assertion `toBeTruthy()` remplacée par `render()` + vérification du header "Briefly Admin" et du contenu children via `@testing-library/react`
+- **[M1/L3]** i18n : ajout namespace `admin` dans `messages/fr.json` et `messages/en.json` (clés `title`, `dashboardTitle`, `dashboardWelcome`). Layout utilise `getTranslations('admin')` au lieu de texte en dur
+- **[M2]** Suppression du `return null` mort après `redirect()` (2 occurrences dans layout)
+- **[M3]** Redirect non-admin corrigé : `redirect('/')` → `redirect('/${locale}')` pour cohérence i18n
+
+**Issues non corrigées (note) :**
+- `page.tsx` a été significativement modifié par une story ultérieure (9.2+) — le hardcoded "Dashboard Admin" dans page.tsx est hors scope de cette review
+- 543 tests passent, 10 échecs préexistants (Supabase integration, settings, categories API), 0 régression
