@@ -2,11 +2,14 @@ import { emailWorker } from './email.worker'
 import { summaryWorker } from './summary.worker'
 import { cleanupWorker } from './cleanup.worker'
 import { registerCleanupCron } from '@/lib/queue/cleanup.queue'
+import { startBullBoard } from './bull-board'
 import logger from '@/lib/utils/logger'
 
 registerCleanupCron().catch((err) => {
   logger.error({ err }, 'Failed to register cleanup cron')
 })
+
+startBullBoard()
 
 logger.info('Workers started')
 

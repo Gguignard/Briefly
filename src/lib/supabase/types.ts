@@ -316,6 +316,7 @@ export type Database = {
           id: string
           inbox_address: string
           stripe_customer_id: string | null
+          suspended: boolean
           tier: string
           updated_at: string
         }
@@ -326,6 +327,7 @@ export type Database = {
           id?: string
           inbox_address: string
           stripe_customer_id?: string | null
+          suspended?: boolean
           tier?: string
           updated_at?: string
         }
@@ -336,6 +338,7 @@ export type Database = {
           id?: string
           inbox_address?: string
           stripe_customer_id?: string | null
+          suspended?: boolean
           tier?: string
           updated_at?: string
         }

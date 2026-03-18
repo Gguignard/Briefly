@@ -10,6 +10,19 @@ export async function processEmailJob(jobId: string | undefined, data: EmailJobD
   const { userId, userTier, from, subject, rawEmail, receivedAt } = data
   logger.info({ jobId, userId, subject }, 'Processing email job')
 
+  // 0. Vérifier si l'utilisateur est suspendu
+  const supabaseCheck = createAdminClient()
+  const { data: user } = await supabaseCheck
+    .from('users')
+    .select('suspended')
+    .eq('id', userId)
+    .single()
+
+  if (user?.suspended) {
+    logger.info({ jobId, userId }, 'User suspended, skipping email processing')
+    return
+  }
+
   // 1. Extraire le contenu texte de l'email
   const { text, html } = await extractTextFromEmail(rawEmail)
 

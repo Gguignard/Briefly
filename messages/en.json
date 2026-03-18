@@ -184,7 +184,47 @@
   "admin": {
     "title": "Briefly Admin",
     "dashboardTitle": "Admin Dashboard",
-    "dashboardWelcome": "Welcome to the admin panel."
+    "dashboardWelcome": "Welcome to the admin panel.",
+    "queues": {
+      "title": "Queue Monitoring",
+      "description": "Bull Board dashboard for monitoring BullMQ jobs.",
+      "openExternal": "Open in new tab",
+      "notConfigured": "Bull Board is not configured. Set BULL_BOARD_URL in your environment variables."
+    },
+    "users": {
+      "title": "User Management",
+      "searchPlaceholder": "Search by email…",
+      "search": "Search",
+      "email": "Email",
+      "tier": "Tier",
+      "registration": "Registration",
+      "summaries": "Summaries",
+      "status": "Status",
+      "actions": "Actions",
+      "active": "Active",
+      "suspended": "Suspended",
+      "upgradePaid": "Upgrade paid",
+      "revertFree": "Revert free",
+      "suspend": "Suspend",
+      "reactivate": "Reactivate",
+      "loading": "Loading…",
+      "noUsers": "No users found",
+      "userCount": "{count} user{count, plural, one {} other {s}} — page {page}/{totalPages}",
+      "changeTier": "Change tier",
+      "tierFree": "Free",
+      "tierStarter": "Starter",
+      "tierPro": "Pro",
+      "confirmSuspendTitle": "Confirm suspension",
+      "confirmSuspendDescription": "Are you sure you want to suspend this user? Their email processing will be blocked.",
+      "confirmReactivateTitle": "Confirm reactivation",
+      "confirmReactivateDescription": "Are you sure you want to reactivate this user? Email processing will resume.",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "tierUpdateSuccess": "Tier updated successfully.",
+      "suspendSuccess": "User suspended successfully.",
+      "reactivateSuccess": "User reactivated successfully.",
+      "errorGeneric": "An error occurred. Please try again."
+    }
   },
   "marketing": {
     "meta": {

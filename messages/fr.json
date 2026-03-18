@@ -184,7 +184,47 @@
   "admin": {
     "title": "Briefly Admin",
     "dashboardTitle": "Dashboard Admin",
-    "dashboardWelcome": "Bienvenue dans le panneau d'administration."
+    "dashboardWelcome": "Bienvenue dans le panneau d'administration.",
+    "queues": {
+      "title": "Monitoring des Queues",
+      "description": "Tableau de bord Bull Board pour surveiller les jobs BullMQ.",
+      "openExternal": "Ouvrir dans un nouvel onglet",
+      "notConfigured": "Bull Board n'est pas configuré. Définissez BULL_BOARD_URL dans vos variables d'environnement."
+    },
+    "users": {
+      "title": "Gestion des utilisateurs",
+      "searchPlaceholder": "Rechercher par email…",
+      "search": "Rechercher",
+      "email": "Email",
+      "tier": "Tier",
+      "registration": "Inscription",
+      "summaries": "Résumés",
+      "status": "Statut",
+      "actions": "Actions",
+      "active": "Actif",
+      "suspended": "Suspendu",
+      "upgradePaid": "Upgrade paid",
+      "revertFree": "Revert free",
+      "suspend": "Suspendre",
+      "reactivate": "Réactiver",
+      "loading": "Chargement…",
+      "noUsers": "Aucun utilisateur trouvé",
+      "userCount": "{count} utilisateur{count, plural, one {} other {s}} — page {page}/{totalPages}",
+      "changeTier": "Changer le tier",
+      "tierFree": "Free",
+      "tierStarter": "Starter",
+      "tierPro": "Pro",
+      "confirmSuspendTitle": "Confirmer la suspension",
+      "confirmSuspendDescription": "Êtes-vous sûr de vouloir suspendre cet utilisateur ? Le traitement de ses emails sera bloqué.",
+      "confirmReactivateTitle": "Confirmer la réactivation",
+      "confirmReactivateDescription": "Êtes-vous sûr de vouloir réactiver cet utilisateur ? Le traitement des emails reprendra.",
+      "cancel": "Annuler",
+      "confirm": "Confirmer",
+      "tierUpdateSuccess": "Tier mis à jour avec succès.",
+      "suspendSuccess": "Utilisateur suspendu avec succès.",
+      "reactivateSuccess": "Utilisateur réactivé avec succès.",
+      "errorGeneric": "Une erreur est survenue. Veuillez réessayer."
+    }
   },
   "marketing": {
     "meta": {

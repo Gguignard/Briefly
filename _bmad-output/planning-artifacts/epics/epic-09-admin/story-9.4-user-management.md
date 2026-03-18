@@ -18,8 +18,8 @@
 ## Acceptance Criteria
 
 1. ✅ Page `/admin/users` liste les utilisateurs (email, tier, date d'inscription, résumés générés)
-2. ✅ Bouton "Passer en paid" / "Revenir en free" par utilisateur
-3. ✅ Bouton "Suspendre" — bloque le traitement des emails de cet utilisateur
+2. ✅ Select dropdown tier (free/starter/pro) par utilisateur
+3. ✅ Bouton "Suspendre" avec confirmation — bloque le traitement des emails de cet utilisateur
 4. ✅ Recherche par email
 5. ✅ Pagination (20 users par page)
 
@@ -148,32 +148,62 @@ if (user?.suspended) {
 
 ## Definition of Done
 
-- [ ] `GET /api/admin/users` avec pagination et recherche
-- [ ] `POST /api/admin/users/:id/tier` pour upgrade/downgrade
-- [ ] Colonne `suspended` dans `users`
-- [ ] Page `/admin/users` fonctionnelle
+- [x] `GET /api/admin/users` avec pagination et recherche
+- [x] `POST /api/admin/users/:id/tier` pour upgrade/downgrade
+- [x] Colonne `suspended` dans `users`
+- [x] Page `/admin/users` fonctionnelle
 
 ---
 
 ## Dev Agent Record
 
 ### Status
-Not Started
+review
 
 ### Agent Model Used
-_À remplir par l'agent_
+claude-opus-4-6
 
 ### Tasks
-- [ ] Créer `GET /api/admin/users`
-- [ ] Créer `POST /api/admin/users/[id]/tier`
-- [ ] Créer migration `suspended` column
-- [ ] Créer page `/admin/users`
+- [x] Créer `GET /api/admin/users`
+- [x] Créer `POST /api/admin/users/[id]/tier`
+- [x] Créer `POST /api/admin/users/[id]/suspend`
+- [x] Créer migration `suspended` column
+- [x] Créer page `/admin/users`
+- [x] Créer composant `AdminUsersTable` (client component)
+- [x] Ajouter types admin (`AdminUserRow`, `AdminUsersResponse`)
+- [x] Ajouter clés i18n `admin.users.*` (en.json, fr.json)
+- [x] Ajouter tests API routes (GET, tier, suspend)
+- [x] Ajouter tests composant AdminUsersTable
+- [x] Mettre à jour types Supabase (colonne `suspended`)
 
 ### Completion Notes
-_À remplir par l'agent_
+- Code review (2026-03-18) : 11 issues trouvées et corrigées (3 Critical, 2 High, 4 Medium, 2 Low)
+  - C2: Ajouté vérification `suspended` dans `email.processor.ts` (AC #3 manquant)
+  - C3: Corrigé bug metadata Clerk dans tier route (écrasait metadata du user cible avec celles de l'admin)
+  - H1: Remplacé fetch de toutes les lignes summaries par Supabase relation count
+  - H2: Remplacé boutons tier simples par Select dropdown supportant free/starter/pro
+  - M1+L1+L2: Ajouté i18n complet au composant AdminUsersTable + titre page + dates locale-aware
+  - M2: Extrait logique partagée dans `admin.service.ts` (DRY entre page SSR et API route)
+  - M3: Ajouté toast notifications (sonner) pour feedback succès/erreur
+  - M4: Ajouté AlertDialog de confirmation pour suspend/réactivation
 
 ### File List
-_À remplir par l'agent_
+- `src/app/api/admin/users/route.ts` — GET /api/admin/users (pagination, recherche)
+- `src/app/api/admin/users/[id]/tier/route.ts` — POST tier upgrade/downgrade
+- `src/app/api/admin/users/[id]/suspend/route.ts` — POST toggle suspend
+- `src/app/[locale]/admin/users/page.tsx` — Page admin users (SSR)
+- `src/features/admin/components/AdminUsersTable.tsx` — Table client component
+- `src/features/admin/admin.types.ts` — Types AdminUserRow, AdminUsersResponse
+- `src/features/admin/admin.service.ts` — Service partagé fetchAdminUsers
+- `src/lib/supabase/types.ts` — Types Supabase mis à jour (colonne suspended)
+- `src/workers/email.processor.ts` — Ajout check suspended
+- `supabase/migrations/011_user_suspended.sql` — Migration colonne suspended
+- `messages/en.json` — Clés i18n admin.users (EN)
+- `messages/fr.json` — Clés i18n admin.users (FR)
+- `src/app/api/admin/users/__tests__/route.test.ts` — Tests GET route
+- `src/app/api/admin/users/[id]/tier/__tests__/route.test.ts` — Tests tier route
+- `src/app/api/admin/users/[id]/suspend/__tests__/route.test.ts` — Tests suspend route
+- `src/features/admin/components/__tests__/AdminUsersTable.test.tsx` — Tests composant
 
 ### Debug Log
-_À remplir par l'agent_
+Aucun problème lors de l'implémentation initiale. Code review a identifié et corrigé 11 issues.

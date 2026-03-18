@@ -115,30 +115,47 @@ app.listen(3001, () => console.log('Bull Board: http://localhost:3001/queues'))
 
 ## Definition of Done
 
-- [ ] Bull Board accessible (sur `/admin/queues` ou port `:3001`)
-- [ ] Queues `email.process`, `summary.generate`, `cleanup` visibles
-- [ ] Jobs échoués retryables depuis l'UI
+- [x] Bull Board accessible (sur `/admin/queues` ou port `:3001`)
+- [x] Queues `email.process`, `summary.generate`, `cleanup` visibles
+- [x] Jobs échoués retryables depuis l'UI
 
 ---
 
 ## Dev Agent Record
 
 ### Status
-Not Started
+review
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Installer `@bull-board/api` et adapter
-- [ ] Configurer Bull Board avec les 3 queues
-- [ ] Protéger l'accès
+- [x] Installer `@bull-board/api` et adapter
+- [x] Configurer Bull Board avec les 3 queues
+- [x] Protéger l'accès
 
 ### Completion Notes
-_À remplir par l'agent_
+- Installé `@bull-board/api`, `@bull-board/express`, `express`, `@types/express`
+- Bull Board intégré dans le workers process (`src/workers/bull-board.ts`) sur port configurable (`BULL_BOARD_PORT`, défaut 3001)
+- Protection par token (`BULL_BOARD_TOKEN`) via query param ou header `x-bull-board-token`
+- Page admin `/admin/queues` avec iframe Bull Board (protégée par le layout admin Clerk existant)
+- `BULL_BOARD_URL` env var pour configurer l'URL Bull Board côté Next.js
+- 14 tests ajoutés (9 bull-board server + 5 page admin queues), tous passent
+- Traductions FR/EN ajoutées pour la page queues
 
 ### File List
-_À remplir par l'agent_
+- `src/workers/bull-board.ts` (nouveau) — serveur Express Bull Board avec auth token
+- `src/workers/index.ts` (modifié) — import et démarrage de Bull Board
+- `src/app/[locale]/admin/queues/page.tsx` (nouveau) — page admin avec iframe
+- `src/workers/__tests__/bull-board.test.ts` (nouveau) — 9 tests unitaires
+- `src/app/[locale]/admin/queues/__tests__/page.test.tsx` (nouveau) — 5 tests unitaires
+- `messages/fr.json` (modifié) — traductions admin.queues
+- `messages/en.json` (modifié) — traductions admin.queues
+- `package.json` (modifié) — nouvelles dépendances
+
+### Change Log
+- 2026-03-18 : Implémentation complète story 9.3 — Bull Board monitoring des queues BullMQ
 
 ### Debug Log
-_À remplir par l'agent_
+- Mock ExpressAdapter/BullMQAdapter : nécessite des classes (pas des fonctions) pour `new` en vitest
+- happy-dom fetch incompatible avec serveurs Express réels — tests restructurés en unit tests avec mocks
