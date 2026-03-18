@@ -187,31 +187,51 @@ export async function GET() {
 
 ## Definition of Done
 
-- [ ] Page `/admin` avec les 3 KPIs cards
-- [ ] `CostBreakdown` avec ventilation par provider
-- [ ] Export CSV fonctionnel
-- [ ] Accessible uniquement aux admins
+- [x] Page `/admin` avec les 3 KPIs cards
+- [x] `CostBreakdown` avec ventilation par provider
+- [x] Export CSV fonctionnel
+- [x] Accessible uniquement aux admins
 
 ---
 
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer `src/app/admin/page.tsx`
-- [ ] Créer `MetricsCards`, `CostBreakdown`, `RecentSummaries`
-- [ ] Créer `GET /api/admin/export-costs`
+- [x] Créer `src/app/[locale]/admin/page.tsx` — Server Component avec 4 queries Supabase parallèles
+- [x] Créer `MetricsCards`, `CostBreakdown`, `RecentSummaries` — 3 composants UI avec tests unitaires
+- [x] Créer `GET /api/admin/export-costs` — Route API protégée admin avec export CSV
 
 ### Completion Notes
-_À remplir par l'agent_
+- Page admin avec dashboard métriques complet : 3 KPI cards (users distincts actifs 7j, résumés/jour moy, coût LLM EUR), ventilation coûts par provider ET par tier, tableau 10 derniers résumés
+- Colonnes DB alignées sur migration 008 : `cost_cents`, `tokens_input`, `tokens_output` (pas `cost_usd`/`tokens_used`)
+- Types partagés extraits dans `admin.types.ts` pour les composants
+- Route API CSV protégée par vérification admin via Clerk `sessionClaims.metadata.role`, avec sanitisation CSV
+- Gestion d'erreur Supabase : throw si une requête échoue
+- 22 tests (12 composants + 6 API + 4 layout), tous passent
 
 ### File List
-_À remplir par l'agent_
+- `src/app/[locale]/admin/page.tsx` (modifié)
+- `src/app/[locale]/admin/layout.tsx` (nouveau)
+- `src/app/[locale]/admin/__tests__/layout.test.tsx` (nouveau)
+- `src/features/admin/admin.types.ts` (nouveau)
+- `src/features/admin/components/MetricsCards.tsx` (nouveau)
+- `src/features/admin/components/CostBreakdown.tsx` (nouveau)
+- `src/features/admin/components/RecentSummaries.tsx` (nouveau)
+- `src/features/admin/components/__tests__/MetricsCards.test.tsx` (nouveau)
+- `src/features/admin/components/__tests__/CostBreakdown.test.tsx` (nouveau)
+- `src/features/admin/components/__tests__/RecentSummaries.test.tsx` (nouveau)
+- `src/app/api/admin/export-costs/route.ts` (nouveau)
+- `src/app/api/admin/export-costs/__tests__/route.test.ts` (nouveau)
+
+### Review Follow-ups (AI)
+- [ ] [AI-Review][MEDIUM] i18n : Les composants admin (MetricsCards, CostBreakdown, RecentSummaries) utilisent des chaînes françaises en dur au lieu de `useTranslations`/`getTranslations` — à migrer vers next-intl pour cohérence avec le reste de l'app
+- [ ] [AI-Review][LOW] page.tsx n'a pas de vérification d'auth inline — repose entièrement sur layout.tsx pour la protection admin
 
 ### Debug Log
-_À remplir par l'agent_
+Aucun problème rencontré.
