@@ -156,6 +156,31 @@
       "pro": "Pro"
     }
   },
+  "categoriesPage": {
+    "title": "Catégories",
+    "subtitle": "Organisez vos newsletters par catégorie",
+    "count": "{count} catégorie(s)",
+    "countWithLimit": "{count}/3 catégorie(s)",
+    "add": "Ajouter",
+    "empty": "Aucune catégorie. Créez-en une pour organiser vos newsletters.",
+    "upgradeBanner": "Limite de 3 catégories atteinte.",
+    "upgradeLink": "Passez au Premium",
+    "unlimitedCategories": "pour des catégories illimitées.",
+    "namePlaceholder": "Nom de la catégorie",
+    "colorLabel": "Couleur",
+    "newsletterCount": "{count, plural, one {# newsletter} other {# newsletters}}",
+    "deleteConfirmTitle": "Supprimer la catégorie",
+    "deleteConfirmDescription": "Cette catégorie sera supprimée et les newsletters associées seront désassignées. Cette action est irréversible.",
+    "categoryNameLabel": "Nom de la catégorie",
+    "renameError": "Erreur lors du renommage",
+    "colorError": "Erreur lors du changement de couleur",
+    "deleteError": "Erreur lors de la suppression",
+    "addError": "Erreur lors de l'ajout",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "delete": "Supprimer"
+  },
   "marketing": {
     "meta": {
       "title": "Briefly — Résumés IA de vos newsletters | Gratuit",

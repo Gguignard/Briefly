@@ -37,6 +37,20 @@ export async function PATCH(
 
   const supabase = createAdminClient()
 
+  // Vérifier unicité du nom si renommage
+  if (parsed.data.name !== undefined) {
+    const { count: nameCount } = await supabase
+      .from('categories')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('name', parsed.data.name)
+      .neq('id', id)
+
+    if ((nameCount ?? 0) > 0) {
+      return apiError('VALIDATION_ERROR', 'Une catégorie avec ce nom existe déjà', 409)
+    }
+  }
+
   const updateData: Record<string, string> = {}
   if (parsed.data.name !== undefined) updateData.name = parsed.data.name
   if (parsed.data.color !== undefined) updateData.color = parsed.data.color

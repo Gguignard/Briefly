@@ -156,6 +156,31 @@
       "pro": "Pro"
     }
   },
+  "categoriesPage": {
+    "title": "Categories",
+    "subtitle": "Organize your newsletters by category",
+    "count": "{count} category(ies)",
+    "countWithLimit": "{count}/3 category(ies)",
+    "add": "Add",
+    "empty": "No categories. Create one to organize your newsletters.",
+    "upgradeBanner": "3-category limit reached.",
+    "upgradeLink": "Upgrade to Premium",
+    "unlimitedCategories": "for unlimited categories.",
+    "namePlaceholder": "Category name",
+    "colorLabel": "Color",
+    "newsletterCount": "{count, plural, one {# newsletter} other {# newsletters}}",
+    "deleteConfirmTitle": "Delete category",
+    "deleteConfirmDescription": "This category will be deleted and associated newsletters will be unassigned. This action cannot be undone.",
+    "categoryNameLabel": "Category name",
+    "renameError": "Error renaming category",
+    "colorError": "Error updating color",
+    "deleteError": "Error deleting category",
+    "addError": "Error adding category",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete"
+  },
   "marketing": {
     "meta": {
       "title": "Briefly — AI Newsletter Summaries | Free",

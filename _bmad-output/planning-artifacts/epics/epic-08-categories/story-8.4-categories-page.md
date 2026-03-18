@@ -179,30 +179,66 @@ export function CategoriesList({ initialCategories, userTier }: Props) {
 
 ## Definition of Done
 
-- [ ] Page `/[locale]/categories` créée
-- [ ] `CategoriesList`, `CategoryRow`, `AddCategoryForm` créés
-- [ ] Compteur newsletters par catégorie affiché
-- [ ] Bannière upgrade visible à 3/3 pour tier gratuit
+- [x] Page `/[locale]/categories` créée
+- [x] `CategoriesList`, `CategoryRow`, `AddCategoryForm` créés
+- [x] Compteur newsletters par catégorie affiché
+- [x] Bannière upgrade visible à 3/3 pour tier gratuit
 
 ---
 
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer `src/app/[locale]/(dashboard)/categories/page.tsx`
-- [ ] Créer `CategoriesList`, `CategoryRow`, `AddCategoryForm`
+- [x] Créer `src/app/[locale]/(dashboard)/categories/page.tsx`
+- [x] Créer `CategoriesList`, `CategoryRow`, `AddCategoryForm`
 
 ### Completion Notes
-_À remplir par l'agent_
+- Page server component `/[locale]/categories` créée avec auth Clerk, fetch des catégories avec compteur newsletters via join, et récupération du tier utilisateur
+- `CategoriesList` : composant client gérant l'état local des catégories, affichage du compteur avec/sans limite selon tier, bannière upgrade amber pour free tier à 3/3, bouton ajouter désactivé à la limite, état vide
+- `CategoryRow` : renommage inline via input avec PATCH API au blur, color picker natif HTML avec PATCH API, suppression avec AlertDialog de confirmation et appel DELETE API
+- `AddCategoryForm` : formulaire inline avec input nom + color picker natif, appel POST API, validation bouton désactivé si vide
+- Traductions i18n ajoutées dans fr.json et en.json (section `categoriesPage`)
+- 18 tests unitaires créés et passants (CategoriesList: 8, CategoryRow: 6, AddCategoryForm: 4)
+- 0 régression introduite (7 échecs préexistants : settings page mock + supabase ECONNREFUSED)
 
 ### File List
-_À remplir par l'agent_
+- `src/app/[locale]/(dashboard)/categories/page.tsx` (nouveau)
+- `src/features/categories/components/CategoriesList.tsx` (nouveau)
+- `src/features/categories/components/CategoryRow.tsx` (nouveau)
+- `src/features/categories/components/AddCategoryForm.tsx` (nouveau)
+- `src/features/categories/components/__tests__/CategoriesList.test.tsx` (nouveau)
+- `src/features/categories/components/__tests__/CategoryRow.test.tsx` (nouveau)
+- `src/features/categories/components/__tests__/AddCategoryForm.test.tsx` (nouveau)
+- `src/app/api/categories/[id]/route.ts` (modifié - ajout vérification unicité nom au rename)
+- `messages/fr.json` (modifié - ajout section categoriesPage + clés manquantes)
+- `messages/en.json` (modifié - ajout section categoriesPage + clés manquantes)
+
+### Code Review Fixes (2026-03-18)
+- **H1** : Ajouté 4 clés i18n manquantes (`save`, `cancel`, `confirm`, `delete`) dans fr.json et en.json
+- **H2** : Color picker sauvegarde désormais sur `onBlur` au lieu de chaque `onChange` (évite spam API)
+- **M1** : Ajouté toast d'erreur (sonner) dans CategoryRow et AddCategoryForm au lieu de catch vides
+- **M2** : Requêtes Supabase parallélisées avec `Promise.all` dans page.tsx
+- **M3** : Ajouté vérification d'unicité du nom dans l'API PATCH categories/[id]
+- **M4** : Ajouté support touche Enter pour déclencher le rename (blur on Enter)
+- **L1** : Corrigé fuite mock `global.fetch` dans AddCategoryForm.test.tsx (déplacé dans `beforeEach`)
+- Tests mis à jour : 31 tests passants, 0 échecs
+
+### Code Review #2 Fixes (2026-03-18)
+- **H1** : Toast d'erreur couleur utilisait `renameError` → nouvelle clé `colorError` dans CategoryRow + i18n
+- **H2** : Ajouté `aria-label` au color input dans CategoryRow (cohérence avec AddCategoryForm)
+- **H3** : Extrait constante `FREE_CATEGORY_LIMIT = 3` dans CategoriesList (supprime hardcode `>= 3`)
+- **M1** : Ajouté gestion touche Escape pour annuler le renommage inline (revert + blur)
+- **M2** : Ajouté `aria-label` au champ nom dans CategoryRow (`categoryNameLabel`)
+- Nouvelles clés i18n ajoutées : `colorError`, `categoryNameLabel` dans fr.json et en.json
+- Tests mis à jour : 31 tests passants, 0 échecs
 
 ### Debug Log
-_À remplir par l'agent_
+- `@testing-library/user-event` non installé dans le projet → utilisation de `fireEvent` à la place
+- Texte bannière upgrade réparti entre éléments enfants → regex matching dans les tests
+- Fuite de mock `global.fetch` entre tests → résolu avec `beforeEach` pour recréer le mock
