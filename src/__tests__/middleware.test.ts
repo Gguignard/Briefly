@@ -1,6 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest, NextFetchEvent } from 'next/server'
 
+// Mock feature flags
+const mockFeatureFlags = {
+  signupEnabled: true,
+  premiumEnabled: true,
+  maintenanceMode: false,
+  llmEnabled: true,
+  emailIngestionEnabled: true,
+}
+vi.mock('../lib/flags', () => ({
+  featureFlags: mockFeatureFlags,
+}))
+
 // Mock next-intl middleware
 const mockIntlMiddleware = vi.fn(() => new Response(null, { status: 200 }))
 vi.mock('next-intl/middleware', () => ({
@@ -51,8 +63,9 @@ describe('middleware', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks()
-    vi.resetModules()
     mockProtect.mockResolvedValue({ sessionClaims: {} })
+    mockFeatureFlags.maintenanceMode = false
+    mockFeatureFlags.signupEnabled = true
     const mod = await import('../middleware')
     middleware = mod.default
   })
@@ -206,6 +219,88 @@ describe('middleware', () => {
       expect(mockProtect).toHaveBeenCalledWith(
         expect.objectContaining({ unauthenticatedUrl: expect.stringContaining('/en/sign-in') }),
       )
+    })
+  })
+
+  describe('maintenance mode', () => {
+    it('returns 503 with maintenance page for public route', async () => {
+      mockFeatureFlags.maintenanceMode = true
+      const req = createRequest('/fr')
+      const response = await middleware(req, fakeEvent)
+
+      expect(response.status).toBe(503)
+      expect(response.headers.get('Retry-After')).toBe('300')
+      const body = await response.text()
+      expect(body).toContain('maintenance')
+      expect(body).toContain('lang="fr"')
+    })
+
+    it('returns maintenance page in English for /en route', async () => {
+      mockFeatureFlags.maintenanceMode = true
+      const req = createRequest('/en')
+      const response = await middleware(req, fakeEvent)
+
+      expect(response.status).toBe(503)
+      const body = await response.text()
+      expect(body).toContain('lang="en"')
+      expect(body).toContain('under maintenance')
+    })
+
+    it('returns 503 for protected route', async () => {
+      mockFeatureFlags.maintenanceMode = true
+      const req = createRequest('/fr/dashboard')
+      const response = await middleware(req, fakeEvent)
+
+      expect(response.status).toBe(503)
+      expect(mockProtect).not.toHaveBeenCalled()
+    })
+
+    it('allows admin routes during maintenance', async () => {
+      mockFeatureFlags.maintenanceMode = true
+      mockProtect.mockResolvedValue({
+        sessionClaims: { metadata: { role: 'admin' } },
+      })
+
+      const req = createRequest('/fr/admin')
+      await middleware(req, fakeEvent)
+
+      expect(mockProtect).toHaveBeenCalled()
+    })
+
+    it('does not block when maintenance mode is off', async () => {
+      mockFeatureFlags.maintenanceMode = false
+      const req = createRequest('/fr')
+      await middleware(req, fakeEvent)
+
+      expect(mockIntlMiddleware).toHaveBeenCalledWith(req)
+    })
+  })
+
+  describe('signup disabled', () => {
+    it('redirects /fr/sign-up to /fr when signup is disabled', async () => {
+      mockFeatureFlags.signupEnabled = false
+      const req = createRequest('/fr/sign-up')
+      const response = await middleware(req, fakeEvent)
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toContain('/fr')
+    })
+
+    it('redirects /en/sign-up to /en when signup is disabled', async () => {
+      mockFeatureFlags.signupEnabled = false
+      const req = createRequest('/en/sign-up')
+      const response = await middleware(req, fakeEvent)
+
+      expect(response.status).toBe(307)
+      expect(response.headers.get('location')).toContain('/en')
+    })
+
+    it('allows /fr/sign-up when signup is enabled', async () => {
+      mockFeatureFlags.signupEnabled = true
+      const req = createRequest('/fr/sign-up')
+      await middleware(req, fakeEvent)
+
+      expect(mockIntlMiddleware).toHaveBeenCalledWith(req)
     })
   })
 

@@ -5,6 +5,7 @@ import { apiError } from '@/lib/utils/apiResponse'
 import { redirect } from 'next/navigation'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
 import { logError } from '@/lib/utils/logger'
+import { featureFlags } from '@/lib/flags'
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL
 if (!appUrl) {
@@ -12,6 +13,10 @@ if (!appUrl) {
 }
 
 export async function GET() {
+  if (!featureFlags.premiumEnabled) {
+    return apiError('FEATURE_DISABLED', 'Premium subscriptions are temporarily disabled', 503)
+  }
+
   const { userId } = await auth()
   if (!userId) return apiError('UNAUTHORIZED', 'Non autorisé', 401)
 

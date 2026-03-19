@@ -93,30 +93,50 @@ FEATURE_EMAIL_INGESTION_ENABLED=true
 
 ## Definition of Done
 
-- [ ] `src/lib/flags.ts` créé
-- [ ] Mode maintenance fonctionnel via env var
-- [ ] Flags documentés dans `.env.example`
+- [x] `src/lib/flags.ts` créé
+- [x] Mode maintenance fonctionnel via env var
+- [x] Flags documentés dans `.env.example`
 
 ---
 
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer `src/lib/flags.ts`
-- [ ] Étendre le middleware pour le mode maintenance
-- [ ] Documenter les flags dans `.env.example`
+- [x] Créer `src/lib/flags.ts`
+- [x] Étendre le middleware pour le mode maintenance
+- [x] Documenter les flags dans `.env.example`
 
 ### Completion Notes
-_À remplir par l'agent_
+- `src/lib/flags.ts` : 5 feature flags booléens (signupEnabled, premiumEnabled, maintenanceMode, llmEnabled, emailIngestionEnabled) avec valeurs par défaut sûres (activés par défaut sauf maintenanceMode)
+- Middleware étendu : vérification de `maintenanceMode` avant toute autre logique. Retourne 503 HTML sauf pour les routes `/admin`
+- `.env.example` documenté avec les 5 variables FEATURE_*
+- 13 tests unitaires pour `flags.ts` couvrant valeurs par défaut, opt-out (=false), opt-in (=true), et valeurs arbitraires
+- 4 tests ajoutés au middleware existant couvrant : page maintenance sur route publique, blocage route protégée, accès admin autorisé, et mode normal
 
 ### File List
-_À remplir par l'agent_
+- `src/lib/flags.ts` (nouveau — getters dynamiques, case-insensitive)
+- `src/lib/__tests__/flags.test.ts` (nouveau — 18 tests)
+- `src/middleware.ts` (modifié — maintenance i18n + signup gate)
+- `src/__tests__/middleware.test.ts` (modifié — 30 tests incl. maintenance i18n + signup disabled)
+- `.env.example` (modifié — ajout section Feature Flags)
+- `src/app/api/billing/checkout/route.ts` (modifié — gate premiumEnabled)
+- `src/app/api/webhooks/email/route.ts` (modifié — gate emailIngestionEnabled)
+- `src/workers/summary.worker.ts` (modifié — gate llmEnabled)
+
+### Code Review Fixes (2026-03-19)
+- **H1**: Intégré les 4 flags non utilisés : `premiumEnabled` → checkout, `emailIngestionEnabled` → email webhook, `llmEnabled` → summary worker, `signupEnabled` → middleware sign-up gate
+- **H2**: Converti flags statiques en getters dynamiques (lecture env var à chaque accès)
+- **H3**: Page maintenance améliorée : HTML complet, i18n fr/en, styling, header Retry-After
+- **M2**: Tests flags simplifiés (plus besoin de `vi.resetModules()`)
+- **M3**: Comparaison case-insensitive des env vars (`toLowerCase()`)
+- Tests : 48 tests passent (18 flags + 30 middleware)
 
 ### Debug Log
-_À remplir par l'agent_
+- `require.resolve` ne fonctionne pas dans Vitest ESM → remplacé par `vi.resetModules()` + dynamic import
+- 4 fichiers de test pré-existants en échec (supabase, email worker, settings page, categories) — non liés à cette story

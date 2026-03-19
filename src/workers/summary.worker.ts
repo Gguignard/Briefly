@@ -7,12 +7,19 @@ import { summarize } from '@/lib/llm/llmService'
 import { getLLMTierForUser } from '@/lib/llm/tier-selector'
 import { trackLLMCost } from '@/lib/llm/cost-tracker'
 import logger, { logError } from '@/lib/utils/logger'
+import { featureFlags } from '@/lib/flags'
 
 export async function processSummaryJob(
   jobId: string | undefined,
   data: SummaryJobData,
 ): Promise<void> {
   const { rawEmailId, userId, userTier, subject } = data
+
+  if (!featureFlags.llmEnabled) {
+    logger.info({ jobId, userId }, 'LLM feature disabled, skipping summary generation')
+    return
+  }
+
   logger.info({ jobId, userId, rawEmailId }, 'Generating summary')
 
   const supabase = createAdminClient()

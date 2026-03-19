@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { emailQueue } from '@/lib/queue/email.queue'
 import { apiResponse, apiError } from '@/lib/utils/apiResponse'
 import logger, { logError } from '@/lib/utils/logger'
+import { featureFlags } from '@/lib/flags'
 
 const MAX_BODY_SIZE = 10 * 1024 * 1024 // 10 MB
 
@@ -25,6 +26,10 @@ async function verifyHmac(body: string, signature: string): Promise<boolean> {
 }
 
 export async function POST(req: Request) {
+  if (!featureFlags.emailIngestionEnabled) {
+    return apiError('FEATURE_DISABLED', 'Email ingestion is temporarily disabled', 503)
+  }
+
   const body = await req.text()
 
   // M3: Rejeter les payloads trop volumineux
