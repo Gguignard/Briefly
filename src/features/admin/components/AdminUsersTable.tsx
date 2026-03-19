@@ -65,16 +65,22 @@ export function AdminUsersTable({
       const params = new URLSearchParams({ page: String(p) })
       if (s) params.set('search', s)
       const res = await fetch(`/api/admin/users?${params}`)
+      if (!res.ok) {
+        toast.error(t('errorGeneric'))
+        return
+      }
       const json = await res.json()
       if (json.data) {
         setUsers(json.data.users)
         setTotal(json.data.total)
         setPage(json.data.page)
       }
+    } catch {
+      toast.error(t('errorGeneric'))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [t])
 
   const handleSearch = () => {
     fetchUsers(1, search)

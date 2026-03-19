@@ -17,6 +17,10 @@ vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: vi.fn(() => ({ from: mockFrom })),
 }))
 
+vi.mock('@/lib/utils/logger', () => ({
+  default: { info: vi.fn(), error: vi.fn(), warn: vi.fn() },
+}))
+
 const makeParams = (id: string) => Promise.resolve({ id })
 
 describe('POST /api/admin/users/[id]/suspend', () => {

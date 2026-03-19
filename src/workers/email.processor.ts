@@ -10,9 +10,10 @@ export async function processEmailJob(jobId: string | undefined, data: EmailJobD
   const { userId, userTier, from, subject, rawEmail, receivedAt } = data
   logger.info({ jobId, userId, subject }, 'Processing email job')
 
+  const supabase = createAdminClient()
+
   // 0. Vérifier si l'utilisateur est suspendu
-  const supabaseCheck = createAdminClient()
-  const { data: user } = await supabaseCheck
+  const { data: user } = await supabase
     .from('users')
     .select('suspended')
     .eq('id', userId)
@@ -32,7 +33,6 @@ export async function processEmailJob(jobId: string | undefined, data: EmailJobD
   }
 
   // 2. Résoudre la newsletter correspondante (best-effort)
-  const supabase = createAdminClient()
   const { data: newsletter } = await supabase
     .from('newsletters')
     .select('id')

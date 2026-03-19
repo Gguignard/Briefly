@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   const { sessionClaims } = await auth()
   const metadata = sessionClaims?.metadata as Partial<BrieflyPublicMetadata> | undefined
   if (metadata?.role !== 'admin') {
-    return apiError(ErrorCodes.FORBIDDEN, 'Accès refusé', 403)
+    return apiError(ErrorCodes.FORBIDDEN, 'Admin access required', 403)
   }
 
   const { searchParams } = request.nextUrl
@@ -19,6 +19,6 @@ export async function GET(request: NextRequest) {
     const response = await fetchAdminUsers(page, search)
     return apiResponse(response)
   } catch {
-    return apiError(ErrorCodes.INTERNAL_ERROR, 'Erreur lors du chargement des utilisateurs', 500)
+    return apiError(ErrorCodes.INTERNAL_ERROR, 'Failed to load users', 500)
   }
 }

@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { apiResponse, apiError, ErrorCodes } from '@/lib/utils/apiResponse'
 import type { BrieflyPublicMetadata } from '@/features/auth/auth.types'
 import type { NextRequest } from 'next/server'
+import logger from '@/lib/utils/logger'
 
 export async function POST(
   _request: NextRequest,
@@ -11,7 +12,7 @@ export async function POST(
   const { sessionClaims } = await auth()
   const metadata = sessionClaims?.metadata as Partial<BrieflyPublicMetadata> | undefined
   if (metadata?.role !== 'admin') {
-    return apiError(ErrorCodes.FORBIDDEN, 'Accès refusé', 403)
+    return apiError(ErrorCodes.FORBIDDEN, 'Admin access required', 403)
   }
 
   const { id } = await params
@@ -24,7 +25,7 @@ export async function POST(
     .single()
 
   if (fetchError || !user) {
-    return apiError(ErrorCodes.NOT_FOUND, 'Utilisateur non trouvé', 404)
+    return apiError(ErrorCodes.NOT_FOUND, 'User not found', 404)
   }
 
   const newSuspended = !user.suspended
@@ -35,8 +36,10 @@ export async function POST(
     .eq('id', id)
 
   if (updateError) {
-    return apiError(ErrorCodes.INTERNAL_ERROR, 'Erreur lors de la suspension', 500)
+    return apiError(ErrorCodes.INTERNAL_ERROR, 'Failed to update suspension status', 500)
   }
+
+  logger.info({ userId: id, suspended: newSuspended, adminId: sessionClaims?.sub }, 'Admin toggled user suspension')
 
   return apiResponse({ id, suspended: newSuspended })
 }

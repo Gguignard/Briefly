@@ -10,27 +10,25 @@ export async function fetchAdminUsers(
   const supabase = createAdminClient()
   const offset = (page - 1) * PER_PAGE
 
-  let countQuery = supabase.from('users').select('id', { count: 'exact', head: true })
-  let dataQuery = supabase
+  let query = supabase
     .from('users')
-    .select('id, clerk_id, email, tier, suspended, created_at, summaries(count)')
+    .select('id, clerk_id, email, tier, suspended, created_at, summaries(count)', { count: 'exact' })
 
   if (search) {
-    countQuery = countQuery.ilike('email', `%${search}%`)
-    dataQuery = dataQuery.ilike('email', `%${search}%`)
+    query = query.ilike('email', `%${search}%`)
   }
 
-  dataQuery = dataQuery
+  query = query
     .order('created_at', { ascending: false })
     .range(offset, offset + PER_PAGE - 1)
 
-  const [countResult, dataResult] = await Promise.all([countQuery, dataQuery])
+  const { data, count, error } = await query
 
-  if (countResult.error || dataResult.error) {
+  if (error) {
     throw new Error('Failed to load users')
   }
 
-  const users: AdminUserRow[] = (dataResult.data as unknown[]).map((u: unknown) => {
+  const users: AdminUserRow[] = (data as unknown[]).map((u: unknown) => {
     const row = u as Record<string, unknown>
     const summariesArr = row.summaries as { count: number }[] | undefined
     return {
@@ -46,7 +44,7 @@ export async function fetchAdminUsers(
 
   return {
     users,
-    total: countResult.count ?? 0,
+    total: count ?? 0,
     page,
     perPage: PER_PAGE,
   }

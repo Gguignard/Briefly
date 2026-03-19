@@ -20,6 +20,10 @@ vi.mock('@/lib/supabase/admin', () => ({
   createAdminClient: vi.fn(() => ({ from: mockFrom })),
 }))
 
+vi.mock('@/lib/utils/logger', () => ({
+  default: { info: vi.fn(), error: vi.fn(), warn: vi.fn() },
+}))
+
 function makeRequest(body: unknown) {
   return new NextRequest('http://localhost/api/admin/users/uuid-1/tier', {
     method: 'POST',
@@ -35,7 +39,7 @@ describe('POST /api/admin/users/[id]/tier', () => {
     vi.clearAllMocks()
     vi.resetModules()
 
-    mockSingle.mockResolvedValue({ data: { clerk_id: 'clerk_1' }, error: null })
+    mockSingle.mockResolvedValue({ data: { clerk_id: 'clerk_1', tier: 'free' }, error: null })
     mockEq.mockImplementation(() => {
       return { single: mockSingle }
     })
@@ -126,5 +130,40 @@ describe('POST /api/admin/users/[id]/tier', () => {
     expect(mockUpdateUser).toHaveBeenCalledWith('clerk_1', {
       publicMetadata: { role: 'user', tier: 'starter', customField: 'keep' },
     })
+  })
+
+  it('rolls back Supabase tier when Clerk getUser fails', async () => {
+    mockAuth.mockResolvedValue({
+      sessionClaims: { metadata: { role: 'admin' } },
+    })
+    mockGetUser.mockRejectedValue(new Error('Clerk unavailable'))
+
+    const { POST } = await import('../route')
+    const response = await POST(makeRequest({ tier: 'pro' }), { params: makeParams('uuid-1') })
+    const json = await response.json()
+
+    expect(response.status).toBe(500)
+    expect(json.error.code).toBe('INTERNAL_ERROR')
+    // Verify rollback: update called twice (first with new tier, then rollback to original)
+    expect(mockUpdate).toHaveBeenCalledTimes(2)
+    expect(mockUpdate).toHaveBeenNthCalledWith(1, { tier: 'pro' })
+    expect(mockUpdate).toHaveBeenNthCalledWith(2, { tier: 'free' })
+  })
+
+  it('rolls back Supabase tier when Clerk updateUser fails', async () => {
+    mockAuth.mockResolvedValue({
+      sessionClaims: { metadata: { role: 'admin' } },
+    })
+    mockUpdateUser.mockRejectedValue(new Error('Clerk rate limited'))
+
+    const { POST } = await import('../route')
+    const response = await POST(makeRequest({ tier: 'starter' }), { params: makeParams('uuid-1') })
+    const json = await response.json()
+
+    expect(response.status).toBe(500)
+    expect(json.error.code).toBe('INTERNAL_ERROR')
+    expect(mockUpdate).toHaveBeenCalledTimes(2)
+    expect(mockUpdate).toHaveBeenNthCalledWith(1, { tier: 'starter' })
+    expect(mockUpdate).toHaveBeenNthCalledWith(2, { tier: 'free' })
   })
 })
