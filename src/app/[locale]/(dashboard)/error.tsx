@@ -1,26 +1,24 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useLocale } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import * as Sentry from '@sentry/nextjs'
 
-export default function Error({
-  error,
-  reset,
-}: {
+interface Props {
   error: Error & { digest?: string }
   reset: () => void
-}) {
+}
+
+export default function DashboardError({ error, reset }: Props) {
+  const locale = useLocale()
+
   useEffect(() => {
     Sentry.captureException(error)
-
-    if (process.env.NODE_ENV === 'development') {
-      console.error(error)
-    }
   }, [error])
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 px-4 text-center">
+    <div className="flex flex-col items-center justify-center min-h-[400px] gap-6 text-center px-4">
       <div className="space-y-2">
         <p className="text-5xl font-bold text-muted-foreground/30">500</p>
         <h1 className="text-xl font-semibold">Une erreur est survenue</h1>
@@ -33,7 +31,12 @@ export default function Error({
           </p>
         )}
       </div>
-      <Button onClick={() => reset()}>Recharger</Button>
+      <div className="flex gap-3">
+        <Button onClick={reset}>Recharger</Button>
+        <Button variant="outline" onClick={() => window.location.href = `/${locale}/summaries`}>
+          Retour aux résumés
+        </Button>
+      </div>
     </div>
   )
 }

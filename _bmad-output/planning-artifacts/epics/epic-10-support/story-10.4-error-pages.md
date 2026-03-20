@@ -144,11 +144,11 @@ export default function GlobalError({ error, reset }: { error: Error; reset: () 
 
 ## Definition of Done
 
-- [ ] `src/app/not-found.tsx` créé
-- [ ] `src/app/[locale]/(dashboard)/error.tsx` créé
-- [ ] `src/app/global-error.tsx` créé
-- [ ] Test : visiter une URL inexistante → 404 personnalisée
-- [ ] Test : déclencher une erreur → 500 avec bouton "Recharger"
+- [x] `src/app/not-found.tsx` créé
+- [x] `src/app/[locale]/(dashboard)/error.tsx` créé
+- [x] `src/app/global-error.tsx` créé
+- [x] Test : visiter une URL inexistante → 404 personnalisée
+- [x] Test : déclencher une erreur → 500 avec bouton "Recharger"
 
 ---
 
@@ -162,21 +162,48 @@ export default function GlobalError({ error, reset }: { error: Error; reset: () 
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer `src/app/not-found.tsx`
-- [ ] Créer `src/app/[locale]/(dashboard)/error.tsx`
-- [ ] Créer `src/app/global-error.tsx`
+- [x] Mettre à jour `src/app/not-found.tsx` — 404 avec code visuel, message, lien résumés + accueil
+- [x] Créer `src/app/[locale]/(dashboard)/error.tsx` — error boundary 500 avec Sentry, digest, boutons recharger/retour
+- [x] Créer `src/app/global-error.tsx` — erreur critique globale avec Sentry et bouton recharger
 
 ### Completion Notes
-_À remplir par l'agent_
+- `not-found.tsx` existait déjà avec un design minimal — mis à jour selon les AC (code 404, deux boutons)
+- `error.tsx` (dashboard) inclut Sentry.captureException, affichage du digest, et boutons recharger/retour
+- `global-error.tsx` utilise du HTML inline (pas de Tailwind) car il remplace le layout root
+- 16 tests unitaires écrits et passants : 5 (not-found) + 8 (dashboard error) + 3 (global-error)
 
 ### File List
-_À remplir par l'agent_
+- `src/app/not-found.tsx` (modifié)
+- `src/app/[locale]/(dashboard)/error.tsx` (créé)
+- `src/app/global-error.tsx` (créé)
+- `src/app/error.tsx` (modifié — alignement design avec dashboard error)
+- `src/app/__tests__/not-found.test.tsx` (créé)
+- `src/app/[locale]/(dashboard)/__tests__/error.test.tsx` (créé)
+- `src/app/__tests__/global-error.test.tsx` (créé)
+
+### Code Review (AI) — 2026-03-20
+
+**Reviewer :** Claude Opus 4.6
+**Issues Found :** 2 High, 3 Medium, 2 Low → All HIGH and MEDIUM fixed
+
+**Fixes Applied :**
+- **H1** : `not-found.tsx` — Bouton "Mes résumés" conditionné sur `auth()` (AC 4 : "si l'utilisateur est connecté")
+- **H2** : Locale `/fr/` hardcodée remplacée par `getLocale()` (not-found) et `useLocale()` (dashboard error)
+- **M1** : `global-error.tsx` — Ajout `lang="fr"`, `<head>` avec viewport meta, message utilisateur, styling du bouton
+- **M2** : Dashboard `error.tsx` — Navigation locale-aware via `useLocale()` au lieu de `/fr/` en dur
+- **M3** : Root `error.tsx` — Design aligné avec dashboard error (code 500, digest, bouton "Recharger")
+
+**Remaining (LOW, not fixed) :**
+- L1 : Tests utilisent `toBeDefined()` au lieu de `toBeInTheDocument()` — mineur
+- L2 : Warning jsdom `<html> cannot be a child of <div>` dans global-error tests — limitation jsdom
+
+**Tests :** 21 passants (8 not-found + 9 dashboard error + 4 global-error)
 
 ### Debug Log
-_À remplir par l'agent_
+Aucun problème rencontré.
