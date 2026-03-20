@@ -90,6 +90,28 @@
       "description": "Transférez vos newsletters vers cette adresse pour les recevoir dans Briefly."
     }
   },
+  "onboarding": {
+    "title": "Bienvenue dans Briefly !",
+    "subtitle": "3 \u00e9tapes pour recevoir vos premiers r\u00e9sum\u00e9s",
+    "close": "Fermer le guide",
+    "copy_button": "Copier mon adresse Briefly",
+    "copied": "Copi\u00e9 !",
+    "dismiss": "J'ai compris",
+    "steps": {
+      "copy_address": {
+        "title": "Copiez votre adresse Briefly",
+        "description": "C'est l'adresse \u00e0 utiliser pour vous abonner \u00e0 vos newsletters pr\u00e9f\u00e9r\u00e9es."
+      },
+      "subscribe": {
+        "title": "Abonnez-vous \u00e0 vos newsletters",
+        "description": "Utilisez votre adresse Briefly comme email d'inscription sur les sites de newsletters."
+      },
+      "wait_summary": {
+        "title": "Vos r\u00e9sum\u00e9s arrivent le lendemain",
+        "description": "D\u00e8s la premi\u00e8re newsletter re\u00e7ue, Briefly g\u00e9n\u00e8re un r\u00e9sum\u00e9 pour vous."
+      }
+    }
+  },
   "billing": {
     "title": "Facturation",
     "subtitle": "Gérez votre abonnement Briefly.",
@@ -316,6 +338,47 @@
         "unlimited_categories": "Catégorisation personnalisée illimitée",
         "priority_support": "Support prioritaire"
       }
+    },
+    "help": {
+      "meta_title": "Aide — Briefly",
+      "meta_description": "Questions fréquentes sur Briefly, le service de résumés de newsletters IA.",
+      "title": "Centre d'aide",
+      "subtitle": "Questions fréquentes sur Briefly",
+      "section_how_it_works": "Comment ça marche ?",
+      "section_email_issues": "Problèmes d'ingestion email",
+      "section_billing": "Facturation",
+      "section_gdpr": "RGPD",
+      "faq_how_it_works_q": "Comment fonctionne Briefly ?",
+      "faq_how_it_works_a": "Briefly génère des résumés IA de vos newsletters. Vous obtenez une adresse email dédiée (ex: votre-id@mail.briefly.app) que vous utilisez pour vous abonner à vos newsletters préférées. Briefly reçoit les emails, les résume avec IA, et les affiche dans votre feed quotidien.",
+      "faq_free_limit_q": "Quelle est la limite du tier gratuit ?",
+      "faq_free_limit_a": "Le tier gratuit vous permet de suivre jusqu'à 5 newsletters et de recevoir 1 résumé premium (meilleure IA) par jour. Les résumés supplémentaires utilisent notre modèle standard, toujours très performant.",
+      "faq_no_summaries_q": "Je ne reçois pas mes résumés, que faire ?",
+      "faq_no_summaries_a": "Vérifiez que vous vous êtes bien abonné à vos newsletters avec votre adresse Briefly (visible dans l'onglet Newsletters). Certaines newsletters peuvent prendre 24h avant le premier email. Si le problème persiste, contactez-nous.",
+      "faq_cancel_q": "Comment annuler mon abonnement Premium ?",
+      "faq_cancel_a": "Rendez-vous dans Paramètres → Facturation, puis cliquez sur \"Gérer l'abonnement\". Vous serez redirigé vers le portail Stripe où vous pourrez annuler facilement. L'annulation prend effet à la fin de la période en cours.",
+      "faq_personal_email_q": "Briefly accède-t-il à mes emails personnels ?",
+      "faq_personal_email_a": "Non, jamais. Briefly fonctionne uniquement avec une adresse email dédiée que nous créons pour vous. Nous n'avons aucun accès à votre boîte mail Gmail, Outlook, ou autre.",
+      "faq_delete_account_q": "Comment supprimer mon compte ?",
+      "faq_delete_account_a": "Allez dans Paramètres → Zone de danger → Supprimer mon compte. Toutes vos données seront supprimées définitivement et immédiatement.",
+      "contact_prompt": "Vous n'avez pas trouvé votre réponse ?",
+      "contact_link": "Contactez notre équipe →"
+    },
+    "contact": {
+      "title": "Contactez-nous",
+      "placeholder_name": "Votre nom",
+      "placeholder_email": "Votre email",
+      "placeholder_subject": "Sujet",
+      "placeholder_message": "Votre message (min. 10 caractères)",
+      "submit": "Envoyer le message",
+      "submitting": "Envoi...",
+      "success_title": "Message envoyé !",
+      "success_message": "Nous vous répondrons sous 48h.",
+      "error_name": "Le nom est requis",
+      "error_email": "Email invalide",
+      "error_subject": "Le sujet est requis",
+      "error_message": "Le message doit faire au moins 10 caractères",
+      "error_rate_limit": "Trop de messages envoyés. Réessayez dans 1h.",
+      "error_generic": "Une erreur est survenue. Veuillez réessayer."
     },
     "legal": {
       "privacy": {

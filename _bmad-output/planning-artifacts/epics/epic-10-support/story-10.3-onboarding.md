@@ -20,7 +20,7 @@
 1. ✅ À la première connexion, banner d'accueil visible sur la page Newsletters
 2. ✅ Guide en 3 étapes : "Copiez votre adresse", "Abonnez-vous", "Attendez le premier résumé"
 3. ✅ Guide dismissable (stocker `onboarding_completed` dans user_settings)
-4. ✅ Si aucun résumé après 24h, email de rappel (simple, non-intrusif)
+4. ❌ Si aucun résumé après 24h, email de rappel (simple, non-intrusif)
 5. ✅ Guide ne s'affiche plus une fois la première newsletter ajoutée
 
 ---
@@ -149,31 +149,54 @@ ALTER TABLE user_settings ADD COLUMN onboarding_completed BOOLEAN DEFAULT false;
 
 ## Definition of Done
 
-- [ ] `OnboardingBanner` composant créé
-- [ ] Affiché uniquement aux nouveaux users sans newsletter
-- [ ] Dismissable avec persistance dans `user_settings`
-- [ ] Disparaît automatiquement après ajout d'une newsletter
+- [x] `OnboardingBanner` composant créé
+- [x] Affiché uniquement aux nouveaux users sans newsletter
+- [x] Dismissable avec persistance dans `user_settings`
+- [x] Disparaît automatiquement après ajout d'une newsletter
 
 ---
 
 ## Dev Agent Record
 
 ### Status
-Not Started
+in-progress
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer `OnboardingBanner` component
-- [ ] Ajouter colonne `onboarding_completed` dans `user_settings`
-- [ ] Intégrer dans la page newsletters
+- [x] Créer `OnboardingBanner` component
+- [x] Ajouter colonne `onboarding_completed` dans `user_settings`
+- [x] Intégrer dans la page newsletters
+- [ ] Implémenter l'email de rappel après 24h sans résumé (AC #4 — cron/worker + template email)
+
+#### Review Follow-ups (AI)
+- [x] [AI-Review][MEDIUM] Validation API par champ individuel [route.ts:18-31] — corrigé
+- [x] [AI-Review][MEDIUM] OnboardingWrapper re-affiche le banner si API échoue [OnboardingWrapper.tsx:13-24] — corrigé
+- [x] [AI-Review][MEDIUM] Barrel export pour le module onboarding [features/onboarding/index.ts] — corrigé
+- [x] [AI-Review][LOW] Messages d'erreur API harmonisés en français [route.ts] — corrigé
 
 ### Completion Notes
-_À remplir par l'agent_
+- Composant `OnboardingBanner` créé avec 3 étapes guidées, copie d'adresse, dismiss
+- `OnboardingWrapper` client component gère l'état visible/caché et l'appel API dismiss
+- Migration SQL 012 ajoute `onboarding_completed` à `user_settings`
+- Route API PATCH étendue pour supporter `onboardingCompleted` en plus de `dailySummaryEnabled`
+- Page newsletters intégrée : banner affiché si 0 newsletters ET `onboarding_completed = false`
+- Clés i18n ajoutées dans fr.json et en.json (namespace `onboarding`)
+- 18 tests : 7 OnboardingBanner, 3 OnboardingWrapper, 8 API route (dont 2 nouveaux)
 
 ### File List
-_À remplir par l'agent_
+- src/features/onboarding/index.ts (nouveau — barrel export)
+- src/features/onboarding/components/OnboardingBanner.tsx (nouveau)
+- src/features/onboarding/components/OnboardingWrapper.tsx (nouveau, modifié review)
+- src/features/onboarding/components/__tests__/OnboardingBanner.test.tsx (nouveau)
+- src/features/onboarding/components/__tests__/OnboardingWrapper.test.tsx (nouveau, modifié review)
+- src/app/[locale]/(dashboard)/newsletters/page.tsx (modifié)
+- src/app/api/settings/notifications/route.ts (modifié, modifié review)
+- src/app/api/settings/notifications/__tests__/route.test.ts (modifié, modifié review)
+- supabase/migrations/012_onboarding_completed.sql (nouveau)
+- messages/fr.json (modifié)
+- messages/en.json (modifié)
 
 ### Debug Log
-_À remplir par l'agent_
+Aucun problème rencontré. Tous les tests passent (18/18). Les échecs dans la suite complète (settings page, email worker, categories, supabase integration) sont pré-existants et non liés à cette story.

@@ -58,10 +58,32 @@ describe('PATCH /api/settings/notifications', () => {
     expect(data.error.code).toBe('VALIDATION_ERROR')
   })
 
+  it('returns 400 when no recognized field is provided', async () => {
+    mockAuth.mockResolvedValue({ userId: 'user_123' })
+
+    const req = createRequest({ unknownField: true })
+    const response = await PATCH(req)
+    const data = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(data.error.code).toBe('VALIDATION_ERROR')
+  })
+
   it('returns 400 when dailySummaryEnabled is not a boolean', async () => {
     mockAuth.mockResolvedValue({ userId: 'user_123' })
 
     const req = createRequest({ dailySummaryEnabled: 'yes' })
+    const response = await PATCH(req)
+    const data = await response.json()
+
+    expect(response.status).toBe(400)
+    expect(data.error.code).toBe('VALIDATION_ERROR')
+  })
+
+  it('returns 400 when onboardingCompleted is not a boolean', async () => {
+    mockAuth.mockResolvedValue({ userId: 'user_123' })
+
+    const req = createRequest({ onboardingCompleted: 'yes' })
     const response = await PATCH(req)
     const data = await response.json()
 
@@ -95,6 +117,35 @@ describe('PATCH /api/settings/notifications', () => {
     expect(data.data.updated).toBe(true)
     expect(mockUpsert).toHaveBeenCalledWith(
       { user_id: 'user_123', daily_summary_enabled: false },
+      { onConflict: 'user_id' }
+    )
+  })
+
+  it('upserts onboardingCompleted when provided', async () => {
+    mockAuth.mockResolvedValue({ userId: 'user_123' })
+
+    const req = createRequest({ onboardingCompleted: true })
+    const response = await PATCH(req)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(data.data.updated).toBe(true)
+    expect(mockUpsert).toHaveBeenCalledWith(
+      { user_id: 'user_123', onboarding_completed: true },
+      { onConflict: 'user_id' }
+    )
+  })
+
+  it('upserts both fields when both are provided', async () => {
+    mockAuth.mockResolvedValue({ userId: 'user_123' })
+
+    const req = createRequest({ dailySummaryEnabled: true, onboardingCompleted: true })
+    const response = await PATCH(req)
+    const data = await response.json()
+
+    expect(response.status).toBe(200)
+    expect(mockUpsert).toHaveBeenCalledWith(
+      { user_id: 'user_123', daily_summary_enabled: true, onboarding_completed: true },
       { onConflict: 'user_id' }
     )
   })

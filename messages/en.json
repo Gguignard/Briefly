@@ -90,6 +90,28 @@
       "description": "Forward your newsletters to this address to receive them in Briefly."
     }
   },
+  "onboarding": {
+    "title": "Welcome to Briefly!",
+    "subtitle": "3 steps to get your first summaries",
+    "close": "Close guide",
+    "copy_button": "Copy my Briefly address",
+    "copied": "Copied!",
+    "dismiss": "Got it",
+    "steps": {
+      "copy_address": {
+        "title": "Copy your Briefly address",
+        "description": "This is the address to use when subscribing to your favorite newsletters."
+      },
+      "subscribe": {
+        "title": "Subscribe to your newsletters",
+        "description": "Use your Briefly address as the sign-up email on newsletter websites."
+      },
+      "wait_summary": {
+        "title": "Your summaries arrive the next day",
+        "description": "As soon as the first newsletter is received, Briefly generates a summary for you."
+      }
+    }
+  },
   "billing": {
     "title": "Billing",
     "subtitle": "Manage your Briefly subscription.",
@@ -316,6 +338,47 @@
         "unlimited_categories": "Unlimited custom categorization",
         "priority_support": "Priority support"
       }
+    },
+    "help": {
+      "meta_title": "Help — Briefly",
+      "meta_description": "Frequently asked questions about Briefly, the AI newsletter summary service.",
+      "title": "Help Center",
+      "subtitle": "Frequently asked questions about Briefly",
+      "section_how_it_works": "How does it work?",
+      "section_email_issues": "Email ingestion issues",
+      "section_billing": "Billing",
+      "section_gdpr": "GDPR",
+      "faq_how_it_works_q": "How does Briefly work?",
+      "faq_how_it_works_a": "Briefly generates AI summaries of your newsletters. You get a dedicated email address (e.g., your-id@mail.briefly.app) that you use to subscribe to your favorite newsletters. Briefly receives the emails, summarizes them with AI, and displays them in your daily feed.",
+      "faq_free_limit_q": "What is the free tier limit?",
+      "faq_free_limit_a": "The free tier lets you follow up to 5 newsletters and receive 1 premium summary (best AI) per day. Additional summaries use our standard model, which is still very capable.",
+      "faq_no_summaries_q": "I'm not receiving my summaries, what should I do?",
+      "faq_no_summaries_a": "Make sure you subscribed to your newsletters using your Briefly address (visible in the Newsletters tab). Some newsletters may take 24h before the first email. If the issue persists, contact us.",
+      "faq_cancel_q": "How do I cancel my Premium subscription?",
+      "faq_cancel_a": "Go to Settings → Billing, then click \"Manage subscription\". You'll be redirected to the Stripe portal where you can easily cancel. Cancellation takes effect at the end of the current period.",
+      "faq_personal_email_q": "Does Briefly access my personal emails?",
+      "faq_personal_email_a": "No, never. Briefly only works with a dedicated email address we create for you. We have no access to your Gmail, Outlook, or other inbox.",
+      "faq_delete_account_q": "How do I delete my account?",
+      "faq_delete_account_a": "Go to Settings → Danger zone → Delete my account. All your data will be permanently and immediately deleted.",
+      "contact_prompt": "Didn't find your answer?",
+      "contact_link": "Contact our team →"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "placeholder_name": "Your name",
+      "placeholder_email": "Your email",
+      "placeholder_subject": "Subject",
+      "placeholder_message": "Your message (min. 10 characters)",
+      "submit": "Send message",
+      "submitting": "Sending...",
+      "success_title": "Message sent!",
+      "success_message": "We'll get back to you within 48h.",
+      "error_name": "Name is required",
+      "error_email": "Invalid email",
+      "error_subject": "Subject is required",
+      "error_message": "Message must be at least 10 characters",
+      "error_rate_limit": "Too many messages sent. Try again in 1 hour.",
+      "error_generic": "An error occurred. Please try again."
     },
     "legal": {
       "privacy": {

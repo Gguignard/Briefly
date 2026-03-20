@@ -4,7 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function PATCH(req: Request) {
   const { userId } = await auth()
-  if (!userId) return apiError('UNAUTHORIZED', 'Non autorisé', 401)
+  if (!userId) return apiError('UNAUTHORIZED', 'Non autorisé.', 401)
 
   let body: Record<string, unknown>
   try {
@@ -13,17 +13,32 @@ export async function PATCH(req: Request) {
     return apiError('VALIDATION_ERROR', 'Corps de requête JSON invalide', 400)
   }
 
-  const { dailySummaryEnabled } = body
+  const { dailySummaryEnabled, onboardingCompleted } = body
 
-  if (typeof dailySummaryEnabled !== 'boolean') {
-    return apiError('VALIDATION_ERROR', 'dailySummaryEnabled must be a boolean', 400)
+  const hasDailySummary = 'dailySummaryEnabled' in body
+  const hasOnboarding = 'onboardingCompleted' in body
+
+  if (!hasDailySummary && !hasOnboarding) {
+    return apiError('VALIDATION_ERROR', 'Au moins un champ requis : dailySummaryEnabled, onboardingCompleted', 400)
   }
+
+  if (hasDailySummary && typeof dailySummaryEnabled !== 'boolean') {
+    return apiError('VALIDATION_ERROR', 'dailySummaryEnabled doit être un booléen', 400)
+  }
+
+  if (hasOnboarding && typeof onboardingCompleted !== 'boolean') {
+    return apiError('VALIDATION_ERROR', 'onboardingCompleted doit être un booléen', 400)
+  }
+
+  const updates: Record<string, unknown> = { user_id: userId }
+  if (typeof dailySummaryEnabled === 'boolean') updates.daily_summary_enabled = dailySummaryEnabled
+  if (typeof onboardingCompleted === 'boolean') updates.onboarding_completed = onboardingCompleted
 
   const supabase = createAdminClient()
 
   const { error } = await supabase
     .from('user_settings')
-    .upsert({ user_id: userId, daily_summary_enabled: dailySummaryEnabled }, { onConflict: 'user_id' })
+    .upsert(updates, { onConflict: 'user_id' })
 
   if (error) return apiError('INTERNAL_ERROR', 'Erreur de sauvegarde', 500)
 

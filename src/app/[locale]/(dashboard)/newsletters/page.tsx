@@ -4,6 +4,7 @@ import { getTranslations } from 'next-intl/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { InboxAddressCard } from '@/features/newsletters/components/InboxAddressCard'
 import { NewsletterList } from '@/features/newsletters/components/NewsletterList'
+import { OnboardingWrapper } from '@/features/onboarding/components/OnboardingWrapper'
 
 export default async function NewslettersPage() {
   const { userId } = await auth()
@@ -13,7 +14,7 @@ export default async function NewslettersPage() {
 
   const supabase = createAdminClient()
 
-  const [{ data: newsletters }, { data: user }] = await Promise.all([
+  const [{ data: newsletters }, { data: user }, { data: settings }] = await Promise.all([
     supabase
       .from('newsletters')
       .select('*')
@@ -24,9 +25,15 @@ export default async function NewslettersPage() {
       .select('inbox_address, tier')
       .eq('clerk_id', userId)
       .single(),
+    supabase
+      .from('user_settings')
+      .select('onboarding_completed')
+      .eq('user_id', userId)
+      .single(),
   ])
 
   const tier = (user?.tier as 'free' | 'paid') ?? 'free'
+  const showOnboarding = (newsletters ?? []).length === 0 && !settings?.onboarding_completed
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4 space-y-6">
@@ -34,6 +41,10 @@ export default async function NewslettersPage() {
         <h1 className="text-2xl font-semibold">{t('title')}</h1>
         <p className="text-muted-foreground text-sm mt-1">{t('subtitle')}</p>
       </div>
+
+      {showOnboarding && user?.inbox_address && (
+        <OnboardingWrapper inboxAddress={user.inbox_address} />
+      )}
 
       {user?.inbox_address && (
         <InboxAddressCard inboxAddress={user.inbox_address} />
