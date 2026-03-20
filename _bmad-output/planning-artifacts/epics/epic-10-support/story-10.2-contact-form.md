@@ -175,30 +175,50 @@ RESEND_API_KEY=re_xxx
 
 ## Definition of Done
 
-- [ ] `POST /api/contact` avec validation et Resend
-- [ ] Page formulaire avec confirmation après envoi
-- [ ] Rate limiting basique (3/heure par IP)
+- [x] `POST /api/contact` avec validation et Resend
+- [x] Page formulaire avec confirmation après envoi
+- [x] Rate limiting basique (3/heure par IP)
 
 ---
 
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Installer `resend` et `@hookform/resolvers`
-- [ ] Créer `POST /api/contact`
-- [ ] Créer page `/[locale]/help/contact`
+- [x] Installer `resend`, `react-hook-form` et `@hookform/resolvers`
+- [x] Créer `POST /api/contact`
+- [x] Créer page `/[locale]/help/contact`
 
 ### Completion Notes
-_À remplir par l'agent_
+- Installé resend@^6.9.4, react-hook-form@^7.71.2, @hookform/resolvers@^5.2.2
+- Route API POST /api/contact : validation Zod (nom, email, subject, message), rate limiting in-memory 3/h par IP, envoi via Resend, gestion erreurs JSON invalide et Resend failure
+- Correction bug story originale : le rate limiter ne réinitialisait pas le compteur après expiration du resetAt
+- Page contact client-side avec react-hook-form + zodResolver, pré-remplissage email Clerk (AC6), confirmation visuelle (AC4), affichage erreurs serveur
+- Composant UI Textarea créé (pattern shadcn identique à Input)
+- Traductions i18n ajoutées (fr + en) sous namespace marketing.contact
+- 14 tests API (validation, rate limit, erreurs Resend, longueurs max, IP parsing, invalid requests not counted)
+- 7 tests page (rendu, pré-remplissage email, soumission, erreur serveur, erreur rate limit traduite, erreur non-JSON, état submitting)
+- 0 régression introduite (4 fichiers en échec pré-existants : workers, supabase integ, settings, categories)
 
 ### File List
-_À remplir par l'agent_
+- src/app/api/contact/route.ts (new)
+- src/app/api/contact/__tests__/route.test.ts (new)
+- src/app/[locale]/(marketing)/help/contact/page.tsx (new)
+- src/app/[locale]/(marketing)/help/contact/__tests__/page.test.tsx (new)
+- src/components/ui/textarea.tsx (new)
+- messages/fr.json (modified — added marketing.contact namespace)
+- messages/en.json (modified — added marketing.contact namespace)
+- package.json (modified — added resend, react-hook-form, @hookform/resolvers)
 
 ### Debug Log
-_À remplir par l'agent_
+- Mock Resend initial avec vi.fn() échouait ("not a constructor") → corrigé avec class mock
+- npm install lent (>3min) à cause des warnings EBADENGINE node v21 — n'affecte pas le fonctionnement
+
+### Change Log
+- 2026-03-19 : Implémentation complète story 10.2 — formulaire de contact avec API, validation, rate limiting, i18n, tests
+- 2026-03-20 : Code review — Corrigé 8 issues (H1: fuite mémoire rate limiter + cleanup, H2: import auth inutilisé supprimé, H3: parsing x-forwarded-for, M1: rate limit après validation seulement, M2: max lengths client = serveur, M3: messages erreur API en anglais + traduction côté client, M4: emails en env vars, M5: protection res.json() non-JSON). Ajouté 3 tests (invalid requests not counted, IP chain parsing, non-JSON error fallback). 21 tests passent.

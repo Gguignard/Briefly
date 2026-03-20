@@ -67,6 +67,14 @@ export default async function MarketingFooter({ locale }: { locale: string }) {
             <h3 className="text-sm font-semibold">{t('support')}</h3>
             <ul className="space-y-2 text-sm">
               <li>
+                <Link
+                  href={`/${locale}/help`}
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {t('help')}
+                </Link>
+              </li>
+              <li>
                 <a
                   href="mailto:hello@briefly.app"
                   className="text-muted-foreground hover:text-foreground transition-colors"

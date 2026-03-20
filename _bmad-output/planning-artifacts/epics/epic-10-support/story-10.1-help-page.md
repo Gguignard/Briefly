@@ -135,29 +135,43 @@ export default function HelpPage({ params }: { params: { locale: string } }) {
 
 ## Definition of Done
 
-- [ ] Page `/[locale]/help` accessible et rendue statiquement
-- [ ] Accordéon FAQ avec au moins 6 questions
-- [ ] Lien vers le formulaire de contact
+- [x] Page `/[locale]/help` accessible et rendue statiquement
+- [x] Accordéon FAQ avec au moins 6 questions
+- [x] Lien vers le formulaire de contact
 
 ---
 
 ## Dev Agent Record
 
 ### Status
-Not Started
+done
 
 ### Agent Model Used
-_À remplir par l'agent_
+Claude Opus 4.6
 
 ### Tasks
-- [ ] Créer `src/app/[locale]/(marketing)/help/page.tsx`
-- [ ] Ajouter lien dans le footer de la landing
+- [x] Créer `src/app/[locale]/(marketing)/help/page.tsx`
+- [x] Ajouter lien dans le footer de la landing
 
 ### Completion Notes
-_À remplir par l'agent_
+- Page `/[locale]/help` créée avec SSG (`force-static` + `generateStaticParams` fr/en)
+- FAQ structurée en 4 sections (Comment ça marche, Ingestion email, Facturation, RGPD) avec 6 questions au total
+- Composant Accordion (shadcn/ui + Radix) installé et utilisé
+- Métadonnées SEO complètes (title, description, canonical, alternates, OpenGraph)
+- Traductions FR/EN ajoutées dans `messages/fr.json` et `messages/en.json` sous `marketing.help`
+- Lien "Aide" ajouté dans la section Support du footer marketing
+- Note : routes `/help` et `/help/(.*)` déjà présentes dans le middleware (ajoutées lors de la story 9.5)
+- 13 tests unitaires écrits et passants (metadata, contenu FR/EN, liens contact, sections FAQ)
 
 ### File List
-_À remplir par l'agent_
+- `src/app/[locale]/(marketing)/help/page.tsx` (nouveau)
+- `src/app/[locale]/(marketing)/help/__tests__/page.test.tsx` (nouveau)
+- `src/components/ui/accordion.tsx` (nouveau — shadcn/ui)
+- `src/components/marketing/MarketingFooter.tsx` (modifié — ajout lien aide)
+- `messages/fr.json` (modifié — ajout section marketing.help)
+- `messages/en.json` (modifié — ajout section marketing.help)
+- `package.json` (modifié — ajout @radix-ui/react-accordion)
 
 ### Debug Log
-_À remplir par l'agent_
+- Mock `getTranslations` corrigé pour supporter le switch de locale EN via `setRequestLocale` tracking
+- Échecs préexistants non liés : Supabase ECONNREFUSED (pas de serveur local), email.worker (mocks cassés avant cette story), settings/categories (mocks incomplets)
