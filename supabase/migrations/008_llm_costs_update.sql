@@ -34,7 +34,7 @@ CREATE INDEX IF NOT EXISTS idx_llm_costs_user_month ON public.llm_costs(user_id,
 ALTER TABLE public.llm_costs ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY llm_costs_user_select ON public.llm_costs
-  FOR SELECT USING (auth.uid()::text = user_id);
+  FOR SELECT USING (auth.uid() = user_id);
 
 CREATE POLICY llm_costs_service_all ON public.llm_costs
   FOR ALL USING (auth.role() = 'service_role');
